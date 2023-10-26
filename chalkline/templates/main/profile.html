@@ -1,0 +1,111 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='main/home.css')}}">
+</head>
+{% extends "design.html" %}
+
+{% block title %}Create Profile{% endblock title %}
+
+{% block content %}
+<main>
+    <center>
+        <h1>Profile</h1>
+        <h3>Need Help? Check the <a href="#">Docs</a>.</h3>
+        <h3 class='error'>{{msg}}</h3>
+        <section>
+            <form method="post" id="teams">
+                <h3>My Teams</h3>
+                <table id="teamCodes" class="center">
+                    
+                    {% if teamsList|length > 0 %}
+                        <tr>
+                            <th>Team Code</th>
+                            <th>Team Name</th>
+                            <th>Remove</th>
+                        </tr>
+                        {% for team in teamsList %}
+                        <tr>
+                            <td>{{team['teamId']}}</td>
+                            <td>{{team['teamName']}}</td>
+                            <td><button name="removeTeam" value="{{team['teamId']}}" class="action">Remove</button></td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <h3 class="error">No teams associated with this account.</h3>
+                    {% endif %}
+                    
+                </table>
+            </form>
+
+                <h3>Add Team</h3>
+
+                <form method="post">
+                    <table class="center">
+                        <tr>
+                            <td><label for="newTeam">Add Team Code</label></td>
+                            <td><input type="text" name="newTeam" id="newTeam" placeholder="Add Team Code here..."></td>
+                        </tr>
+                    </table>
+                    <button class="action" type="submit" name="addTeam" value="addTeam">Add Team</button>
+                </form>
+
+                
+
+            
+        </section>
+        
+        <section>
+            <form method="post" id="profile">
+                <h3>Personal Information</h3>
+                <table class="center">
+                    <tr>
+                        <td><label for="firstName">First Name</label></td>
+                        <td><input type="text" name="firstName" id="firstName" value={{user.firstName}} required></td>
+                    </tr>
+                    <tr>
+                        <td><label for="lastName">Last Name</label></td>
+                        <td><input type="text" name="lastName" id="lastName" value={{user.lastName}} required></td>
+                    </tr>
+                    <tr>
+                        <td><label for="email">Email</label></td>
+                        <td><input type="email" name="email" id="email" value={{user.email}} required></td>
+                    </tr>
+                    <tr>
+                        <td><label for="phone">Phone</label></td>
+                        <td><input type="tel" name="phone" id="phone" pattern="[0-9]{10}" value={{user.phone}} required></td>
+                    </tr>
+                    <tr>
+                        <td><label for="emailNotifications">Receive email alerts</label></td>
+                        <td><input type="checkbox" name="emailNotifications" id="emailNotifications" checked></td>
+                    </tr>
+                    <tr>
+                        <td><label for="phoneNotifications">Receive text alerts</label></td>
+                        <td><input type="checkbox" name="phoneNotifications" id="phoneNotifications" checked></td>
+                    </tr>
+                </table>
+
+                <script>
+                    let user = {{user | tojson}};
+                    console.log(user);
+                    if (!user.emailNotifications) {
+                        document.getElementById('emailNotifications').checked = false;
+                    }
+                    if (!user.phoneNotifications) {
+                        document.getElementById('phoneNotifications').checked = false;
+                    }
+                </script>
+                
+
+                <button class="action" type="submit" name="updateProfile" value="updateProfile">Save</button>
+            </form>
+        </section>
+        <section>
+            <h3>Session</h3>
+            <form method="post" id="logout">
+                <button class="action" type="submit" name="logout" value="logout"><b>Sign Out</b></button>
+            </form>
+        </section>
+            
+    </center>
+</main>
+
+{% endblock content %}

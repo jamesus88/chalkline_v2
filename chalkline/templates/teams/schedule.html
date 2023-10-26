@@ -1,0 +1,40 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='schedule.css')}}">
+</head>
+
+{% extends "design.html" %}
+{% block title %}Team Schedule{% endblock title %}
+
+{% block content %}
+<main>
+    <h1>Team Schedule</h1>
+    <h2>Your Teams: </h2>
+    <section>
+        <h4>Filters</h4>
+        <form method="post">
+            <button type="submit" name="updateFilter" value="updateFilter">Update</button>
+            <select class="filter" name="hidePast" id="hidePast">
+                <option value="True">Upcoming events</option>
+                <option value="False">All events (past included)</option>
+            </select>
+            <select class="filter" name="teamId" id="teamId">
+                <option value="none">All My Teams</option>
+            </select>
+        </form>
+        
+    </section>
+    <section>
+        <table>
+            <tr>
+                <th>Location</th>
+                <th>Date/Time</th>
+                <th>Field</th>
+                <th>Away</th>
+                <th>Home</th>
+                <th>Umpire Duty</th>
+            </tr>
+        </table>
+    </section>
+
+</main>
+{% endblock content %}

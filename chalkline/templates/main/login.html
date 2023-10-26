@@ -1,0 +1,49 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='main/home.css')}}">
+</head>
+{% extends "design.html" %}
+
+{% block title %}Sign In{% endblock title %}
+
+{% block content %}
+<main>
+    <form method="post" id="login">
+        <section>
+            <center>
+                <h1>Sign In</h1>
+                <label class="sign-in" for="userId">User ID</label>
+                <input type="password" name="userId" id="userId" required autofocus>
+                <button class="button-sign-in" type="submit">Sign In</button>
+                <h3 class='error'>{{msg}}</h3>
+                <a href="{{url_for('main.signup')}}">Create Account</a>
+            </center>
+        </section>
+        <section class="split">
+            <div>
+                <h2>Forgot User ID?</h2>
+                <ul>
+                    <li>Enter authenticating information to locate User ID</li>
+                    OR
+                    <li>Contact administrator to locate User ID</li>
+                    OR
+                    <li>Contact administrator to delete your account</li>
+                </ul>
+                <h3><a href="#">Locate User ID</a></h3>
+                <h3><a href="#">Documentation</a></h3>
+            </div>
+            <div>
+                <i class="fa-solid fa-question large"></i>
+            </div>
+            
+        </section>
+        <section>
+            <center>
+                <h2>Chalkline&trade; Security</h2>
+                <p><a href="#">Learn more</a> about how Chalkline&trade; keeps your data safe.</p>
+                <p>Cool Nerd Stuff: <a href="#">Password Hashing and Salting</a></p>
+            </center>
+        </section>
+    </form>
+</main>
+
+{% endblock content %}

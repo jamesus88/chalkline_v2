@@ -1,0 +1,79 @@
+:root {
+    --chalkline-navy: #07132c;
+    --highlight-blue: rgb(0, 48, 224);
+    --section-background: rgb(236, 236, 236);
+    --purple: rgb(85, 0, 255);
+}
+html {
+    scroll-behavior: smooth;
+}
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    overflow: auto;
+    color: var(--chalkline-navy);
+}
+#html-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100svh;
+}
+.login {
+    padding: 10px;
+    background-color: var(--highlight-blue);
+    color: white;
+    text-decoration: none;
+    border-radius: 15px;
+    border: 2px solid var(--chalkline-navy);
+    transition: all 0.3s;
+}
+.login:hover {
+    background-color: white;
+    color: var(--highlight-blue);
+}
+a {
+    font-weight: bold;
+    color: var(--highlight-blue);
+    transition: all 0.3s;
+}
+a:hover {
+    color: var(--purple);
+}
+.error {
+    color: red;
+    font-weight: bold;
+}
+.urgent {
+    color: orangered;
+    font-weight: bold;
+}
+.message {
+    color: var(--purple);
+    font-style: italic;
+}
+button.action {
+    color: white;
+    background-color: var(--highlight-blue);
+    border-radius: 15px;
+    border: 2px solid var(--chalkline-navy);
+    font-size: 12pt;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+button.action:hover {
+    color: var(--highlight-blue);
+    background-color: white;
+}
+.flex-col {
+    display: flex;
+    flex-direction: column;
+}
+input, select {
+    border-radius: 10px;
+    border: 2px solid var(--chalkline-navy);
+    font-size: 10pt;
+    padding: 5px;
+    width: 200px;
+}

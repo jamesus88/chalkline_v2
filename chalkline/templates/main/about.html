@@ -1,0 +1,80 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='main/home.css')}}">
+</head>
+{% extends "design.html" %}
+{% block title %}About{% endblock title %}
+
+{% block content %}
+<main>
+    <center>
+        <h1>About Chalkline</h1>
+        <section id="about-page">
+            <h2>What is Chalkline?</h2>
+            <section class="split">
+                <div>
+                    <h3>Chalkline, your all-in-one website for everything Little League Baseball.</h3>
+                    <p>Chalkline incorporates scheduling, umpiring, coaching, and league services into one, simple webapp.</p>
+                </div>
+                <div>
+                    <i class="fa-solid fa-baseball large"></i>
+                </div>
+            </section>
+            <section class="split">
+                <div>
+                    <i class="fa-solid fa-clipboard-check large"></i>
+                </div>
+                <div>
+                    <h3>Schedule practices, games, and umpires easily with one click.</h3>
+                    <p>Master schedules are easily accessible and custom views are available for each user.</p>
+                    <p>Teams can view the standings and their upcoming games or practices.</p>
+                </div>
+            </section>
+            <section class="split">
+                <div>
+                    <h3>Umpiring made simple.</h3>
+                    <p>Chalkline allows umpires to schedule themselves, without the need for an assignor.</p>
+                    <p>Leagues can assign games manually, or let umpires choose their own schedule.</p>
+                    <p>Coaches can request field umpires to fill their umpire duty.</p>
+                </div>
+                <div>
+                    <i class="fa-solid fa-glasses large"></i>
+                </div>
+            </section>
+            <section class="split">
+                <div>
+                    <i class="fa-solid fa-bullhorn large"></i>
+                </div>
+                <div>
+                    <h3>Never miss an update.</h3>
+                    <p>Coaches can send announcments to their entire team.</p>
+                    <p>League administrators can send game/field updates to all users.</p>
+                </div>
+            </section>
+            <section class="split">
+                <div>
+                    <h3>Always improving.</h3>
+                    <p>Updates with new features are pushed out every week.</p>
+                    <p>View the <a href="#">Developer's Log</a>.</p>
+                </div>
+                <div>
+                    <i class="fa-solid fa-wrench large"></i>
+                </div>
+            </section>
+            <section class="split">
+                <div>
+                    <i class="fa-solid fa-scale-balanced large"></i>
+                </div>
+                <div>
+                    <h3>Affordable pricing.</h3>
+                    <p>$99.99 USD per season, up to 3 seasons per year (spring, summer, fall)</p>
+                    <p>$3.99 USD per game scheduled.</p>
+                    <p>All Stars services included.</p>
+                    <p>All features included.</p>
+                    <p>Standard messaging and data rates apply for each user.</p>
+                </div>
+            </section>
+        </section>
+    </center>
+</main>
+
+{% endblock content %}

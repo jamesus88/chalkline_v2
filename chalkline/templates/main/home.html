@@ -1,0 +1,34 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='main/home.css')}}">
+</head>
+{% extends "design.html" %}
+{% block title %}Home{% endblock title %}
+{% block content %}
+
+<main>
+    <center>
+        {% if user is none %}
+        <h1>Baseball Ready.</h1>
+        <a class="login large-link" href="{{url_for('main.login')}}">Sign In <i class="fa-solid fa-user"></i></a>
+        <a href="{{url_for('main.signup')}}">Create Account</a>
+        {% else %}
+        <h1>Hello, {{user.firstName}}!</h1>
+        {% endif %}
+    <br>
+        <h2>Chalkline News</h2>
+        <section>
+            <h3><a href="#">v4.0.0</a> is here.</h3>
+            <h4>New look. New features. Still baseball.</h4>
+        </section>
+        <section>
+            <h3>New <a href="#">Team page</a>.</h3>
+            <h4>View game schedule, practices, and send announcements to your team.</h4>
+            <h3>New <a href="#">League page</a>.</h3>
+            <h4>View contacts, director on duty, and other league-wide information.</h4>
+        </section>
+    
+        <h1>Questions? Check the <a href="#">docs</a>.</h1>
+    </center>
+</main>
+
+{% endblock content %}

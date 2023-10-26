@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/9794118ac5.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{url_for('static', filename='design.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='navbar.css')}}">
+    <title>Chalkline | {% block title %}{% endblock title %}</title>
+</head>
+
+<div id="html-container">
+    <nav id="main-navbar" class="topnav">
+        <a id="menu-title" href="{{url_for('main.home')}}"><b id="title">Chalkline</b></a>
+
+            {% if user is not none %}
+
+                {% if 'coach' in user.role %}
+                <div class="dropdown dropdown-team">
+                    <button class="dropdown-button">Teams <i class="fa-solid fa-caret-down"></i></button>
+                    <div class="dropdown-content team">
+                        <a href="#">Team Schedule</a>
+                        <a href="#">Contact Team</a>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if 'youth' in user.role or 'umpire' in user.role %}
+                <div class="dropdown dropdown-umpire">
+                    <button class="dropdown-button">Umpiring <i class="fa-solid fa-caret-down"></i></button>
+                    <div class="dropdown-content umpire">
+                        <a href="#">My Games</a>
+                        <a href="#">Umpire Schedule</a>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="dropdown dropdown-league">
+                    <button class="dropdown-button">League <i class="fa-solid fa-caret-down"></i></button>
+                    <div class="dropdown-content league">
+                        <a href="#">My League</a>
+                        <a href="#">Contacts</a>
+                    </div>
+                </div>
+
+                {% if 'admin' in user.role %}
+                <div class="dropdown dropdown-admin">
+                    <button class="dropdown-button">Admin <i class="fa-solid fa-caret-down"></i></button>
+                    <div class="dropdown-content admin">
+                        <a href="#">Announcements</a>
+                        <a href="#">Game Data</a>
+                    </div>
+                </div>
+                {% endif %}
+
+            {% endif %}
+
+        <a href="{{url_for('main.about')}}">About</a>
+        
+        <div class="nav-right">
+            {% if user is none %}
+            <a href="{{url_for('main.signup')}}">Create Account</a>
+            <a class="sign-in" href="{{url_for('main.login')}}">Sign In</a>
+            {% else %}
+            <a class="sign-in" href="{{url_for('main.profile')}}">Account</a>
+            {% endif %}
+            <a href="#" class="menu-bars" onclick="showMobileNav()"><i class="fa-solid fa-bars"></i></a>
+        </div>
+    </nav>
+
+    <body>{% block content %}{% endblock content %}</body>
+    
+    <footer>
+        <p>Created and Maintained by Aidan Hurwitz</p>
+        <p>Chalkline&trade; v4.0.0 &copy;2023</p>
+    </footer>
+
+</div>
+<script>
+    function showMobileNav() {
+        var x = document.getElementById("main-navbar");
+        if (x.className === "topnav") {
+          x.className += " responsive";
+        } else {
+          x.className = "topnav";
+        }
+      }
+</script>
+</html>

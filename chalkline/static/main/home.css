@@ -1,0 +1,110 @@
+@import './design.css';
+main {
+    width: 60%;
+    margin: 0 auto;
+}
+.split {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: transparent;
+    padding: 15px;
+    align-items: center;
+    text-align: left;
+    width: 80%;
+    margin: auto;
+}
+h1 {
+    font-size: 25pt;
+}
+center {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+.large-link {
+    padding: 20px 40px;
+    font-size: 12pt;
+    width: 80px;
+    margin: 10px auto;
+}
+.login {
+    margin-bottom: 20px;
+    box-shadow: 10px 10px 20px var(--highlight-blue);
+}
+section {
+    background-color: var(--section-background);
+    border-radius: 20px;
+    margin: 10px;
+    padding: 5px;
+}
+p {
+    margin: 5px;
+}
+h2 {
+    margin: 10px;
+}
+h3 {
+    margin: 15px;
+}
+#login label {
+    display: block;
+    font-weight: bold;
+    font-size: 16pt;
+    margin: 5x;
+}
+#login input {
+    padding: 10px;
+    width: 300px;
+    font-size: 20pt;
+    border-radius: 10px;
+    border: 2px solid var(--chalkline-navy);
+    margin: 10px auto;
+    outline: none;
+}
+#login input:focus {
+    outline: 3px solid var(--highlight-blue);
+}
+i.large {
+    font-size: 80pt;
+}
+button.button-sign-in {
+    width: 100px;
+    margin: 15px auto;
+    font-size: 15pt;
+    font-weight: bold;
+    background-color: var(--highlight-blue);
+    color: white;
+    border: 2px solid var(--chalkline-navy);
+    border-radius: 10px;
+    box-shadow: 10px 10px 20px var(--highlight-blue);
+    transition: all 0.3s;
+}
+button.button-sign-in:hover {
+    color: var(--highlight-blue);
+    background-color: white;
+}
+table.center {
+    margin: auto;
+    border-collapse: separate;
+    border-spacing: 10px 10px;
+}
+table.center > tr {
+    margin: 10px;
+}
+@media screen and (max-width: 1000px) {
+    main {
+        width: 95%;
+    }
+    .split {
+        flex-direction: column-reverse;
+        padding: 5px;
+    }
+    #about-page .split:nth-child(odd) {
+        flex-direction: column;
+    }
+    #about-page .split {
+        text-align: center;
+        width: 100%;
+    }
+}
