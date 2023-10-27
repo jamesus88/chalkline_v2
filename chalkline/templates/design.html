@@ -19,7 +19,7 @@
                 <div class="dropdown dropdown-team">
                     <button class="dropdown-button">Teams <i class="fa-solid fa-caret-down"></i></button>
                     <div class="dropdown-content team">
-                        <a href="#">Team Schedule</a>
+                        <a href="{{url_for('teams.schedule')}}">Team Schedule</a>
                         <a href="#">Contact Team</a>
                     </div>
                 </div>
@@ -30,7 +30,7 @@
                     <button class="dropdown-button">Umpiring <i class="fa-solid fa-caret-down"></i></button>
                     <div class="dropdown-content umpire">
                         <a href="#">My Games</a>
-                        <a href="#">Umpire Schedule</a>
+                        <a href="{{url_for('umpire.schedule')}}">Umpire Schedule</a>
                     </div>
                 </div>
                 {% endif %}

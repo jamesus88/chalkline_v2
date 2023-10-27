@@ -4,7 +4,57 @@ main {
     width: 70%;
     margin: 0 auto;
 }
-
+table.event-display {
+    width: 100%;
+    text-align: left;
+    border-collapse: separate;
+    border-spacing: 0 15px;
+}
+section.split {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.align-right {
+    text-align: right;
+}
+th {
+    padding: 5px 10px;
+    font-size: 10pt;
+}
+td {
+    background-color: var(--section-background);
+    padding: 5px 10px;
+    font-size: 10pt;
+}
+td:first-child, th:first-child {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+td:last-child, th:last-child {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+.blue-text {
+    color: blue;
+    font-weight: bold;
+}
+.red-text {
+    color: red;
+    font-weight: bold;
+}
+.green-text {
+    color: green;
+    font-weight: bold;
+}
+.filter-section {
+    display: flex;
+    flex-direction: row;
+}
+.filter {
+    margin: 5px;
+    width: fit-content;
+}
 @media screen and (max-width: 850px) {
     main {
         width: 95%;

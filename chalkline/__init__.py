@@ -10,4 +10,7 @@ def create_app():
     from chalkline.teams.routes import teams
     app.register_blueprint(teams, url_prefix="/teams")
     
+    from chalkline.umpire.routes import umpire
+    app.register_blueprint(umpire, url_prefix="/umpire")
+    
     return app

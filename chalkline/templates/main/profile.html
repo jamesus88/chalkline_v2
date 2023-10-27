@@ -85,7 +85,6 @@
 
                 <script>
                     let user = {{user | tojson}};
-                    console.log(user);
                     if (!user.emailNotifications) {
                         document.getElementById('emailNotifications').checked = false;
                     }

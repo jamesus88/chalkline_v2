@@ -4,18 +4,17 @@
 </head>
 
 {% extends "design.html" %}
-{% block title %}Team Schedule{% endblock title %}
+{% block title %}Umpire Schedule{% endblock title %}
 
 {% block content %}
 <main>
     <section class="split">
         <div>
-            <h1>Team Schedule</h1>
-            <h3>Your Teams: </h3>
+            <h1>Umpire Schedule</h1>
         </div>
         <div class="align-right">
-            <h3><a href="#">Request Umpires</a></h3>
-            <p>Umpire duties can be covered by youth umpires.</p>
+            <h3><a href="#">My Games</a></h3>
+            <p>View games you are working.</p>
         </div>
     </section>
     <button type="" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action">Filters <i class="fa-solid fa-caret-down"></i></button>
@@ -28,24 +27,18 @@
                 <option value="True" selected>Upcoming events</option>
                 <option value="False">All events (past included)</option>
             </select>
-            <select class="filter" name="teamId" id="teamId" onchange="this.form.submit()">
-                <option value="null" selected>All My Teams</option>
-                {% for team in user.teams %}
-                <option value="{{team}}">{{team}}</option>
-                {% endfor %}
-            </select>
-            <select class="filter" name="eventType" id="eventType" onchange="this.form.submit()">
-                <option value="null" selected>All events</option>
-                <option value="Game">Games only</option>
-                <option value="Practice">Practices only</option>
-                <option value="Umpire Duty">Umpire Duties only</option>
+            <select class="filter" name="ageGroup" id="ageGroup" onchange="this.form.submit()">
+                <option value="null" selected>All Age Groups</option>
+                <option value="AA">AA only</option>
+                <option value="AAA">AAA only</option>
+                <option value="Majors">Majors only</option>
+                <option value="50/70">50/70 only</option>
+                <option value="Juniors">Juniors only</option>
             </select>
         
             <script>
                 let filter = {{ eventFilter | tojson }};
                 document.getElementById('hidePast').value = filter.hidePast;
-                document.getElementById('teamId').value = filter.teamId;
-                document.getElementById('eventType').value = filter.eventType;
 
                 function toggleFilterSection(section) {
                     let sect = document.getElementById(section);
@@ -61,30 +54,27 @@
 
         <section class="schedule-section scrollwrapper">
             {% if eventList|length < 1 %}
-            <h3 class="error">No events found. Try the <a href="#">Master Schedule</a></h3>
+            <h3 class="error">No games found.</h3>
             {% endif %}
             <table id="schedule-table" class="event-display">
                 <tr>
-                    <th>Event</th>
                     <th>Info</th>
                     <th>Venue</th>
                     <th>Date/Time</th>
                     <th>Field</th>
-                    <th>Away</th>
-                    <th>Home</th>
-                    <th>Umpire Duty</th>
-                    
+                    <th>Age Group</th>
+                    <th>Plate</th>
+                    <th>Field</th>
                 </tr>
                 {% for event in eventList %}
                 <tr class="event-row">
-                    <td class="event-type">{{event.eventType}}</td>
                     <td><a class="icon-link" href="#"><i class="fa-solid fa-info"></i></a></td>
                     <td>{{event.eventVenue}}</td>
                     <td>{{event.eventDate.strftime('%a %m/%d @ %H:%M')}}</td>
                     <td>{{event.eventField}}</td>
-                    <td>{{event.awayTeam}}</td>
-                    <td>{{event.homeTeam}}</td>
-                    <td>{{event.umpireDuty}}</td>
+                    <td>{{event.eventAgeGroup}}</td>
+                    <td>{{event.plateUmpire}}</td>
+                    <td>{{event.field1Umpire}}</td>
                 </tr>
                 {% endfor %}
                 

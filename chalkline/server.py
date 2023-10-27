@@ -14,4 +14,7 @@ def logout():
 def todaysDate():
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=-4)
     return now
-    
+
+def safeUser(user):
+    user.pop('userId')
+    return user

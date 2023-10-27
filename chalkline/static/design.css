@@ -41,6 +41,18 @@ a {
 a:hover {
     color: var(--purple);
 }
+a.icon-link {
+    color: var(--chalkline-navy);
+    padding: 5px 12px;
+    font-size: 14pt;
+    background-color: white;
+    border: 2px solid var(--chalkline-navy);
+    border-radius: 15px;
+}
+a.icon-link:hover {
+    color: white;
+    background-color: var(--chalkline-navy);
+}
 .error {
     color: red;
     font-weight: bold;
@@ -76,4 +88,7 @@ input, select {
     font-size: 10pt;
     padding: 5px;
     width: 200px;
+}
+.scrollwrapper {
+    overflow: auto;
 }
