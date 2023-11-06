@@ -17,10 +17,10 @@
 
                 {% if 'coach' in user.role %}
                 <div class="dropdown dropdown-team">
-                    <button class="dropdown-button">Teams <i class="fa-solid fa-caret-down"></i></button>
+                    <button class="dropdown-button">Team <i class="fa-solid fa-caret-down"></i></button>
                     <div class="dropdown-content team">
                         <a href="{{url_for('teams.schedule')}}">Team Schedule</a>
-                        <a href="#">Contact Team</a>
+                        <a href="{{url_for('teams.info')}}">Team Info</a>
                     </div>
                 </div>
                 {% endif %}
@@ -29,8 +29,8 @@
                 <div class="dropdown dropdown-umpire">
                     <button class="dropdown-button">Umpiring <i class="fa-solid fa-caret-down"></i></button>
                     <div class="dropdown-content umpire">
-                        <a href="#">My Games</a>
                         <a href="{{url_for('umpire.schedule')}}">Umpire Schedule</a>
+                        <a href="{{url_for('umpire.assignments')}}">My Games</a>
                     </div>
                 </div>
                 {% endif %}
@@ -38,8 +38,9 @@
                 <div class="dropdown dropdown-league">
                     <button class="dropdown-button">League <i class="fa-solid fa-caret-down"></i></button>
                     <div class="dropdown-content league">
-                        <a href="#">My League</a>
-                        <a href="#">Contacts</a>
+                        <a href="{{url_for('league.master_schedule')}}">Master Schedule</a>
+                        <a href="#">Director on Duty</a>
+                        <a href="#">League Info</a>
                     </div>
                 </div>
 
@@ -48,7 +49,10 @@
                     <button class="dropdown-button">Admin <i class="fa-solid fa-caret-down"></i></button>
                     <div class="dropdown-content admin">
                         <a href="#">Announcements</a>
-                        <a href="#">Game Data</a>
+                        <a href="#">Event Data</a>
+                        <a href="#">Manage Teams</a>
+                        <a href="#">Assign Umpires</a>
+                        <a href="#">Users</a>
                     </div>
                 </div>
                 {% endif %}

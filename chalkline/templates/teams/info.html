@@ -1,0 +1,81 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='main/home.css')}}">
+    <script src="{{url_for('static', filename='share.js')}}"></script>
+</head>
+
+{% extends "design.html" %}
+{% block title %}Team info{% endblock title %}
+
+{% block content %}
+<main>
+    <center>
+        <h1>My Teams</h1>
+        <section>
+            <form method="post">
+                <h3>Team: <select class="filter" name="teamId" id="teamId" onchange="this.form.submit()">
+                    {% for team in user.teams %}
+                    <option value="{{team}}">{{team}}</option>
+                    {% endfor %}
+                </select></h3>
+                <script>
+                    let team = {{ team | tojson }};
+                    document.getElementById('teamId').value = team.teamId;
+                </script>
+            </form>
+        </section>
+        <section>
+            <h2>{{team.teamId}} - {{team.teamName}}</h2>
+        </section>
+        <section>
+            <h2>Standings</h2>
+            <h3>Current Seed: </h3>
+            <table class="center">
+                <tr>
+                    <th>Wins</th>
+                    <th>Losses</th>
+                    <th>Ties</th>
+                </tr>
+                <tr>
+                    <td>{{team.wins}}</td>
+                    <td>{{team.losses}}</td>
+                    <td>{{team.ties}}</td>
+                </tr>
+            </table>
+        </section>
+        <section>
+            <h2>Contacts</h2>
+            <p>Other users with this team</p>
+            {% if user.hideEmail %}
+            <p class='urgent'>Your email is hidden to other users</p>
+            {% endif %}
+            {% if user.hidePhone %}
+            <p class='urgent'>Your phone number is hidden to other users</p>
+            {% endif %}
+            <a href="{{url_for('main.profile')}}">Change contact sharing preferences</a></p>
+            <table class="center">
+                <tr>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                </tr>
+                {% for user in teamContacts %}
+                <tr>
+                    <td>{{user.firstName}} {{user.lastName}}</td>
+                    {% if 'coach' in user.role %}
+                    <td>Coach</td>
+                    {% else %}
+                    <td>Parent</td>
+                    {% endif %}
+                    <td>{{user.phone}}</td>
+                    <td>{{user.email}}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            <button class='action' onclick="copy('{{link}}')">Share Team <i class="fa-solid fa-share-from-square"></i></button>
+        </section>
+    </center>
+</main>
+
+
+{% endblock content %}

@@ -1,75 +1,72 @@
 from chalkline import server, db
+import pymongo
 
 class EventFilter:
     hidePast = True
-    ageGroup = None
-    teamId = None
-    field = None
-    time = None
     eventType = None
+    teamId = None
+    ageGroup = None
+    
+    def __init__(self, **kwargs) -> None:
+        for key, value in kwargs:
+            setattr(self, key, value)
     
     def update(self, form):
-        if form['hidePast'] == 'False':
-            self.hidePast = False
+        if form.get('hidePast'):
+            if form['hidePast'] == 'false':
+                self.hidePast = False
                 
-        if form.get('teamId') not in  ['null', None]:
-            self.teamId = form['teamId']
+        if form.get('eventType'):
+            if form['eventType'] != 'null':
+                self.eventType = form['eventType']
+        
+        if form.get('teamId'):
+            if form['teamId'] != 'null':
+                self.teamId = form['teamId']
                 
-        if form.get('eventType') not in ['null', None]:
-            self.eventType = form['eventType']
-            
-        if form.get('ageGroup') not in ['null', None]:
-            self.ageGroup = form['ageGroup']
-            
-    def __repr__(self) -> str:
-        return f'{self.hidePast=}, {self.teamId=}, {self.eventType=}'
-    
-    def asdict(self) -> dict:
-        filterAsDict = {
-            'hidePast': str(self.hidePast),
-            'ageGroup': self.ageGroup,
+        if form.get('ageGroup'):
+            if form['ageGroup'] != 'null':
+                self.ageGroup = form['ageGroup']
+                
+    def asdict(self):
+        return {
+            'hidePast': self.hidePast,
+            'eventType': self.eventType,
             'teamId': self.teamId,
-            'field': self.field,
-            'eventType': self.eventType
+            'ageGroup': self.ageGroup
         }
-            
-        return filterAsDict
-            
         
     
-def getEventList(filter=EventFilter):
-    now = server.todaysDate()
-    criteria = [{}]
+def getEventList(filter=EventFilter, add_criteria={}, safe=True, userList=[]):
+    criteria = [add_criteria]
     
     if filter.hidePast:
-        criteria.append({'eventDate': {'$gte': now}})
-    
-    if filter.ageGroup is not None:
+        criteria.append({'eventDate': {'$gte': server.todaysDate(padding_hrs=2)}})
+        
+    if filter.eventType:
+        if filter.eventType == 'Umpire Duty':
+            criteria.append({'umpireDuty': filter.teamId})
+        else:
+            criteria.append({'eventType': filter.eventType})
+            
+    if filter.ageGroup:
         criteria.append({'eventAgeGroup': filter.ageGroup})
+        
+    if filter.teamId:
+        if filter.eventType == 'Umpire Duty':
+            criteria.append({'umpireDuty': filter.teamId})
+        elif filter.eventType:
+            criteria.append({'$or': [{'awayTeam': filter.teamId}, {'homeTeam': filter.teamId}]})
+        else:
+            criteria.append({'$or': [{'awayTeam': filter.teamId}, {'homeTeam': filter.teamId}, {'umpireDuty': filter.teamId}]})
     
-    if filter.teamId is not None:
-        criteria.append({'$or': [{'awayTeam': filter.teamId}, {'homeTeam': filter.teamId}, {'umpireDuty': filter.teamId}]})
-        
-    if filter.field is not None:
-        criteria.append({'eventField': filter.field})
-        
-    if filter.eventType is not None:
-        criteria.append({'eventType': filter.eventType})
-
-    print(f'{criteria=}')
-    events = db.eventData.find({"$and": criteria})
-
-    eventList = []
-
-    if filter.time is not None:
-        for event in events:
-            if event['eventDate'].strftime('%H:%M') == filter.time:
-                eventList.append(event)
-    else:
-        eventList = list(events)
-        
-    eventList.sort(key= lambda x: x['eventDate'], reverse=True)
+    events = list(db.eventData.find({'$and': criteria}).sort('eventDate', pymongo.ASCENDING))
     
-    return eventList
-
+    for i in range(len(events)):
+        if events[i]['umpireDuty'] == filter.teamId:
+            events[i]['eventType'] = 'Umpire Duty'
+    if safe:
+        events = [server.safeEvent(event, userList) for event in events]
+    
+    return events
         

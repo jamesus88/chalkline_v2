@@ -1,0 +1,120 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='schedule.css')}}">
+    <script src="{{url_for('static', filename='schedule.js')}}"></script>
+</head>
+
+{% extends "design.html" %}
+{% block title %}My Games{% endblock title %}
+
+{% block content %}
+<main>
+    <section class="split">
+        <div>
+            <h1>My Games - {{user.firstName[0]}}. {{user.lastName}}</h1>
+            <h3>View your schedule and remove games.</h3>
+            <p class="urgent">*Some games require approval to be removed.</p>
+        </div>
+        <div class="align-right">
+            <h3>Go to <a href="{{url_for('umpire.schedule')}}">Umpire Schedule</a></h3>
+            <p>To view all games for umpires.</p>
+        </div>
+    </section>
+    <button type="" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
+    <form method="post">
+        <section id="filter-section" class="filter-section" style='display: none;'>
+            <select name="updateFilter" id="updateFilter" style="display: none;">
+                <option value="updateFilter" selected>UpdateFilter</option>
+            </select>
+            <select class="filter" name="hidePast" id="hidePast" onchange="this.form.submit()">
+                <option value="true" selected>Future only</option>
+                <option value="false">Past and Future</option>
+            </select>
+            <select class="filter" name="ageGroup" id="ageGroup" onchange="this.form.submit()">
+                <option value="null" selected>All Age Groups</option>
+                <option value="AA">AA only</option>
+                <option value="AAA">AAA only</option>
+                <option value="Majors">Majors only</option>
+                <option value="50/70">50/70 only</option>
+                <option value="Juniors">Juniors only</option>
+            </select>
+
+            <script>
+                let filter = {{ eventFilter | tojson }};
+                document.getElementById('hidePast').value = filter.hidePast;
+                document.getElementById('ageGroup').value = filter.ageGroup;
+
+                function toggleFilterSection(section) {
+                    let sect = document.getElementById(section);
+                    if (sect.style.display == 'block') {
+                        sect.style.display = 'none';
+                    }
+                    else {
+                        sect.style.display = 'block';
+                    }
+                }
+            </script>
+        </section>
+        <p class="error">{{msg}}</p>
+        <section class="schedule-section scrollwrapper">
+            {% if eventList|length < 1 %}
+            <h3 class="error">You have no upcoming games. Add games on the <a href="{{url_for('umpire.schedule')}}">Umpire Schedule</a></h3>
+            {% else %}
+            <table id="schedule-table" class="event-display">
+                <tr>
+                    <th></th>
+                    <th>Date/Time</th>
+                    <th>Venue</th>
+                    <th>Field</th>
+                    <th>Age Group</th>
+                    <th>Status</th>
+                    <th>Plate</th>
+                    <th>Field</th>
+                    <th>Remove</th>
+                </tr>
+                {% for event in eventList %}
+                <tr class="event-row">
+                    <td><a class="icon-link" href="{{url_for('view_info.event', eventId=event._id)}}"><i class="fa-solid fa-info"></i></a></td>
+                    <td>{{event.eventDate.strftime('%a %m/%d @ %H:%M')}}</td>
+                    <td>{{event.eventVenue}}</td>
+                    <td>{{event.eventField}}</td>
+                    <td>{{event.eventAgeGroup}}</td>
+                    <td>{{event.status}}</td>
+                    <td>
+                        {% if event.plateUmpireInfo.fLast is not none %}
+                        <a href="#">{{event.plateUmpireInfo.fLast}}</a>
+                        {% else %}
+                        {{event.plateUmpireInfo.fLast}}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if event.field1UmpireInfo.fLast is not none %}
+                        <a href="#">{{event.field1UmpireInfo.fLast}}</a>
+                        {% else %}
+                        {{event.field1UmpireInfo.fLast}}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if event.editRules.requireRemoveRequest %}
+                        <button class="schedule-action" type="submit" name="removeGame" value="{{event._id}}" onclick="return confirm('Remove from game? This game REQUIRES permission before being removed.')">Remove*</button>
+                        {% else %}
+                        <button class="schedule-action" type="submit" name="removeGame" value="{{event._id}}" onclick="return confirm('Remove game?')">Remove</button>
+                        {% endif %}
+                        
+                    </td>
+
+                    
+
+                </tr>
+                {% endfor %}
+                
+            </table>
+            {% endif %}
+        </section>
+    </form>
+</main>
+
+<script>
+    let tbl = document.getElementById('schedule-table');
+    colorifySchedule(tbl);
+</script>
+{% endblock content %}

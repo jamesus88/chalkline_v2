@@ -41,7 +41,7 @@ def profile():
         if request.form.get('updateProfile'):
             user = db.updateProfile(user['userId'], request.form)
             session['user'] = user
-            return redirect(url_for('main.profile'))
+            msg = 'Profile Updated'
         
         elif request.form.get('logout'):
             srv.logout()
@@ -51,16 +51,17 @@ def profile():
             teamCode = request.form['removeTeam']
             user = db.removeTeamFromUser(user, teamCode)
             session['user'] = user
-            return redirect(url_for('main.profile'))
+            msg = f'Removed {teamCode} from your teams'
         
         elif request.form.get('addTeam'):
-            teamCode = request.form['newTeam']
+            teamCode = request.form['newTeam'].upper()
             response = db.addTeamToUser(user, teamCode)
             if type(response) == str:
                 msg = response
             else:
                 user = response
                 session['user'] = user
+                msg = f'Added {teamCode} to your teams'
                 
     teamsList = db.getTeamsFromUser(user['teams'])
     print(user)

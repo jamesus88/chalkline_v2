@@ -3,7 +3,8 @@ from chalkline import db, get_events
 from chalkline import server as srv
 teams = Blueprint('teams', __name__)
 
-@teams.route('/', methods=['GET', 'POST'])
+
+@teams.route('/schedule', methods=['GET', 'POST'])
 def schedule():
     user = srv.getUser()
     if user is None:
@@ -11,12 +12,50 @@ def schedule():
     elif 'coach' not in user['role'] and 'parent' not in user['role']:
         return redirect(url_for('main.home'))
     
+    msg = ''
+    
     eventFilter = get_events.EventFilter()
+    if len(user['teams']) > 0:
+        eventFilter.teamId = user['teams'][0]
     
     if request.method == 'POST':
         if request.form.get('updateFilter'):
             eventFilter.update(request.form)
             
-    eventList = get_events.getEventList(eventFilter)
+        if request.form.get('requestField1Umpire'):
+            gameId = request.form['requestField1Umpire']
+            msg = db.requestField1Umpire(user, gameId)
+            
+    userList = db.getUserList()
+    eventList = get_events.getEventList(eventFilter, userList=userList)
     
-    return render_template('teams/schedule.html', user=srv.safeUser(user), eventList=eventList, eventFilter=eventFilter.asdict())
+    return render_template('teams/schedule.html', user=srv.safeUser(user), eventList=eventList, eventFilter=eventFilter.asdict(), msg=msg)
+
+@teams.route("/info", methods=['GET', 'POST'])
+def info():
+    user = srv.getUser()
+    if user is None:
+        return redirect(url_for('main.login'))
+    elif 'coach' not in user['role'] and 'parent' not in user['role']:
+        return redirect(url_for('main.home'))
+    
+    msg = ''
+    teamId = None
+    if len(user['teams']) > 0:
+        teamId = user['teams'][0]
+    else:
+        return redirect(url_for('main.profile'))
+    
+    
+    if request.method == 'POST':
+        teamId = request.form.get('teamId')
+    
+    team = db.getTeams({'teamId': teamId})[0]
+    teamContacts = [srv.safeUser(contact, user) for contact in db.getUserList({'teams': teamId})]
+    link = srv.SHARE_LINK + f"invite/add-team/{teamId}"
+    
+    return render_template("teams/info.html", user=user, team=team, msg=msg, teamContacts=teamContacts, link=link)
+    
+    
+    
+    

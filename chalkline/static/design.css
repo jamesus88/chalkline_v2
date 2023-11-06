@@ -14,6 +14,12 @@ html, body {
     overflow: auto;
     color: var(--chalkline-navy);
 }
+h1 {
+    font-size: 24pt;
+}
+h2 {
+    font-size: 20pt;
+}
 #html-container {
     display: flex;
     flex-direction: column;
@@ -43,8 +49,8 @@ a:hover {
 }
 a.icon-link {
     color: var(--chalkline-navy);
-    padding: 5px 12px;
-    font-size: 14pt;
+    padding: 3px 10px;
+    font-size: 12pt;
     background-color: white;
     border: 2px solid var(--chalkline-navy);
     border-radius: 15px;
@@ -58,7 +64,7 @@ a.icon-link:hover {
     font-weight: bold;
 }
 .urgent {
-    color: orangered;
+    color: rgb(102, 0, 255);
     font-weight: bold;
 }
 .message {
@@ -88,6 +94,9 @@ input, select {
     font-size: 10pt;
     padding: 5px;
     width: 200px;
+}
+select {
+    background-color: white;
 }
 .scrollwrapper {
     overflow: auto;

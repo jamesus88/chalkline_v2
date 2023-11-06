@@ -13,4 +13,13 @@ def create_app():
     from chalkline.umpire.routes import umpire
     app.register_blueprint(umpire, url_prefix="/umpire")
     
+    from chalkline.league.routes import league
+    app.register_blueprint(league, url_prefix="/league")
+    
+    from chalkline.view_info.routes import view_info
+    app.register_blueprint(view_info, url_prefix="/view-info")
+    
+    from chalkline.invite.routes import invite
+    app.register_blueprint(invite, url_prefix="/invite")
+    
     return app

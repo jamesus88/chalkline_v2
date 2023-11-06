@@ -1,0 +1,22 @@
+@import './design.css';
+
+main {
+    width: 50%;
+    margin: 0 auto;
+}
+div.split {
+    display: flex;
+    justify-content: space-around;
+    flex-direction: row;
+}
+section {
+    background-color: var(--section-background);
+    padding: 5px;
+    border-radius: 15px;
+    margin: 10px 0;
+}
+@media screen and (max-width: 1000px) {
+    main {
+        width: 95%;
+    }
+}

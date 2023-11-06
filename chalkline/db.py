@@ -1,4 +1,4 @@
-import pymongo, bson
+import pymongo, bson, datetime
 from flask import session
 
 client = pymongo.MongoClient("mongodb+srv://aidanhurwitz:Mongo4821@mongo.to6zmzr.mongodb.net/?retryWrites=true&w=majority", connect=False)
@@ -15,9 +15,20 @@ def authenticate(userId = ''):
     user = userData.find_one({'userId': userId})
     if user:
         user['_id'] = str(user['_id'])
+        
+        permissionSet = permissions.find_one({'set': user['permissionSet']})
+        permissionSet.pop('_id')
+        
+        user['permissions'] = permissionSet
+        
+        print('login: ', user)
+        
         return user
     else:
         return None
+
+def getUserList(criteria={}):
+    return list(userData.find(criteria))
 
 def checkDuplicateUser(newUser):
     user = userData.find_one({"$or": [{'userId': newUser['userId']}, {'email': newUser['email']}, {'phone': newUser['phone']}]})
@@ -36,8 +47,12 @@ def createUser(form):
           "role": [],
           "child": [],
           "teams": [],
+          "permissionSet": "C0",
+          "canRemoveGame": False,
           "emailNotifications": True,
-          "textNotifications": True
+          "phoneNotifications": True,
+          "hideEmail": False,
+          "hidePhone": False
         },
         'error': None
     }
@@ -48,8 +63,10 @@ def createUser(form):
         response['newUser']['role'].append('parent')
     if form.get('role-umpire'):
         response['newUser']['role'].append('umpire')
+        response['newUser']['permissionSet'] = "U0"
     if form.get('role-youth'):
         response['newUser']['role'].append('youth')
+        response['newUser']['permissionSet'] = "Y0"
     if form.get('role-board'):
         response['newUser']['role'].append('board')
         
@@ -58,7 +75,7 @@ def createUser(form):
         
     if checkDuplicateUser(response['newUser']):
         response['error'] = 'User ID, email, or phone number already exists. Try logging in...'
-    print(response)
+
     return response
 
 def saveUser(user):
@@ -73,14 +90,20 @@ def updateProfile(userId, form):
         'email': form['email'],
         'phone': form['phone'],
         'emailNotifications': False,
-        'phoneNotifications': False
+        'phoneNotifications': False,
+        "hideEmail": False,
+        "hidePhone": False
     }
     
     if form.get('emailNotifications'):
         writable['emailNotifications'] = True
     if form.get('phoneNotifications'):
         writable['phoneNotifications'] = True
-    
+    if form.get('hideEmail'):
+        writable['hideEmail'] = True
+    if form.get('hidePhone'):
+        writable['hidePhone'] = True
+        
     user = userData.find_one_and_update({'userId': userId}, {'$set': writable}, return_document=pymongo.ReturnDocument.AFTER)
     user['_id'] = str(user['_id'])
     return user
@@ -95,6 +118,17 @@ def getTeamsFromUser(teamCodes):
     
     return teamsList
 
+def getTeams(criteria={}):
+    teams = teamData.find(criteria)
+
+    teamsList = []
+        
+    for team in teams:
+        team['_id'] = str(team['_id'])
+        teamsList.append(team)
+    
+    return teamsList
+        
 def removeTeamFromUser(user, teamCode):
     user['teams'].remove(teamCode)
     user = userData.find_one_and_update({"userId": user['userId']}, {"$set": {"teams": user['teams']}}, return_document=pymongo.ReturnDocument.AFTER)
@@ -111,3 +145,109 @@ def addTeamToUser(user, teamCode):
     user = userData.find_one_and_update({"userId": user['userId']}, {"$set": {"teams": user['teams']}}, return_document=pymongo.ReturnDocument.AFTER)
     user['_id'] = str(user['_id'])
     return user
+
+def addPlate(user, gameId):
+    criteria = [{'_id': bson.ObjectId(gameId)}, {'plateUmpire': None}, {'eventAgeGroup': {'$nin': user['permissions']['prohibitedPlate']}}]
+    
+    game = eventData.find_one_and_update({'$and': criteria}, {'$set': {'plateUmpire': user['userId']}})
+    
+    if game:
+        msg = f'Successfully added {user["firstName"][0]}. {user["lastName"]} for plate duty.'
+    else:
+        msg = 'Error: position filled or unavailable'
+        
+    return msg
+
+def addField1(user, gameId):
+    criteria = [{'_id': bson.ObjectId(gameId)}, {'field1Umpire': None}, {'eventAgeGroup': {'$nin': user['permissions']['prohibitedField']}}]
+    
+    game = eventData.find_one_and_update({'$and': criteria}, {'$set': {'field1Umpire': user['userId']}})
+    
+    if game:
+        msg = f'Successfully added {user["firstName"][0]}. {user["lastName"]} for field duty.'
+    else:
+        msg = 'Error: position filled or unavailable'
+        
+    return msg
+
+def removeGame(user, gameId):
+    game = eventData.find_one({'_id': bson.ObjectId(gameId)})
+    setData = {}
+    if (not game['editRules']['requireRemoveRequest']) or user['canRemoveGame']:
+        if user['userId'] == game['plateUmpire']:
+            setData['plateUmpire'] = None
+        if user['userId'] == game['field1Umpire']:
+            setData['field1Umpire'] = None
+            
+        eventData.update_one({'_id': bson.ObjectId(gameId)}, {'$set': setData})
+
+        msg = 'Successfully removed 1 game.'
+    
+    else:
+        msg = "Error: you do not have permission to remove this game. Contact administrator."
+        
+    return msg
+
+def requestField1Umpire(user, gameId):
+    game = eventData.find_one({'_id': bson.ObjectId(gameId)})
+    
+    if game['editRules']['fieldRequestAddable'] and 'coach' in user['role'] and game['fieldRequest'] is None:
+        eventData.update_one({'_id': bson.ObjectId(gameId)}, {'$set': {'fieldRequest': user['userId']}})
+        msg = 'Successfully requested youth umpire.'
+    
+    else:
+        msg = 'Error: you do not have permission to request a field umpire for this game.'
+        
+    return msg
+
+def getEventInfo(eventId, add_criteria={}):
+    add_criteria['_id'] = bson.ObjectId(eventId)
+    return eventData.find_one(add_criteria)
+
+def updateEvent(eventId, form, userList):
+    writable = {
+        'eventDate': datetime.datetime.strptime(form['eventDate'], "%Y-%m-%dT%H:%M"),
+        'eventVenue': form['eventVenue'],
+        'eventAgeGroup': form['eventAgeGroup'],
+        'awayTeam': form['awayTeam'],
+        'homeTeam': form['homeTeam'],
+        'eventType': form['eventType'],
+        'eventField': form['eventField'],
+        'status': form['status'],
+        'umpireDuty': form['umpireDuty'],
+        'plateUmpire': None,
+        'field1Umpire': None,
+        'fieldRequest': None,
+        'editRules': {
+            'visible': False,
+            'plateUmpireAddable': False,
+            'field1UmpireAddable': False,
+            'fieldRequestAddable': False,
+            'requireRemoveRequest': False,
+            'fieldRequestRemovable': False,
+        }
+    }
+    for user in userList:
+        if str(user['_id']) == form['plateUmpire']:
+            writable['plateUmpire'] = user['userId']
+        if str(user['_id']) == form['field1Umpire']:
+            writable['field1Umpire'] = user['userId']
+        if str(user['_id']) == form['fieldRequest']:
+            writable['fieldRequest'] = user['userId']
+            
+    if form.get('visible'):
+        writable['editRules']['visible'] = True
+    if form.get('plateUmpireAddable'):
+        writable['editRules']['plateUmpireAddable'] = True
+    if form.get('field1UmpireAddable'):
+        writable['editRules']['field1UmpireAddable'] = True
+    if form.get('fieldRequestAddable'):
+        writable['editRules']['fieldRequestAddable'] = True
+    if form.get('requireRemoveRequest'):
+        writable['editRules']['requireRemoveRequest'] = True
+    if form.get('fieldRequestRemovable'):
+        writable['editRules']['fieldRequestRemovable'] = True
+        
+    eventData.update_one({'_id': bson.ObjectId(eventId)}, {'$set': writable})
+    
+    return 'Successfully updated event.'

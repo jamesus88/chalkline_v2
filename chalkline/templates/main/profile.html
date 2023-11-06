@@ -9,8 +9,11 @@
 <main>
     <center>
         <h1>Profile</h1>
-        <h3>Need Help? Check the <a href="#">Docs</a>.</h3>
+        <h3>Need Help? Check the <a href="#">Docs</a>. Or <a href="{{url_for('main.home')}}">Return Home</a>.</h3>
+        <h4></h4>
         <h3 class='error'>{{msg}}</h3>
+
+        {% if 'coach' in user.role or 'parent' in user.role %}
         <section>
             <form method="post" id="teams">
                 <h3>My Teams</h3>
@@ -36,22 +39,19 @@
                 </table>
             </form>
 
-                <h3>Add Team</h3>
+            <h3>Add Team</h3>
 
-                <form method="post">
-                    <table class="center">
-                        <tr>
-                            <td><label for="newTeam">Add Team Code</label></td>
-                            <td><input type="text" name="newTeam" id="newTeam" placeholder="Add Team Code here..."></td>
-                        </tr>
-                    </table>
-                    <button class="action" type="submit" name="addTeam" value="addTeam">Add Team</button>
-                </form>
-
-                
-
-            
+            <form method="post">
+                <table class="center">
+                    <tr>
+                        <td><label for="newTeam">Add Team Code</label></td>
+                        <td><input type="text" name="newTeam" id="newTeam" placeholder="AA1, AAA3, MAJ4, etc..."></td>
+                    </tr>
+                </table>
+                <button class="action" type="submit" name="addTeam" value="addTeam">Add Team</button>
+            </form>
         </section>
+        {% endif %}
         
         <section>
             <form method="post" id="profile">
@@ -81,6 +81,14 @@
                         <td><label for="phoneNotifications">Receive text alerts</label></td>
                         <td><input type="checkbox" name="phoneNotifications" id="phoneNotifications" checked></td>
                     </tr>
+                    <tr>
+                        <td><label for="hideEmail">Hide my email from other users</label></td>
+                        <td><input type="checkbox" name="hideEmail" id="hideEmail"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="hidePhone">Hide my phone number from other users</label></td>
+                        <td><input type="checkbox" name="hidePhone" id="hidePhone"></td>
+                    </tr>
                 </table>
 
                 <script>
@@ -90,6 +98,12 @@
                     }
                     if (!user.phoneNotifications) {
                         document.getElementById('phoneNotifications').checked = false;
+                    }
+                    if (user.hideEmail) {
+                        document.getElementById('hideEmail').checked = true;
+                    }
+                    if (user.hidePhone) {
+                        document.getElementById('hidePhone').checked = true;
                     }
                 </script>
                 
