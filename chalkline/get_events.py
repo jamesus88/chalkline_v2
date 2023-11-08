@@ -3,7 +3,7 @@ import pymongo
 
 class EventFilter:
     hidePast = True
-    eventType = None
+    eventTypeFilter = None
     teamId = None
     ageGroup = None
     
@@ -16,9 +16,9 @@ class EventFilter:
             if form['hidePast'] == 'false':
                 self.hidePast = False
                 
-        if form.get('eventType'):
-            if form['eventType'] != 'null':
-                self.eventType = form['eventType']
+        if form.get('eventTypeFilter'):
+            if form['eventTypeFilter'] != 'null':
+                self.eventTypeFilter = form['eventTypeFilter']
         
         if form.get('teamId'):
             if form['teamId'] != 'null':
@@ -31,11 +31,11 @@ class EventFilter:
     def asdict(self):
         return {
             'hidePast': self.hidePast,
-            'eventType': self.eventType,
+            'eventTypeFilter': self.eventTypeFilter,
             'teamId': self.teamId,
             'ageGroup': self.ageGroup
         }
-        
+    
     
 def getEventList(filter=EventFilter, add_criteria={}, safe=True, userList=[]):
     criteria = [add_criteria]
@@ -43,25 +43,25 @@ def getEventList(filter=EventFilter, add_criteria={}, safe=True, userList=[]):
     if filter.hidePast:
         criteria.append({'eventDate': {'$gte': server.todaysDate(padding_hrs=2)}})
         
-    if filter.eventType:
-        if filter.eventType == 'Umpire Duty':
+    if filter.eventTypeFilter:
+        if filter.eventTypeFilter == 'Umpire Duty':
             criteria.append({'umpireDuty': filter.teamId})
         else:
-            criteria.append({'eventType': filter.eventType})
+            criteria.append({'eventType': filter.eventTypeFilter})
             
     if filter.ageGroup:
         criteria.append({'eventAgeGroup': filter.ageGroup})
         
     if filter.teamId:
-        if filter.eventType == 'Umpire Duty':
+        if filter.eventTypeFilter == 'Umpire Duty':
             criteria.append({'umpireDuty': filter.teamId})
-        elif filter.eventType:
+        elif filter.eventTypeFilter:
             criteria.append({'$or': [{'awayTeam': filter.teamId}, {'homeTeam': filter.teamId}]})
         else:
             criteria.append({'$or': [{'awayTeam': filter.teamId}, {'homeTeam': filter.teamId}, {'umpireDuty': filter.teamId}]})
     
     events = list(db.eventData.find({'$and': criteria}).sort('eventDate', pymongo.ASCENDING))
-    
+
     for i in range(len(events)):
         if events[i]['umpireDuty'] == filter.teamId:
             events[i]['eventType'] = 'Umpire Duty'

@@ -31,7 +31,7 @@
                 <option value="{{team['teamId']}}">{{team['teamId']}}</option>
                 {% endfor %}
             </select>
-            <select class="filter" name="eventType" id="eventType" onchange="this.form.submit()">
+            <select class="filter" name="eventTypeFilter" id="eventTypeFilter" onchange="this.form.submit()">
                 <option value="null" selected>All events</option>
                 <option value="Game">Games only</option>
                 <option value="Practice">Practices only</option>
@@ -41,7 +41,7 @@
                 let filter = {{ eventFilter | tojson }};
                 document.getElementById('hidePast').value = filter.hidePast;
                 document.getElementById('teamId').value = filter.teamId;
-                document.getElementById('eventType').value = filter.eventType;
+                document.getElementById('eventTypeFilter').value = filter.eventTypeFilter;
 
                 function toggleFilterSection(section) {
                     let sect = document.getElementById(section);

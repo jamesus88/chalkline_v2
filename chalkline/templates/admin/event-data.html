@@ -4,27 +4,18 @@
 </head>
 
 {% extends "design.html" %}
-{% block title %}Team Schedule{% endblock title %}
+{% block title %}Event Data{% endblock title %}
 
 {% block content %}
 <main>
     <section class="split">
         <div>
-            <h1>Team Schedule</h1>
-
-            {% if user.teams|length == 1 %}
-            <h3>Your team: {{user.teams[0]}}</h3>
-            {% elif user.teams|length > 1 %}
-            <h3>Your teams: {% for team in user.teams %}{{team}}, {% endfor %}</h3>
-            {% else %}
-            <h3>Your teams: None</h3>
-            {% endif %}
-            
+            <h1>Event Data (2024)</h1>
         </div>
         <div class="align-right">
+            <h3><a href="">Add Event</a></h3>
         </div>
     </section>
-    {% if user.teams|length > 0 %}
     <button type="" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
     <form method="post">
         <section id="filter-section" class="filter-section">
@@ -36,23 +27,22 @@
                 <option value="false">Past and Future</option>
             </select>
             <select class="filter" name="teamId" id="teamId" onchange="this.form.submit()">
-                {% for team in user.teams %}
-                <option value="{{team}}">{{team}}</option>
+                <option value="null" selected>All Teams</option>
+                {% for team in allTeams %}
+                <option value="{{team['teamId']}}">{{team['teamId']}}</option>
                 {% endfor %}
             </select>
             <select class="filter" name="eventTypeFilter" id="eventTypeFilter" onchange="this.form.submit()">
                 <option value="null" selected>All events</option>
                 <option value="Game">Games only</option>
                 <option value="Practice">Practices only</option>
-                <option value="Umpire Duty">Umpire Duties only</option>
             </select>
         
             <script>
                 let filter = {{ eventFilter | tojson }};
-                console.log(filter)
                 document.getElementById('hidePast').value = filter.hidePast;
-                document.getElementById('eventTypeFilter').value = filter.eventTypeFilter;
                 document.getElementById('teamId').value = filter.teamId;
+                document.getElementById('eventTypeFilter').value = filter.eventTypeFilter;
 
                 function toggleFilterSection(section) {
                     let sect = document.getElementById(section);
@@ -68,9 +58,9 @@
 
         <section class="schedule-section scrollwrapper">
             {% if eventList|length < 1 %}
-            <h3 class="error">No events found. Try the <a href="#">Master Schedule</a></h3>
+            <h3 class="error">No events found.</h3>
             {% endif %}
-            <table id="schedule-table" class="event-display">
+            <table id="schedule-table" class="event-display admin">
                 <tr>
                     <th></th>
                     <th>Event</th>
@@ -81,40 +71,46 @@
                     <th>Away</th>
                     <th>Home</th>
                     <th>Umpire Duty</th>
-                    
+                    <th>Update</th>
+                    <th>Delete</th>
                 </tr>
                 {% for event in eventList %}
                 <tr class="event-row">
                     <td><a class="icon-link" href="{{url_for('view_info.event', eventId=event._id)}}"><i class="fa-solid fa-info"></i></a></td>
                     <td class="event-type">{{event.eventType}}</td>
-                    <td>{{event.eventDate.strftime('%a %m/%d @ %H:%M')}}</td>
-                    <td>{{event.eventVenue}}</td>
-                    <td>{{event.eventField}}</td>
-                    <td>{{event.status}}</td>
-                    <td>{{event.awayTeam}}</td>
-                    <td>{{event.homeTeam}}</td>
-                    {% if event.umpireDuty == eventFilter.teamId and 'coach' in user.role %}
-                        {% if event.fieldRequestInfo.fLast is none %}
-                            <td><button class="schedule-action" type="submit" name="requestField1Umpire" value="{{event._id}}" onclick="return confirm('Request Youth Umpire for {{event.umpireDuty}} on {{event.eventDate.strftime('%a %m/%d @ %H:%M')}}? This cannot be undone.')">Request Youth</button></td>
-                        {% elif event.field1UmpireInfo.fLast is none %}
-                            <td>Youth Requested</td>
-                        {% else %}
-                            <td>Fulfilled (<a href="#">{{event.field1UmpireInfo.fLast}}</a>)</td>
-                        {% endif %}
-                    
-                    {% else %}
-                        <td>{{event.umpireDuty}}</td>
-                    {% endif %}
+                    <td><input class="admin" type="datetime-local" name="eventDate_{{event._id}}" id="eventDate" value="{{event.eventDate}}"></td>
+                    <td><input class="admin" type="text" name="eventVenue_{{event._id}}" id="eventVenue" value="{{event.eventVenue}}"></td>
+                    <td><input class="admin" type="number" name="eventField_{{event._id}}" id="eventField" value="{{event.eventField}}"></td>
+                    <td><input class="admin" type="text" name="status_{{event._id}}" id="status" value="{{event.status}}"></td>
+                    <td><select class="admin" name="awayTeam_{{event._id}}" id="awayTeam_{{event._id}}">
+                        {% for team in teamsList %}
+                            <option value="{{team.teamId}}">{{team.teamId}}</option>
+                        {% endfor %}
+                    </select></td>
+                    <td><select class="admin" name="homeTeam_{{event._id}}" id="homeTeam_{{event._id}}">
+                        {% for team in teamsList %}
+                            <option value="{{team.teamId}}">{{team.teamId}}</option>
+                        {% endfor %}
+                    </select></td>
+                    <td><select class="admin" name="umpireDuty_{{event._id}}" id="umpireDuty_{{event._id}}">
+                        <option value="None">None</option>
+                        {% for team in teamsList %}
+                            <option value="{{team.teamId}}">{{team.teamId}}</option>
+                        {% endfor %}
+                    </select></td>
+                    <td><button class="schedule-action" type="submit" name="updateEvent" value="{{event._id}}">Update</button></td>
+                    <td><button class="schedule-action" type="submit" name="deleteEvent" value="{{event._id}}" onclick="return confirm('Delete event?')">Delete</button></td>
                 </tr>
+                <script>
+                    document.getElementById('awayTeam'+"_{{event._id}}").value = "{{event.awayTeam}}";
+                    document.getElementById('homeTeam'+"_{{event._id}}").value = "{{event.homeTeam}}";
+                    document.getElementById('umpireDuty'+"_{{event._id}}").value = "{{event.umpireDuty}}";
+                    document.getElementById('eventAgeGroup'+"_{{event._id}}").value = "{{event.eventAgeGroup}}";
+                </script>
                 {% endfor %}
-                
             </table>
-            
         </section>
     </form>
-    {% else %}
-    <h3 class='error'>Your account is linked to 0 teams in {{user.location}}. Add teams to your <a href="{{url_for('main.profile')}}">Profile</a> to view their unique schedules.</h3>
-    {% endif %}
 </main>
 
 <script>

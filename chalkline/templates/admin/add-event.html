@@ -4,62 +4,17 @@
 
 {% extends "design.html" %}
 
-{% block title %}View Event{% endblock title %}
+{% block title %}Add Event{% endblock title %}
 
 {% block content %}
 <main>
     <center>
-        <h1>View Event</h1>
+        <h1>Add Event</h1>
         <h4 class='error'>{{msg}}</h4>
     </center>
-    {% if 'admin' not in user.role %}
-        <section>
-            <center>
-                <h2>{{event.eventLocation}} - {{event.eventType}}</h2>
-                <h3>{{event.eventDate.strftime('%a %m/%d @ %H:%M')}}</h3>
-                <h3>{{event.eventVenue}} Field {{event.eventField}}</h3>
-                {% if event.eventType == 'Game' %}
-                <h3>(away) {{event.awayTeam}} vs. {{event.homeTeam}} (home)</h3>
-                <h3>Umpire Duty: {{event.umpireDuty}}</h3>
-                {% else %}
-                <h3>Team: {{event.homeTeam}}</h3>
-                {% endif %}
-            </center>
-        </section>
-        <section>
-            <center>
-                <h3>Status: {{event.status}}</h3>
-            </center>
-        </section>
-        {% if event.eventType == 'Game' %}
-        <section>
-            <center>
-                <h2>Plate Umpire: {{event.plateUmpireInfo.fLast}}</h2>
-                <h3>Email: {{event.plateUmpireInfo.email}}</h3>
-                <h3>Phone: {{event.plateUmpireInfo.phone}}</h3>
-            </center>
-        </section>
-        <section>
-            <center>
-                <h2>Field Umpire: {{event.field1UmpireInfo.fLast}}</h2>
-                <h3>Email: {{event.field1UmpireInfo.email}}</h3>
-                <h3>Phone: {{event.field1UmpireInfo.phone}}</h3>
-            </center>
-        </section>
-        <section>
-            <center>
-                <h2>Coach Request: {{event.fieldRequestInfo.fLast}}</h2>
-                <h3>Email: {{event.fieldRequestInfo.email}}</h3>
-                <h3>Phone: {{event.fieldRequestInfo.phone}}</h3>
-            </center>
-        </section>  
-        {% endif %}
-    {% else %}
-    <form method="post" id="updateEvent">
-        <div class="split">
-            <h3 class="urgent">You are authorized to edit event data.</h3>
-            <button class="action" name="updateEvent" value="updateEvent" type="submit">Save Changes</button>
-        </div>
+    
+    <form method="post" id="addEvent">
+        <button class="action" name="updateEvent" value="updateEvent" type="submit">Save Changes</button>
         <section>
             <center>
                 <h2>

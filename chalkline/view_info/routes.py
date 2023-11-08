@@ -15,8 +15,9 @@ def event(eventId):
     
     if request.method == 'POST':
         if request.form.get('updateEvent'):
-            msg = db.updateEvent(eventId, request.form, userList)
             print(f"Event: {eventId} updated by {user['userId']}")
+            this_event = db.getEventInfo(eventId)
+            msg = db.updateEvent(this_event, request.form, userList, editRules=True, editContacts=True)
     
     event = db.getEventInfo(eventId)
     

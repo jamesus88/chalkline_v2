@@ -1,4 +1,5 @@
-import pymongo, bson, datetime
+import pymongo, bson, datetime 
+import chalkline.server as server
 from flask import session
 
 client = pymongo.MongoClient("mongodb+srv://aidanhurwitz:Mongo4821@mongo.to6zmzr.mongodb.net/?retryWrites=true&w=majority", connect=False)
@@ -204,50 +205,58 @@ def getEventInfo(eventId, add_criteria={}):
     add_criteria['_id'] = bson.ObjectId(eventId)
     return eventData.find_one(add_criteria)
 
-def updateEvent(eventId, form, userList):
-    writable = {
-        'eventDate': datetime.datetime.strptime(form['eventDate'], "%Y-%m-%dT%H:%M"),
-        'eventVenue': form['eventVenue'],
-        'eventAgeGroup': form['eventAgeGroup'],
-        'awayTeam': form['awayTeam'],
-        'homeTeam': form['homeTeam'],
-        'eventType': form['eventType'],
-        'eventField': form['eventField'],
-        'status': form['status'],
-        'umpireDuty': form['umpireDuty'],
-        'plateUmpire': None,
-        'field1Umpire': None,
-        'fieldRequest': None,
-        'editRules': {
-            'visible': False,
-            'plateUmpireAddable': False,
-            'field1UmpireAddable': False,
-            'fieldRequestAddable': False,
-            'requireRemoveRequest': False,
-            'fieldRequestRemovable': False,
-        }
-    }
-    for user in userList:
-        if str(user['_id']) == form['plateUmpire']:
-            writable['plateUmpire'] = user['userId']
-        if str(user['_id']) == form['field1Umpire']:
-            writable['field1Umpire'] = user['userId']
-        if str(user['_id']) == form['fieldRequest']:
-            writable['fieldRequest'] = user['userId']
-            
-    if form.get('visible'):
-        writable['editRules']['visible'] = True
-    if form.get('plateUmpireAddable'):
-        writable['editRules']['plateUmpireAddable'] = True
-    if form.get('field1UmpireAddable'):
-        writable['editRules']['field1UmpireAddable'] = True
-    if form.get('fieldRequestAddable'):
-        writable['editRules']['fieldRequestAddable'] = True
-    if form.get('requireRemoveRequest'):
-        writable['editRules']['requireRemoveRequest'] = True
-    if form.get('fieldRequestRemovable'):
-        writable['editRules']['fieldRequestRemovable'] = True
-        
-    eventData.update_one({'_id': bson.ObjectId(eventId)}, {'$set': writable})
+def updateEvent(event, form, userList, editRules=False, editContacts=False):
+    print(event)
+    print(dict(form.items()))
+    writable = {}
+    
+    if editContacts:
+        writable['plateUmpire'] = None
+        writable['field1Umpire'] = None
+        writable['fieldRequest'] = None
+        for user in userList:
+            if str(user['_id']) == form.get('plateUmpire'):
+                writable['plateUmpire'] = user['userId']
+            if str(user['_id']) == form.get('field1Umpire'):
+                writable['field1Umpire'] = user['userId']
+            if str(user['_id']) == form.get('fieldRequest'):
+                writable['fieldRequest'] = user['userId']
+    
+    if form.get('eventDate'): writable['eventDate'] = datetime.datetime.strptime(form['eventDate'], "%Y-%m-%dT%H:%M")
+    if form.get('eventVenue'): writable['eventVenue'] = form['eventVenue']
+    if form.get('eventAgeGroup'): writable['eventAgeGroup'] = form['eventAgeGroup']
+    if form.get('awayTeam'): writable['awayTeam'] = form['awayTeam']
+    if form.get('homeTeam'): writable['homeTeam'] = form['homeTeam']
+    if form.get('eventType'): writable['eventType'] = form['eventType']
+    if form.get('eventField'): writable['eventField'] = form['eventField']
+    if form.get('status'): writable['status'] = form['status']
+    if form.get('umpireDuty'): writable['umpireDuty'] = form['umpireDuty']
+    
+    if editRules:
+        writable['editRules'] = {}
+        if form.get('visible'): writable['editRules']['visible'] = True
+        else: writable['editRules']['visible'] = False
+        if form.get('plateUmpireAddable'): writable['editRules']['plateUmpireAddable'] = True
+        else: writable['editRules']['plateUmpireAddable'] = False
+        if form.get('field1UmpireAddable'): writable['editRules']['field1UmpireAddable'] = True
+        else: writable['editRules']['field1UmpireAddable'] = False
+        if form.get('fieldRequestAddable'): writable['editRules']['fieldRequestAddable'] = True
+        else: writable['editRules']['fieldRequestAddable'] = False
+        if form.get('requireRemoveRequest'): writable['editRules']['requireRemoveRequest'] = True
+        else: writable['editRules']['requireRemoveRequest'] = False
+        if form.get('fieldRequestRemovable'): writable['editRules']['fieldRequestRemovable'] = True
+        else: writable['editRules']['fieldRequestRemovable'] = False
+    
+    print(f"{writable=}")
+    eventData.update_one({'_id': bson.ObjectId(event['_id'])}, {'$set': writable})
     
     return 'Successfully updated event.'
+
+def deleteEvent(eventId, ignoreDate=False):
+    criteria = {'_id': bson.ObjectId(eventId)}
+    event = eventData.find_one(criteria)
+    if event['eventDate'] < server.todaysDate() or ignoreDate:
+        return "Error: cannot edit past events"
+    else:
+        eventData.delete_one(criteria)
+        return "Successfully deleted game"

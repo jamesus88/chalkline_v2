@@ -22,4 +22,7 @@ def create_app():
     from chalkline.invite.routes import invite
     app.register_blueprint(invite, url_prefix="/invite")
     
+    from chalkline.admin.routes import admin
+    app.register_blueprint(admin, url_prefix="/admin")
+    
     return app
