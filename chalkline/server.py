@@ -12,7 +12,7 @@ def getUser():
 
 def logout():
     session.pop('user')
-    session.pop('next-page')
+    if 'next-page' in session: session.pop('next-page')
 
 def todaysDate(padding_hrs=0):
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=-4) + datetime.timedelta(hours=padding_hrs)

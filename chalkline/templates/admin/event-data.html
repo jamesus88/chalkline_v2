@@ -13,7 +13,7 @@
             <h1>Event Data (2024)</h1>
         </div>
         <div class="align-right">
-            <h3><a href="">Add Event</a></h3>
+            <h3><a href="{{url_for('admin.add_event')}}">Add Event</a></h3>
         </div>
     </section>
     <button type="" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
@@ -83,11 +83,13 @@
                     <td><input class="admin" type="number" name="eventField_{{event._id}}" id="eventField" value="{{event.eventField}}"></td>
                     <td><input class="admin" type="text" name="status_{{event._id}}" id="status" value="{{event.status}}"></td>
                     <td><select class="admin" name="awayTeam_{{event._id}}" id="awayTeam_{{event._id}}">
+                        <option value="None">None</option> 
                         {% for team in teamsList %}
                             <option value="{{team.teamId}}">{{team.teamId}}</option>
                         {% endfor %}
                     </select></td>
                     <td><select class="admin" name="homeTeam_{{event._id}}" id="homeTeam_{{event._id}}">
+                        <option value="None">None</option> 
                         {% for team in teamsList %}
                             <option value="{{team.teamId}}">{{team.teamId}}</option>
                         {% endfor %}
@@ -95,7 +97,7 @@
                     <td><select class="admin" name="umpireDuty_{{event._id}}" id="umpireDuty_{{event._id}}">
                         <option value="None">None</option>
                         {% for team in teamsList %}
-                            <option value="{{team.teamId}}">{{team.teamId}}</option>
+                        <option value="{{team.teamId}}">{{team.teamId}}</option>
                         {% endfor %}
                     </select></td>
                     <td><button class="schedule-action" type="submit" name="updateEvent" value="{{event._id}}">Update</button></td>

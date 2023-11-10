@@ -1,0 +1,44 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='main/home.css')}}">
+</head>
+{% extends "design.html" %}
+{% block title %}About{% endblock title %}
+
+{% block content %}
+<main>
+    <center>
+        <h1>League Info</h1>
+        <h3><a href="https://tshq.bluesombrero.com/default.aspx?portalid=25865">Sarasota Little league Website</a></h3>
+    </center>
+    <section>
+        <h1>Contacts</h1>
+        <h3>President Steve Lanners</h3>
+        <h3>Vice President Michael D'Hondt</h3>
+        <h3>Treasurer Ahna Turner</h3>
+        <a href="mailto:info@srqlittleleague.com">Email Sarasota Little League</a>
+    </section>
+    <section>
+        <center>
+            <h2>About Sarasota Little League</h2>
+        </center>
+    </section>
+    <section>
+        <h3>Overview</h3>
+        <p>Sarasota Little League is located at Twin Lakes Park. This 123-acre park boasts 11 baseball fields and the Baltimore Orioles' training complex for minor and major league baseball. Other amenities include batting cages, playground equipment, a large picnic pavilion, lots of green space, ample parking, and our very own Johnny's Grill serving some of the best burgers here in Sarasota!</p>
+        <img src="{{url_for('static', filename='twin_lakes.jpeg')}}" alt="">
+    </section>
+    <section>
+        <h3>Values</h3>
+        <p>Sarasota Little League Baseball is a volunteer based, non-profit organization. Each season our volunteers dedicate hundreds of hours from administration to coaching all in the betterment of enriching the qualities of citizenship, discipline, teamwork and physical well-being. By embracing the virtues of <b>Character, Courage and Loyalty</b>, the Little League Baseball and Softball program is designed to develop superior citizens rather than superior athletes. </p>
+    </section>
+    <section>
+        <h3>Get Involved</h3>
+        <p>Parents are strongly encouraged to become involved in our League. After completing a Little League volunteer application and passing a required national background check, parents may become involved in practices, and be eligible as coaches, managers, umpires, local league board members and other volunteer positions within the league.</p>
+    </section>
+    <section>
+        <h3>Leagues</h3>
+        <p>Sarasota Little League, also known as the Central Sarasota County Little League, is composed of one Charter with split division format. We refer to our divisions as the American League and National League. Each league is defined by boundaries based upon a player's residential address or enrolled school address if chosen.</p>
+    </section>
+</main>
+
+{% endblock content %}

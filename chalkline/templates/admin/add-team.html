@@ -1,0 +1,49 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='view_game/view.css')}}">
+</head>
+
+{% extends "design.html" %}
+
+{% block title %}Add Team{% endblock title %}
+
+{% block content %}
+<main>
+    <center>
+        <h1>Add Team</h1>
+        <h4 class='error'>{{msg}}</h4>
+    </center>
+    
+    <form method="post" id="addTeam">
+        <div class="split"><button class="action" name="addTeam" value="addTeam" type="submit">Add Team</button></div>
+        <section>
+            <center>
+                <h3>Age Group: <select name="teamAgeGroup" id="teamAgeGroup">
+                    <option value="None" disabled selected>Select</option>
+                    <option value="T-Ball">T-Ball</option>
+                    <option value="Coach Pitch">Coach Pitch</option>
+                    <option value="AA">AA</option>
+                    <option value="AAA">AAA</option>
+                    <option value="Majors">Majors</option>
+                    <option value="50/70">50/70</option>
+                    <option value="Juniors">Juniors</option>
+                </select></h3>
+                <h3>Team Code: <select name="codePrefix" id="codePrefix" required>
+                    <option value="None" disabled selected>Select</option>
+                    <option value="TB">TB</option>
+                    <option value="CP">CP</option>
+                    <option value="AA">AA</option>
+                    <option value="AAA">AAA</option>
+                    <option value="MAJ">MAJ</option>
+                    <option value="5070">5070</option>
+                    <option value="JUN">JUN</option>
+
+                </select> <input type="number" name="codeNum" id="codeNum" placeholder="#" required style="width: 60px;"></h3>
+                <h3>Team name: <input type="text" name="teamName" id="teamName" required></h3>
+            </center>
+        </section>
+        <div class="split"><button class="action" name="addTeam" value="addTeam" type="submit">Add Team</button></div>
+    </form>
+    
+</main>
+
+{% endblock content %}

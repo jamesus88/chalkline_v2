@@ -39,8 +39,7 @@
                     <button class="dropdown-button">League <i class="fa-solid fa-caret-down"></i></button>
                     <div class="dropdown-content league">
                         <a href="{{url_for('league.master_schedule')}}">Master Schedule</a>
-                        <a href="{{url_for('league.director_on_duty')}}">Director on Duty</a>
-                        <a href="#">League Info</a>
+                        <a href="{{url_for('league.info')}}">League Info</a>
                     </div>
                 </div>
 
@@ -49,8 +48,8 @@
                     <button class="dropdown-button">Admin <i class="fa-solid fa-caret-down"></i></button>
                     <div class="dropdown-content admin">
                         <a href="{{url_for('admin.event_data')}}">Event Data</a>
-                        <a href="#">Manage Teams</a>
-                        <a href="#">Users</a>
+                        <a href="{{url_for('admin.team_data')}}">Manage Teams</a>
+                        <a href="{{url_for('admin.user_data')}}">Users</a>
                     </div>
                 </div>
                 {% endif %}

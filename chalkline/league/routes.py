@@ -18,8 +18,8 @@ def master_schedule():
     
     return render_template('league/master-schedule.html', user=srv.safeUser(user),eventFilter=eventFilter.asdict(), eventList=eventList, allTeams=allTeams)
 
-@league.route("/director-on-duty", methods=['GET', 'POST'])
-def director_on_duty():
+@league.route("/info", methods=['GET', 'POST'])
+def info():
     user = srv.getUser()
     
-    return render_template("league/director-on-duty.html", user=user)
+    return render_template("league/info.html", user=user)

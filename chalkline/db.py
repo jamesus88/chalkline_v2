@@ -206,8 +206,6 @@ def getEventInfo(eventId, add_criteria={}):
     return eventData.find_one(add_criteria)
 
 def updateEvent(event, form, userList, editRules=False, editContacts=False):
-    print(event)
-    print(dict(form.items()))
     writable = {}
     
     if editContacts:
@@ -247,7 +245,6 @@ def updateEvent(event, form, userList, editRules=False, editContacts=False):
         if form.get('fieldRequestRemovable'): writable['editRules']['fieldRequestRemovable'] = True
         else: writable['editRules']['fieldRequestRemovable'] = False
     
-    print(f"{writable=}")
     eventData.update_one({'_id': bson.ObjectId(event['_id'])}, {'$set': writable})
     
     return 'Successfully updated event.'
@@ -260,3 +257,83 @@ def deleteEvent(eventId, ignoreDate=False):
     else:
         eventData.delete_one(criteria)
         return "Successfully deleted game"
+    
+def addEvent(user, form):
+    writable = {
+        'eventType': form['eventType'],
+        'eventLocation': user['location'],
+        'eventVenue': form['eventVenue'],
+        'eventDate': datetime.datetime.strptime(form['eventDate'], "%Y-%m-%dT%H:%M"),
+        'eventAgeGroup': form['eventAgeGroup'],
+        'eventField': form['eventField'],
+        'awayTeam': form['awayTeam'],
+        'homeTeam': form['homeTeam'],
+        'umpireDuty': form['umpireDuty'],
+        'status': form['status'],
+        'plateUmpire': None,
+        'field1Umpire': None,
+        'fieldRequest': None,
+        'editRules': {} 
+    }
+    
+    if form.get('visible'): writable['editRules']['visible'] = True
+    else: writable['editRules']['visible'] = False
+    if form.get('plateUmpireAddable'): writable['editRules']['plateUmpireAddable'] = True
+    else: writable['editRules']['plateUmpireAddable'] = False
+    if form.get('field1UmpireAddable'): writable['editRules']['field1UmpireAddable'] = True
+    else: writable['editRules']['field1UmpireAddable'] = False
+    if form.get('fieldRequestAddable'): writable['editRules']['fieldRequestAddable'] = True
+    else: writable['editRules']['fieldRequestAddable'] = False
+    if form.get('requireRemoveRequest'): writable['editRules']['requireRemoveRequest'] = True
+    else: writable['editRules']['requireRemoveRequest'] = False
+    if form.get('fieldRequestRemovable'): writable['editRules']['fieldRequestRemovable'] = True
+    else: writable['editRules']['fieldRequestRemovable'] = False
+    
+    if form['plateUmpire'] != "None":
+        writable['plateUmpire'] = form['plateUmpire']
+    if form['field1Umpire'] != "None":
+        writable['field1Umpire'] = form['field1Umpire']
+    if form['fieldRequest'] != "None":
+        writable['fieldRequest'] = form['fieldRequest']
+
+    eventData.insert_one(writable)
+    
+    return True
+
+def getTeamInfo(teamId):
+    team = teamData.find_one({'teamId': teamId})
+    return team
+
+def updateTeam(team, form):
+    teamId = team['teamId']
+    writable = {
+        'teamName': form['teamName'],
+        'teamAgeGroup': form['teamAgeGroup'],
+        'wins': int(form['wins']),
+        'losses': int(form['losses']),
+        'ties': int(form['ties']),
+    }
+    teamData.update_one({'teamId': teamId}, {'$set': writable})
+    return f"Successfully updated {teamId}"
+
+def deleteTeam(teamId):
+    teamData.delete_one({'teamId': teamId})
+    return f"Successfully deleted {teamId}"
+
+def addTeam(user, form):
+    writable = {
+        'teamId': form['codePrefix'] + form['codeNum'],
+        'teamName': form['teamName'],
+        'teamAgeGroup': form['teamAgeGroup'],
+        'wins': 0,
+        'losses': 0,
+        'ties': 0,
+    }
+    duplicateCode = teamData.find_one({'teamId': writable['teamId']})
+    
+    if duplicateCode:
+        return f"Error: Team codes must be unique, {writable['teamId']} already exists."
+    else:
+        teamData.insert_one(writable)
+        return True
+    

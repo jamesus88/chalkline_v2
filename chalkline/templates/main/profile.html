@@ -45,7 +45,12 @@
                 <table class="center">
                     <tr>
                         <td><label for="newTeam">Add Team Code</label></td>
-                        <td><input type="text" name="newTeam" id="newTeam" placeholder="AA1, AAA3, MAJ4, etc..."></td>
+                        <td><select name="newTeam" id="newTeam" required>
+                            <option value="none" disabled selected>Select</option>
+                            {% for team in allTeams %}
+                                <option value="{{team.teamId}}">{{team.teamId}}</option>
+                            {% endfor %}
+                        </select></td>
                     </tr>
                 </table>
                 <button class="action" type="submit" name="addTeam" value="addTeam">Add Team</button>

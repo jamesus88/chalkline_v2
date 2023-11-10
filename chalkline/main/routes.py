@@ -64,9 +64,9 @@ def profile():
                 msg = f'Added {teamCode} to your teams'
                 
     teamsList = db.getTeamsFromUser(user['teams'])
-    print(user)
+    allTeams = db.getTeams()
 
-    return render_template('main/profile.html', user=user, teamsList=list(teamsList), msg=msg)
+    return render_template('main/profile.html', user=user, teamsList=list(teamsList), allTeams=allTeams, msg=msg)
     
 
 @main.route("/login", methods=['GET', 'POST'])

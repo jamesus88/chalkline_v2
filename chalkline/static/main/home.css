@@ -92,6 +92,11 @@ table.center {
 table.center > tr {
     margin: 10px;
 }
+img {
+    width: 50%;
+    display: block;
+    margin: 0 auto;
+}
 @media screen and (max-width: 1000px) {
     main {
         width: 95%;
@@ -106,5 +111,8 @@ table.center > tr {
     #about-page .split {
         text-align: center;
         width: 100%;
+    }
+    img {
+        width: 90%;
     }
 }

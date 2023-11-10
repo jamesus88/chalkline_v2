@@ -17,7 +17,6 @@ def event_data():
     userList = db.getUserList()
     
     if request.method == 'POST':
-        print(request.form)
         if request.form.get('updateFilter'):
             eventFilter.update(request.form)
             
@@ -34,7 +33,7 @@ def event_data():
             
         elif request.form.get('deleteEvent'):
             eventId = request.form['deleteEvent']
-            msg = db.deleteDevent(eventId)
+            msg = db.deleteEvent(eventId)
             print(f"Event: {eventId} deleted by {user['userId']}")
 
     eventList = get_events.getEventList(eventFilter)
@@ -50,4 +49,84 @@ def add_event():
     if 'admin' not in user['role']:
         return redirect(url_for('main.home'))
     
+    msg = ''
+    teamsList = db.getTeams()
+    userList = db.getUserList()
     
+    if request.method == 'POST':
+        msg = db.addEvent(user, request.form)
+        if type(msg) != str:
+            return redirect(url_for('admin.event_data'))
+    
+    return render_template("admin/add-event.html", user=user, msg=msg, userList=userList, teamsList=teamsList)
+
+@admin.route("/team-data", methods=['GET', 'POST'])
+def team_data():
+    user = srv.getUser()
+    if user is None:
+        session['next-page'] = 'admin.add_event'
+        return redirect(url_for('main.login'))
+    if 'admin' not in user['role']:
+        return redirect(url_for('main.home'))
+    
+    msg = ''
+    ageGroupFilter = "None" 
+    
+    if request.method == 'POST':
+        if request.form.get('ageGroupFilter'):
+            ageGroupFilter = request.form['ageGroupFilter']
+        
+        if request.form.get('updateTeam'):
+            teamId = request.form['updateTeam']
+            this_team = db.getTeamInfo(teamId)
+            form = {}
+            for key, value in request.form.items():
+                if f'_{teamId}' in key:
+                    form[key.removesuffix(f"_{teamId}")] = value
+            msg = db.updateTeam(this_team, form)
+            print(f"Team: {teamId} updated by {user['userId']}")
+            
+        elif request.form.get('deleteTeam'):
+            teamId = request.form['deleteTeam']
+            msg = db.deleteTeam(teamId)
+            print(f"Team: {teamId} deleted by {user['userId']}")
+    
+    criteria = {}
+    if ageGroupFilter != 'None':
+        criteria['teamAgeGroup'] = ageGroupFilter
+        
+    teamsList = db.getTeams(criteria)
+    
+    return render_template("admin/team-data.html", user=user, teamsList=teamsList, ageGroupFilter=ageGroupFilter, msg=msg)
+    
+@admin.route("/add-team", methods=['GET', 'POST'])
+def add_team():
+    user = srv.getUser()
+    if user is None:
+        session['next-page'] = 'admin.add_event'
+        return redirect(url_for('main.login'))
+    if 'admin' not in user['role']:
+        return redirect(url_for('main.home'))
+    
+    msg = ''
+    
+    if request.method == 'POST':
+        msg = db.addTeam(user, request.form)
+        if type(msg) != str:
+            return redirect(url_for('admin.team_data'))
+    
+    return render_template("admin/add-team.html", user=user, msg=msg)
+
+
+
+@admin.route("/user-data", methods=['GET', 'POST'])
+def user_data():
+    user = srv.getUser()
+    if user is None:
+        session['next-page'] = 'admin.add_event'
+        return redirect(url_for('main.login'))
+    if 'admin' not in user['role']:
+        return redirect(url_for('main.home'))
+    
+    msg = ''
+    userList = db.getUserList()

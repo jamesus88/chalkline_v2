@@ -79,6 +79,10 @@
                     <option value="50/70">50/70</option>
                     <option value="Juniors">Juniors</option>
                 </select></h3>
+                <script>
+                    document.getElementById('eventType').value = "{{event.eventType}}";
+                    document.getElementById('eventAgeGroup').value = "{{event.eventAgeGroup}}";
+                </script>
                 <h3><input type="text" name="eventVenue" id="eventVenue" value="{{event.eventVenue}}"> Field <input type="number" name="eventField" id="eventField" value="{{event.eventField}}"></h3>
                 {% if event.eventType == 'Game' %}
                 <h3>(away) 
@@ -101,20 +105,22 @@
                         {% endfor %}
                     </select>
                 </h3>
+                <script>
+                    document.getElementById('awayTeam').value = "{{event.awayTeam}}";
+                    document.getElementById('umpireDuty').value = "{{event.umpireDuty}}";
+                </script>
                 {% else %}
                 <h3>Team: <select name="homeTeam" id="homeTeam">
                     {% for team in teamsList %}
                         <option value="{{team.teamId}}">{{team.teamId}}</option>
                     {% endfor %}
                 </select></h3>
+                <script>
+                    document.getElementById('homeTeam').value = "{{event.homeTeam}}";
+                </script>
                 {% endif %}
             </center>
-            <script>
-                document.getElementById('awayTeam').value = "{{event.awayTeam}}";
-                document.getElementById('homeTeam').value = "{{event.homeTeam}}";
-                document.getElementById('umpireDuty').value = "{{event.umpireDuty}}";
-                document.getElementById('eventAgeGroup').value = "{{event.eventAgeGroup}}";
-            </script>
+            
         </section>
         <section>
             <center>
