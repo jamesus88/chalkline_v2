@@ -1,0 +1,21 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='main/home.css')}}">
+</head>
+{% extends "design.html" %}
+{% block title %}Field Status{% endblock title %}
+
+{% block content %}
+<main>
+    <h1>Field Status</h1>
+    <h2>{{user.location}}</h2>
+    {% for venue in venues %}
+        <section>
+            <h2>{{venue.name}}</h2>
+            <h3>Field Status: <b class="urgent">{{venue.status}}</b></h3>
+            <h3>{{venue.address}}</h3>
+            <iframe src="https://www.google.com/maps/embed{{venue.embed}}" style="overflow: hidden;" width="350" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </section>
+    {% endfor %}
+</main>
+
+{% endblock content %}

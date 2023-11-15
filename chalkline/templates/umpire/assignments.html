@@ -12,7 +12,11 @@
         <div>
             <h1>My Games - {{user.firstName[0]}}. {{user.lastName}}</h1>
             <h3>View your schedule and remove games.</h3>
-            <p class="urgent">*Some games require approval to be removed.</p>
+            {% if user.canRemoveGame %}
+            <p class="urgent">You currently have permission to remove any game.</p>
+            {% else %}
+            <p class="urgent">* Some games require approval to be removed.</p>
+            {% endif %}
         </div>
         <div class="align-right">
             <h3>Go to <a href="{{url_for('umpire.schedule')}}">Umpire Schedule</a></h3>

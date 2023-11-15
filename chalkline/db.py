@@ -113,6 +113,11 @@ def updateProfile(userId, form):
         
     user = userData.find_one_and_update({'userId': userId}, {'$set': writable}, return_document=pymongo.ReturnDocument.AFTER)
     user['_id'] = str(user['_id'])
+    
+    permissionSet = permissions.find_one({'set': user['permissionSet']})
+    permissionSet.pop('_id')
+    user['permissions'] = permissionSet
+    
     return user
 
 def getTeamsFromUser(teamCodes):

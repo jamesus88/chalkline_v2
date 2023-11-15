@@ -112,7 +112,7 @@ a.menu {
     text-decoration: none;
     display: block;
     padding: 10px;
-    margin: 5px 0px;
+    margin: 5px auto;
     color: var(--chalkline-navy);
     border: 2px solid var(--chalkline-navy);
     background-color: white;

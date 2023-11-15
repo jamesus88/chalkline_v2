@@ -3,14 +3,15 @@ from chalkline import db, get_events
 from chalkline import server as srv
 umpire = Blueprint('umpire', __name__)
 
-@umpire.route('/')
-def home():
-    return "umpire home"
-
 @umpire.route('/schedule', methods=['GET', 'POST'])
 def schedule():
     user = srv.getUser()
-    
+    if user is None:
+        session['next-page'] = 'umpire.schedule'
+        return redirect(url_for('main.login'))
+    elif 'umpire' not in user['role'] and 'youth' not in user['role']:
+        return redirect(url_for('main.home'))
+
     eventFilter = get_events.EventFilter()
     msg = ''
     
@@ -35,6 +36,11 @@ def schedule():
 @umpire.route('/assignments', methods=['GET', 'POST'])
 def assignments():
     user = srv.getUser()
+    if user is None:
+        session['next-page'] = 'umpire.schedule'
+        return redirect(url_for('main.login'))
+    elif 'umpire' not in user['role'] and 'youth' not in user['role']:
+        return redirect(url_for('main.home'))
     
     eventFilter = get_events.EventFilter()
     msg = ''
