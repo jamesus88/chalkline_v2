@@ -13,7 +13,7 @@ def event_data():
         return redirect(url_for('main.home'))
     
     eventFilter = get_events.EventFilter()
-    teamsList = db.getTeams()
+    allTeams = db.getTeams()
     userList = db.getUserList()
     
     if request.method == 'POST':
@@ -38,7 +38,7 @@ def event_data():
 
     eventList = get_events.getEventList(eventFilter)
     
-    return render_template('admin/event-data.html', user=srv.safeUser(user),eventFilter=eventFilter.asdict(), eventList=eventList, teamsList=teamsList)
+    return render_template('admin/event-data.html', user=srv.safeUser(user),eventFilter=eventFilter.asdict(), eventList=eventList, allTeams=allTeams)
 
 @admin.route("/add-event", methods=['GET', 'POST'])
 def add_event():
@@ -117,10 +117,8 @@ def add_team():
     
     return render_template("admin/add-team.html", user=user, msg=msg)
 
-
-
-@admin.route("/user-data", methods=['GET', 'POST'])
-def user_data():
+@admin.route("/announcement", methods=['GET', 'POST'])
+def announcement():
     user = srv.getUser()
     if user is None:
         session['next-page'] = 'admin.add_event'
@@ -129,4 +127,62 @@ def user_data():
         return redirect(url_for('main.home'))
     
     msg = ''
-    userList = db.getUserList()
+    allTeams = db.getTeams()
+    
+    if request.method == 'POST':
+        if request.form.get('updateStatus'):
+            if request.form.get('sendStatusAlert'): sendAlert = True
+            else: sendAlert = False
+            venue = request.form['updateStatus']
+            msg = db.updateFieldStatus(venue, request.form['fieldStatus'], sendAlert)
+            
+        if request.form.get('sendMessage'):
+            groups = []
+            teams = []
+            if request.form.get('coach'):
+                groups.append('coach')
+            if request.form.get('parent'):
+                groups.append('parent')
+            if request.form.get('umpire'):
+                groups.append('umpire')
+            if request.form.get('youth'):
+                groups.append('youth')
+            if request.form.get('board'):
+                groups.append('board')
+            
+            for team in allTeams:
+                if request.form.get(team['teamId']):
+                    teams.append(team['teamId'])
+                    
+            users = list(db.getUserList())
+
+            userList = []
+            for user in users:
+                for group in groups:
+                    if group in user['role']:
+                        userList.append(user)
+            
+                for team in teams:
+                    if team in user['teams']:
+                        userList.append(user)
+            
+            message = request.form['msg']
+            
+            if len(userList) < 1:
+                msg = "Error: no recipients found."
+            elif 'email' not in request.form.keys() and 'phone' not in request.form.keys():
+                msg = "Error: select email and/or text."
+            else:
+                if request.form.get('email'):
+                    emailList = srv.createEmailList(userList)
+                    emailList = list(dict.fromkeys(emailList))
+                    srv.sendMail(body=message, recipients=emailList)
+                if request.form.get('text'):
+                    phoneList = srv.createPhoneList(userList)
+                    phoneList = list(dict.fromkeys(phoneList))
+                    srv.sendMail(body=message, recipients=phoneList)
+                msg = "Message Sent!"
+    
+    venues = db.getVenues("Sarasota")
+    
+    return render_template('admin/announcement.html', user=user, msg=msg, allTeams=allTeams, venues=venues)

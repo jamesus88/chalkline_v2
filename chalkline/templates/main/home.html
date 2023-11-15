@@ -15,16 +15,64 @@
         <h1>Hello, {{user.firstName}}!</h1>
         {% endif %}
     <br>
+        {% if user is not none %}
+        <div class="divide">
+            {% if 'coach' in user.role or 'parent' in user.role %}
+            <section class="menu">
+                <h2>Teams</h2>
+                <i class="fa-solid fa-users menu"></i>
+                <div class="hide">
+                    <a href="{{url_for('teams.schedule')}}" class="menu">Team Schedule</a>
+                    <a href="{{url_for('teams.info')}}" class="menu">Info and Contacts</a>
+                </div> 
+            </section>
+            {% endif %}
+            {% if 'umpire' in user.role or 'youth' in user.role %}
+            <section class="menu">
+                <h2>Umpiring</h2>
+                <i class="fa-solid fa-clipboard-list menu"></i>
+                <div class="hide">
+                    <a href="{{url_for('umpire.schedule')}}" class="menu">Umpire Schedule</a>
+                    <a href="{{url_for('umpire.assignments')}}" class="menu">My Games</a>
+                </div>
+            </section>
+            {% endif %}
+            <section class="menu">
+                <h2>League</h2>
+                <i class="fa-solid fa-baseball-bat-ball menu"></i>
+                <div class="hide">
+                    <a href="{{url_for('league.master_schedule')}}" class="menu">Master Schedule</a>
+                    <a href="{{url_for('league.info')}}" class="menu">League Info</a>
+                </div>
+            </section>
+            {% if 'admin' in user.role %}
+            <section class="menu">
+                <h2>Admin</h2>
+                <i class="fa-solid fa-wrench menu"></i>
+                <div class="hide">
+                    <a href="{{url_for('admin.event_data')}}" class="menu">Manage Events</a>
+                    <a href="{{url_for('admin.team_data')}}" class="menu">Manage Teams</a>
+                    <a href="{{url_for('admin.announcement')}}" class="menu">Send Announcement</a>
+                </div>
+            </section>
+            {% endif %}
+        </div>
+        <script>
+            function showLinks(section_id) {
+                document.getElementById(section_id).style.display = 'block';
+            }
+        </script>
+        {% endif %}
         <h2>Chalkline News</h2>
         <section>
-            <h3><a href="#">v4.0.0</a> is here.</h3>
+            <h3>v4.0.0 is here.</h3>
             <h4>New look. New features. Still baseball.</h4>
         </section>
         <section>
-            <h3>New <a href="#">Team page</a>.</h3>
-            <h4>View game schedule, practices, and send announcements to your team.</h4>
-            <h3>New <a href="#">League page</a>.</h3>
-            <h4>View contacts, director on duty, and other league-wide information.</h4>
+            <h3>New <a href="{{url_for('teams.schedule')}}">Team Schedule</a>.</h3>
+            <h4>View game schedule, practices, and umpire duties for your team.</h4>
+            <h3>New <a href="{{url_for('league.master_schedule')}}">League Schedule</a>.</h3>
+            <h4>View the master schedule for all games.</h4>
         </section>
     
         <h1>Questions? Check the <a href="#">docs</a>.</h1>

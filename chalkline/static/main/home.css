@@ -14,6 +14,13 @@ main {
     width: 80%;
     margin: auto;
 }
+div.divide {
+    display: flex;
+    flex-wrap: wrap;
+}
+div.divide > * {
+    flex-grow: 1;
+}
 h1 {
     font-size: 25pt;
 }
@@ -68,6 +75,10 @@ h3 {
 i.large {
     font-size: 80pt;
 }
+i.menu {
+    font-size: 40pt;
+    margin: 10px 40px;
+}
 button.button-sign-in {
     width: 100px;
     margin: 15px auto;
@@ -96,6 +107,33 @@ img {
     width: 50%;
     display: block;
     margin: 0 auto;
+}
+a.menu {
+    text-decoration: none;
+    display: block;
+    padding: 10px;
+    margin: 5px 0px;
+    color: var(--chalkline-navy);
+    border: 2px solid var(--chalkline-navy);
+    background-color: white;
+    border-radius: 15px;
+}
+a.menu:hover {
+    color: white;
+    background-color: var(--chalkline-navy);
+}
+section.menu {
+    transition: all 0.3s;
+    margin: 15px;
+}
+section.menu:hover {
+    border: 2px solid var(--chalkline-navy);
+}
+div.hide {
+    display: none;
+}
+section.menu:hover div.hide {
+    display: block;
 }
 @media screen and (max-width: 1000px) {
     main {

@@ -22,7 +22,13 @@ def signup():
         if response['error']:
             msg = response['error']
         else:
-            session['user'] = db.saveUser(response['newUser'])
+            user = db.saveUser(response['newUser'])
+            session['user'] = user
+            srv.sendMail(
+                subject=f"Welcome to Chalkline, {user['firstName']}!",
+                body="Your account was successfully created! \nwww.chalklinebaseball.com",
+                recipients=[user['email']]
+            )
             return redirect(url_for('main.profile'))
     
     return render_template("main/create-account.html", user=user, msg=msg)

@@ -11,6 +11,8 @@ permissions = db['permissions']
 reportData = db['test_reportData']
 teamData = db['test_teamData']
 playerData = db['test_playerData']
+leagueData = db['test_leagueData']
+venueData = db['test_venueData']
 
 def authenticate(userId = ''):
     user = userData.find_one({'userId': userId})
@@ -44,9 +46,9 @@ def createUser(form):
           "lastName": form['lastName'],
           "email": form['email'],
           "phone": form['phone'],
+          "sms-gateway": form.get('carrier'),
           "userId": form['userId'],
           "role": [],
-          "child": [],
           "teams": [],
           "permissionSet": "C0",
           "canRemoveGame": False,
@@ -65,11 +67,15 @@ def createUser(form):
     if form.get('role-umpire'):
         response['newUser']['role'].append('umpire')
         response['newUser']['permissionSet'] = "U0"
+        if form['role-pass'] != server.LEAGUE_CODE:
+            response['error'] = "Incorrect league code. Umpires must enter a valid league code to create an account."
     if form.get('role-youth'):
         response['newUser']['role'].append('youth')
         response['newUser']['permissionSet'] = "Y0"
     if form.get('role-board'):
         response['newUser']['role'].append('board')
+        if form['role-pass'] != server.LEAGUE_CODE:
+            response['error'] = "Incorrect league code. Board Members must enter a valid league code to create an account."
         
     if len(response['newUser']['role']) < 1:
         response['error'] = 'Select at least one account role'
@@ -127,7 +133,7 @@ def getTeams(criteria={}):
     for team in teams:
         team['_id'] = str(team['_id'])
         teamsList.append(team)
-    
+    teamsList = sorted(teamsList, key=lambda x: x['teamId'])    
     return teamsList
         
 def removeTeamFromUser(user, teamCode):
@@ -336,4 +342,33 @@ def addTeam(user, form):
     else:
         teamData.insert_one(writable)
         return True
+
+def updateFieldStatus(venueId, status, sendAlert=True):
+    venue = venueData.find_one_and_update({'venueId': venueId}, {'$set': {'status': status}})
+    if sendAlert:
+        emailUsers = getUserList({'emailNotifications': True})
+        emailList = server.createEmailList(emailUsers)
+        server.sendMail(
+            subject=f"{venue['name']} field status: {status}",
+            body=f"Sarasota Little League has updated {venue['name']} field status to {status}. Visit www.chalklinebaseball.com/league/status for more info.\nwww.chalklinebaseball.com",
+            recipients=emailList
+        )
+        
+        phoneUsers = getUserList({'phoneNotifications': True})
+        phoneList = server.createPhoneList(phoneUsers)
+        server.sendMail(
+            subject=None,
+            body=f"Sarasota Little League has updated {venue['name']} field status to {status}. Visit www.chalklinebaseball.com/league/status for more info.\nwww.chalklinebaseball.com",
+            recipients=phoneList
+        )
+    return f"{venue['name']} field status updated."    
+
+def getVenues(league, criteria={}):
+    criteria.update({'location': league})
+    venues = venueData.find(criteria)
+    venueList = []
+    for venue in venues:
+        venue['_id'] = str(venue['_id'])
+        venueList.append(venue)
     
+    return venueList

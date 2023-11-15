@@ -1,7 +1,12 @@
 from flask import session
+from chalkline import mail
+from flask_mail import Message
 import datetime
+import requests
 
 SHARE_LINK = "www.chalklinebaseball.com/"
+MAIL_SENDER = 'Chalkline Baseball'
+LEAGUE_CODE = "sll2024!"
 
 def getUser():
     if 'user' in session:
@@ -20,9 +25,7 @@ def todaysDate(padding_hrs=0):
 
 def safeUser(user, session_user={}):
     user['_id'] = str(user['_id'])
-    print('safe')
     if session_user.get('userId') != user['userId']:
-        print('hiding')
         if user['hidePhone']: user['phone'] = None
         if user['hideEmail']: user['email'] = None
     
@@ -79,3 +82,20 @@ def safeEvent(event, userList):
     event['_id'] = str(event['_id'])
     
     return event
+
+def sendMail(subject: str = 'Message from Chalkline Baseball', body: str = 'www.chalklinebaseball.com', sender: str = MAIL_SENDER, recipients: list = []):
+    msg = Message(
+        subject=subject,
+        body=body,
+        sender=sender,
+        bcc=recipients
+    )
+    #mail.send(msg)
+    print(f'Message sent to {str(msg.bcc)}')
+
+def createEmailList(users):
+    return [user['email'] for user in users if user['emailNotifications']]
+
+def createPhoneList(users):
+    return [user['phone'] + '@' + user['sms-gateway'] for user in users if user['phoneNotifications']]
+

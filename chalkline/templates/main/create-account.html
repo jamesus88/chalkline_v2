@@ -15,35 +15,59 @@
                 <h3 class="error">{{msg}}</h3>
                 <table class="center">
                     <h3>Need Help? Read the <a href="#">docs</a>.</h3>
+                    <p class="error">* required</p>
                     <tr>
-                        <td><label for="location">League</label></td>
+                        <td><label for="location">League <b class="error">*</b></label></td>
                         <td><select name="location" id="location" required>
                             <option value="Sarasota" selected>Sarasota</option>
                         </select></td>
                     </tr>
                     <tr>
-                        <td><label for="firstName">First Name</label></td>
+                        <td><label for="firstName">First Name <b class="error">*</b></label></td>
                         <td><input type="text" name="firstName" id="firstName" required></td>
                     </tr>
                     <tr>
-                        <td><label for="lastName">Last Name</label></td>
+                        <td><label for="lastName">Last Name <b class="error">*</b></label></td>
                         <td><input type="text" name="lastName" id="lastName" required></td>
                     </tr>
                     <tr>
-                        <td><label for="email">Email</label></td>
-                        <td><input type="email" name="email" id="email" required></td>
-                    </tr>
-                    <tr>
-                        <td><label for="phone">Phone</label></td>
-                        <td><input type="tel" name="phone" id="phone" pattern="[0-9]{10}" required></td>
-                    </tr>
-                    <tr>
-                        <td><label for="userId">User ID</label></td>
+                        <td><label for="userId">User ID <b class="error">*</b></label></td>
                         <td><input type="password" name="userId" id="userId" required></td>
                         <td><a href="#what-is-a-user-id">?</a></td>
                     </tr>
+                    <tr>
+                        <td><label for="email">Email <b class="error">*</b></label></td>
+                        <td><input type="email" name="email" id="email" required></td>
+                    </tr>
+                    <tr>
+                        <td><label for="phone">Phone <b class="error">*</b></label></td>
+                        <td><input type="tel" name="phone" id="phone" pattern="[0-9]{10}" required></td>
+                    </tr>
+                    <tr>
+                        <td><label for="carrier">Phone Carrier</label></td>
+                        <td><select name="carrier" id="carrier">
+                            <option value="" disabled selected>Select</option>
+                            <option value="sms.alltelwireless.com">Alltel</option>
+                            <option value="txt.att.net">AT&amp;T</option>
+                            <option value="sms.myboostmobile.com">Boost Mobile</option>
+                            <option value="mailmymobile.net">Consumer Cellular</option>
+                            <option value="mms.cricketwireless.net">Cricket Wireless</option>
+                            <option value="msg.fi.google.com">Google Fi Wireless</option>
+                            <option value="mymetropcs.com">Metro PCS</option>
+                            <option value="text.republicwireless.com">Republic Wireless</option>
+                            <option value="messaging.sprintpcs.com">Sprint</option>
+                            <option value="tmomail.net">T-Mobile</option>
+                            <option value="message.ting.com">Ting</option>
+                            <option value="email.uscc.net">U.S. Cellular</option>
+                            <option value="vtext.com">Verizon Wireless</option>
+                            <option value="vmobl.com">Virgin mobile</option>
+                            <option value="vtext.com">XFinity Mobile</option>
+                        </select></td>
+                        <td><a href="#carrier-info">?</a></td>
+                    </tr>
+                    
                 </table>
-                <h3>Account Type <a href="#account-types">?</a></h3>
+                <h3>Account Type <b class="error">*</b> <a href="#account-types">?</a></h3>
 
                 <table class="center">
                     <tr>
@@ -66,6 +90,10 @@
                         <td><label for="role-board">Board Member</label></td>
                         <td><input type="checkbox" name="role-board" id="board"></td>
                     </tr>
+                    <tr>
+                        <td><label for="role-pass">League Password (for umpires and board members)</label></td>
+                        <td><input type="text" name="role-pass" id="role-pass"></td>
+                    </tr>
                 </table>
 
                 <button class="button-sign-in" type="submit">Next</button>
@@ -79,6 +107,7 @@
                     <p>All you need to sign in to your account is your User ID.</p>
                     <p>A User ID must be unique and kept protected.</p>
                     <p>(recommended: last name + a few numbers)</p>
+                    <p>You should treat your User ID like a <b>password</b>!</p>
                 </div>
                 <div>
                     <i class="fa-solid fa-lock large"></i>
@@ -99,6 +128,20 @@
                 </div>
                 <div>
                     <i class="fa-solid fa-users large"></i>
+                </div>
+            </section>
+        </section>
+        <section id="carrier-info">
+            <h2>Why does Chalkline request my phone carrier?</h2>
+            <section class="split">
+                <div>
+                    <h3>Chalkline sends automatic updates straight to your phone.</h3>
+                    <p>For text messaging features like schedule updates, reminders, and rain-out alerts.</p>
+                    <p>Chalkline will never share or sell your data.</p>
+                    <p>This information is collected to minimize messaging rates and keep services free for users.</p>
+                </div>
+                <div>
+                    <i class="fa-solid fa-phone large"></i>
                 </div>
             </section>
         </section>

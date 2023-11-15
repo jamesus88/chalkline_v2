@@ -1,0 +1,112 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='main/home.css')}}">
+</head>
+{% extends "design.html" %}
+
+{% block title %}Send Announcement{% endblock title %}
+
+{% block content %}
+<main>
+    <center>
+        <div class="split">
+            <h1>Send Announcement</h1>
+            <h3><a href="">Documentation</a></h3>
+        </div>
+        <h3 class="error">{{msg}}</h3>
+        {% for venue in venues %}
+            <section>
+                <h2>{{venue.name}}</h2>
+                <form method="post" id="status-wf">
+                    <h3>Field Status: <select name="fieldStatus" id="fieldStatus_{{venue.venueId}}" value="{{venue.status}}">
+                        <option value="Open">Open</option>
+                        <option value="Closed">Closed</option>
+                        <option value="Rain Delay">Rain Delay</option>
+                        <option value="Canceled">Games Canceled</option>
+                    </select></h3>
+                    <h3>Send status alert: <input type="checkbox" name="sendStatusAlert" id="sendStatusAlert" checked></h3>
+                    <button class="action" name="updateStatus" value="{{venue.venueId}}" type="submit">Update</button>
+                    <h4 class="urgent">Updating with status alert will send email and text to all users!</h4>
+                </form>
+            </section>
+            <script>
+                document.getElementById('fieldStatus_{{venue.venueId}}').value = "{{venue.status}}";
+            </script>
+        {% endfor %}
+        
+        <div class="divide">
+            <section>
+                <h2>Custom Message</h2>
+                <form method="post" class="announcement">
+                    <details open class="multiselect">
+                        <summary>Type</summary>
+                        <div>
+                            <label for="email">Email</label>
+                            <input type="checkbox" name="email" id="email">
+                        </div>
+                        <div>
+                            <label for="text">Text</label>
+                            <input type="checkbox" name="text" id="text" disabled>
+                        </div>
+                    </details>
+                    <details open class="multiselect" id="recipients">
+                        <summary>Send To</summary>
+                        <div>
+                            <button class="action" onclick="selectAll()" type="button">All Users</button>
+                        </div>
+                        <p><b>Groups</b> - Send to certain groups (every team)</p>
+                        <div>
+                            <label for="coach">All Coaches</label>
+                            <input type="checkbox" name="coach" id="coach">
+                        </div>
+                        <div>
+                            <label for="parent">All Parents</label>
+                            <input type="checkbox" name="parent" id="parent">
+                        </div>
+                        <div>
+                            <label for="umpire">All Umpires</label>
+                            <input type="checkbox" name="umpire" id="umpire">
+                        </div>
+                        <div>
+                            <label for="youth">All Youth Umpires</label>
+                            <input type="checkbox" name="youth" id="youth">
+                        </div>
+                        <div>
+                            <label for="board">All Board Members</label>
+                            <input type="checkbox" name="board" id="board">
+                        </div>
+                        <p><b>Teams</b> - Send to coaches and parents of each team</p>
+                        {% for team in allTeams %}
+                        <div>
+                            <label for="{{team.teamId}}">{{team.teamId}}</label>
+                            <input type="checkbox" name="{{team.teamId}}" id="{{team.teamId}}">
+                        </div>
+                        {% endfor %}
+                        <script>
+                            function selectAll() {
+                                let allInputs = document.getElementById('recipients').getElementsByTagName('input');
+                                for (var input of allInputs) {
+                                    input.checked = true;
+                                }
+                            }
+                            function updateChars(field, display, max) {
+                                let displayText = 'Characters remaining: ';
+                                let displayField = document.getElementById(display);
+                                let charsLeft = max - field.value.length;
+                                displayText += charsLeft.toString();
+                                displayField.innerHTML = displayText;
+                            }
+                        </script>
+                    </details>
+                    <h3>Message</h3>
+                    <textarea style="resize: none;" name="msg" id="msg" cols="40" rows="5" maxlength="130" onkeyup="updateChars(this, 'chars', 130)" required></textarea>
+                    <p class="error" id='chars'>Characters remaining: 130</p>
+                    <button class="action" type="submit" name="sendMessage" value="sendMessage" onclick="return confirm('Send message?')">Send</button>
+                </form>
+            </section>
+            
+        </div>
+    
+    </center>
+</main>
+
+{% endblock content %}
