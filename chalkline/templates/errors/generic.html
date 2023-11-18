@@ -1,0 +1,26 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='docs/docs.css')}}">
+</head>
+
+{% extends "./design.html" %}
+
+{% block title %}Error{% endblock title %}
+
+{% block content %}
+<main>
+<center>
+    <h1 class="error">Uh oh... an error has occurred.</h1>
+    <i class="fa-solid fa-triangle-exclamation large" style="color: #ff2600;"></i>
+    <a href="{{url_for('main.home')}}">Return Home</a>
+    <section>
+        <h2>Contact</h2>
+        <a href="mailto:chalklinebaseball@gmail.com">Email Developer</a>
+    </section>
+    <section>
+        <h2>Developer Details</h2>
+        <p>{{error}}</p>
+    </section>
+</center>
+</main>
+{% endblock content %}
+

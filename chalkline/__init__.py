@@ -37,4 +37,10 @@ def create_app():
     from chalkline.admin.routes import admin
     app.register_blueprint(admin, url_prefix="/admin")
     
+    from chalkline.docs.routes import docs
+    app.register_blueprint(docs, url_prefix="/docs")
+    
+    from chalkline.errors.routes import errors
+    app.register_blueprint(errors)
+    
     return app

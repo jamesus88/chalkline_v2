@@ -1,0 +1,20 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='docs/docs.css')}}">
+</head>
+
+{% extends "docs/doc-template.html" %}
+
+{% block subtitle %}Home{% endblock subtitle %}
+
+{% block doc_content %}
+<main>
+    <center>
+        <h1>Documentation</h1>
+        <section>
+            <h2>Chalkline Docs</h2>
+            <h3>Pick a topic above to get started...</h3>
+        </section>
+    </center>
+    
+</main>
+{% endblock doc_content %}

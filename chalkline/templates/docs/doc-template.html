@@ -1,0 +1,22 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='docs/docs.css')}}">
+</head>
+
+{% extends "design.html" %}
+
+{% block title %}Docs | {% block subtitle %}{% endblock subtitle %}{% endblock title %}
+
+{% block content %}
+<div id="docnav">
+    <a href="{{url_for('docs.account_creation')}}">Account Creation</a> |
+    <a href="">Updating Profile</a> |
+    <a href="">Team Schedule</a> |
+    <a href="">Team Info</a> |
+    <a href="">Umpire Schedule</a> |
+    <a href="">Umpire Assignments</a> |
+    <a href="">Master Schedule</a> |
+    <a href="">League</a> |
+    <a href="">Lost User ID</a>
+</div>
+{% block doc_content %}{% endblock doc_content %}
+{% endblock content %}

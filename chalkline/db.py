@@ -19,16 +19,20 @@ def authenticate(userId = ''):
     if user:
         user['_id'] = str(user['_id'])
         
-        permissionSet = permissions.find_one({'set': user['permissionSet']})
-        permissionSet.pop('_id')
-        
-        user['permissions'] = permissionSet
+        user = appendPermissions(user)
         
         print('login: ', user)
         
         return user
     else:
         return None
+
+def appendPermissions(user):
+    permissionSet = permissions.find_one({'set': user['permissionSet']})
+    permissionSet.pop('_id')
+    user['permissions'] = permissionSet
+    
+    return user
 
 def getUserList(criteria={}):
     return list(userData.find(criteria))
@@ -114,9 +118,7 @@ def updateProfile(userId, form):
     user = userData.find_one_and_update({'userId': userId}, {'$set': writable}, return_document=pymongo.ReturnDocument.AFTER)
     user['_id'] = str(user['_id'])
     
-    permissionSet = permissions.find_one({'set': user['permissionSet']})
-    permissionSet.pop('_id')
-    user['permissions'] = permissionSet
+    user = appendPermissions(user)
     
     return user
 
@@ -145,6 +147,8 @@ def removeTeamFromUser(user, teamCode):
     user['teams'].remove(teamCode)
     user = userData.find_one_and_update({"userId": user['userId']}, {"$set": {"teams": user['teams']}}, return_document=pymongo.ReturnDocument.AFTER)
     user['_id'] = str(user['_id'])
+    
+    user = appendPermissions(user)
     return user
 
 def addTeamToUser(user, teamCode):
@@ -156,6 +160,8 @@ def addTeamToUser(user, teamCode):
     user['teams'].append(teamCode)
     user = userData.find_one_and_update({"userId": user['userId']}, {"$set": {"teams": user['teams']}}, return_document=pymongo.ReturnDocument.AFTER)
     user['_id'] = str(user['_id'])
+    
+    user = appendPermissions(user)
     return user
 
 def addPlate(user, gameId):
