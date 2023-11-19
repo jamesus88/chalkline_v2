@@ -17,7 +17,7 @@
 
                 {% if 'coach' in user.role %}
                 <div class="dropdown dropdown-team">
-                    <button class="dropdown-button">Team <i class="fa-solid fa-caret-down"></i></button>
+                    <button class="dropdown-button">Teams <i class="fa-solid fa-caret-down"></i></button>
                     <div class="dropdown-content team">
                         <a href="{{url_for('teams.schedule')}}">Team Schedule</a>
                         <a href="{{url_for('teams.info')}}">Team Info</a>
@@ -27,10 +27,21 @@
                 
                 {% if 'youth' in user.role or 'umpire' in user.role %}
                 <div class="dropdown dropdown-umpire">
-                    <button class="dropdown-button">Umpiring <i class="fa-solid fa-caret-down"></i></button>
+                    <button class="dropdown-button">Umpire <i class="fa-solid fa-caret-down"></i></button>
                     <div class="dropdown-content umpire">
                         <a href="{{url_for('umpire.schedule')}}">Umpire Schedule</a>
                         <a href="{{url_for('umpire.assignments')}}">My Games</a>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if 'board' in user.role %}
+                <div class="dropdown dropdown-board">
+                    <button class="dropdown-button">Director <i class="fa-solid fa-caret-down"></i></button>
+                    <div class="dropdown-content umpire">
+                        <a href="{{url_for('director.week')}}">This Week's Games</a>
+                        <a href="{{url_for('director.schedule')}}">Director Schedule</a>
+                        <a href="{{url_for('director.shifts')}}">My Shifts</a>
                     </div>
                 </div>
                 {% endif %}

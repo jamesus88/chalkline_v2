@@ -13,6 +13,7 @@ teamData = db['test_teamData']
 playerData = db['test_playerData']
 leagueData = db['test_leagueData']
 venueData = db['test_venueData']
+directorData = db['test_directorData']
 
 def authenticate(userId = ''):
     user = userData.find_one({'userId': userId})

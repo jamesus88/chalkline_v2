@@ -29,11 +29,22 @@
             {% endif %}
             {% if 'umpire' in user.role or 'youth' in user.role %}
             <section class="menu">
-                <h2>Umpiring</h2>
+                <h2>Umpire</h2>
                 <i class="fa-solid fa-clipboard-list menu"></i>
                 <div class="hide">
                     <a href="{{url_for('umpire.schedule')}}" class="menu">Umpire Schedule</a>
                     <a href="{{url_for('umpire.assignments')}}" class="menu">My Games</a>
+                </div>
+            </section>
+            {% endif %}
+            {% if 'board' in user.role %}
+            <section class="menu">
+                <h2>Director</h2>
+                <i class="fa-solid fa-street-view menu"></i>
+                <div class="hide">
+                    <a href="{{url_for('director.week')}}" class="menu">This Week's Games</a>
+                    <a href="{{url_for('director.schedule')}}" class="menu">Director Schedule</a>
+                    <a href="{{url_for('director.shifts')}}" class="menu">My Shifts</a>
                 </div>
             </section>
             {% endif %}

@@ -7,6 +7,12 @@
 {% block content %}
 <main>
     <h1>Field Status</h1>
+    <section>
+        <h2>Director On Duty</h2>
+        <h3>Twin Lakes Park - {{currentDirector.fLast}}</h3>
+        <h3>Phone: {{currentDirector.phone}}</h3>
+    </section>
+    
     <h2>{{user.location}}</h2>
     {% for venue in venues %}
         <section>

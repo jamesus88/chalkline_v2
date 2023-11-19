@@ -43,4 +43,7 @@ def create_app():
     from chalkline.errors.routes import errors
     app.register_blueprint(errors)
     
+    from chalkline.director.routes import director
+    app.register_blueprint(director, url_prefix="/director")
+    
     return app

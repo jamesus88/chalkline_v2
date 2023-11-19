@@ -1,0 +1,96 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='schedule.css')}}">
+    <script src="{{url_for('static', filename='schedule.js')}}"></script>
+</head>
+
+{% extends "design.html" %}
+{% block title %}This Week's Games{% endblock title %}
+
+{% block content %}
+<main>
+    <section class="split">
+        <div>
+            <h1>This Week's Games</h1>
+            <h3>View this week's schedule</h3>
+        </div>
+        <div class="align-right">
+            <h3>Go to <a href="{{url_for('league.master_schedule')}}">Master Schedule</a></h3>
+            <p>To view all games.</p>
+        </div>
+    </section>
+    <button type="" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
+    <form method="post">
+        <section id="filter-section" class="filter-section" style='display: none;'>
+            <select name="updateFilter" id="updateFilter" style="display: none;">
+                <option value="updateFilter" selected>UpdateFilter</option>
+            </select>
+            <select class="filter" name="hidePast" id="hidePast" onchange="this.form.submit()">
+                <option value="true" selected>Future only</option>
+                <option value="false">Past and Future</option>
+            </select>
+            <select class="filter" name="ageGroup" id="ageGroup" onchange="this.form.submit()">
+                <option value="null" selected>All Age Groups</option>
+                <option value="AA">AA only</option>
+                <option value="AAA">AAA only</option>
+                <option value="Majors">Majors only</option>
+                <option value="50/70">50/70 only</option>
+                <option value="Juniors">Juniors only</option>
+            </select>
+        
+            <script>
+                let filter = {{ eventFilter | tojson }};
+                document.getElementById('hidePast').value = filter.hidePast;
+                document.getElementById('ageGroup').value = filter.ageGroup;
+
+                function toggleFilterSection(section) {
+                    let sect = document.getElementById(section);
+                    if (sect.style.display == 'none') {
+                        sect.style.display = 'block';
+                    }
+                    else {
+                        sect.style.display = 'none';
+                    }
+                }
+            </script>
+        </section>
+        <p class="error">{{msg}}</p>
+        <section class="schedule-section scrollwrapper">
+            {% if eventList|length < 1 %}
+            <h3 class="error">No games found.</h3>
+            {% endif %}
+            <table id="schedule-table" class="event-display">
+                <tr>
+                    <th></th>
+                    <th>Date/Time</th>
+                    <th>Venue</th>
+                    <th>Field</th>
+                    <th>Age Group</th>
+                    <th>Status</th>
+                    <th>Plate Umpire</th>
+                    <th>Field Umpire</th>
+                </tr>
+                {% for event in eventList %}
+                <tr class="event-row">
+                    <td><a class="icon-link" href="{{url_for('view_info.event', eventId=event._id)}}"><i class="fa-solid fa-info"></i></a></td>
+                    <td>{{event.eventDate.strftime('%a %m/%d @ %H:%M')}}</td>
+                    <td>{{event.eventVenue}}</td>
+                    <td>{{event.eventField}}</td>
+                    <td>{{event.eventAgeGroup}}</td>
+                    <td>{{event.status}}</td>
+                    <td>{{event.plateUmpireInfo.fLast}}</td>
+                    <td>{{event.field1UmpireInfo.fLast}}</td>
+
+                </tr>
+                {% endfor %}
+                
+            </table>
+            
+        </section>
+    </form>
+</main>
+
+<script>
+    let tbl = document.getElementById('schedule-table');
+    colorifySchedule(tbl);
+</script>
+{% endblock content %}

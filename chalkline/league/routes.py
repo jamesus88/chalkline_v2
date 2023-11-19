@@ -1,6 +1,7 @@
 from flask import render_template, redirect, url_for, session, request, Blueprint
 from chalkline import db, get_events
 from chalkline import server as srv
+from chalkline.director import director_db
 league = Blueprint('league', __name__)
 
 @league.route('/master-schedule', methods=['GET', 'POST'])
@@ -38,4 +39,6 @@ def status():
         return redirect(url_for('main.login'))
     
     venues = db.getVenues("Sarasota")
-    return render_template("league/status.html", user=user, venues=venues)
+    userList = db.getUserList()
+    currentDirector = director_db.getDirector(userList)
+    return render_template("league/status.html", user=user, venues=venues, currentDirector=currentDirector)

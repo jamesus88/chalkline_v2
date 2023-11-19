@@ -81,7 +81,7 @@ i.menu {
 }
 button.button-sign-in {
     width: 100px;
-    margin: 15px auto;
+    margin: 10px auto;
     font-size: 15pt;
     font-weight: bold;
     background-color: var(--highlight-blue);
@@ -112,7 +112,7 @@ a.menu {
     text-decoration: none;
     display: block;
     padding: 10px;
-    margin: 5px auto;
+    margin: 5px;
     color: var(--chalkline-navy);
     border: 2px solid var(--chalkline-navy);
     background-color: white;
@@ -124,10 +124,11 @@ a.menu:hover {
 }
 section.menu {
     transition: all 0.3s;
-    margin: 15px;
+    margin: 15px 15px;
+    width: 200px;
 }
 section.menu:hover {
-    border: 2px solid var(--chalkline-navy);
+    box-shadow: 15px 15px 15px var(--chalkline-navy);
 }
 div.hide {
     display: none;

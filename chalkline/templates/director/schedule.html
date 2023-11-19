@@ -1,0 +1,76 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='schedule.css')}}">
+</head>
+
+{% extends "design.html" %}
+{% block title %}Director Schedule{% endblock title %}
+
+{% block content %}
+<main>
+    <section class="split">
+        <div>
+            <h1>Director Schedule</h1>
+            <h3>View schedule and add shifts.</h3>
+        </div>
+        <div class="align-right">
+            <h3>Go to <a href="{{url_for('director.shifts')}}">My Shifts</a></h3>
+            <p>To view shifts you are working.</p>
+        </div>
+    </section>
+    <button type="" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
+    <form method="post">
+        <section id="filter-section" class="filter-section" style='display: none;'>
+            <select name="updateFilter" id="updateFilter" style="display: none;">
+                <option value="updateFilter" selected>UpdateFilter</option>
+            </select>
+            <select class="filter" name="hidePast" id="hidePast" onchange="this.form.submit()">
+                <option value="True" selected>Future only</option>
+                <option value="False">Past and Future</option>
+            </select>
+        
+            <script>
+                document.getElementById('hidePast').value = '{{hidePast}}';
+                function toggleFilterSection(section) {
+                    let sect = document.getElementById(section);
+                    if (sect.style.display == 'none') {
+                        sect.style.display = 'block';
+                    }
+                    else {
+                        sect.style.display = 'none';
+                    }
+                }
+            </script>
+        </section>
+        <p class="error">{{msg}}</p>
+        <section class="schedule-section scrollwrapper">
+            {% if shiftList|length < 1 %}
+            <h3 class="error">No shifts found.</h3>
+            {% endif %}
+            <table id="schedule-table" class="event-display">
+                <tr>
+                    <th>Date</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Director</th>
+                </tr>
+                {% for shift in shiftList %}
+                <tr>
+                    <td>{{shift.startDateTime.strftime('%a %m/%d')}}</td>
+                    <td>{{shift.startDateTime.strftime('%H:%M')}}</td>
+                    <td>{{shift.endDateTime.strftime('%H:%M')}}</td>
+                    {% if shift.directorInfo.fLast is none %}
+                    <td><button class="schedule-action" type="submit" name="addDirector" value="{{shift._id}}">+ director</button></td>
+                    {% else %}
+                    <td><a href="#">{{shift.directorInfo.fLast}}</a></td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+                
+                
+            </table>
+            
+        </section>
+    </form>
+</main>
+
+{% endblock content %}
