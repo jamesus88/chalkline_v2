@@ -1,0 +1,24 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='docs/docs.css')}}">
+</head>
+
+{% extends "docs/doc-template.html" %}
+
+{% block subtitle %}Security{% endblock subtitle %}
+
+{% block doc_content %}
+<main>
+    <center>
+        <h1>Chalkline&trade; Security</h1>
+    </center>
+    <section class="text">
+        <h3>User ID Hashing</h3>
+        <ul>
+            <li>Chalkline&trade; implements ID encryption to keep your account safe.</li>
+            <li>Your data will never be shared or sold.</li>
+            <li>Do <u>not</u> use an easily guessed User ID.</li>
+            <li>Do <u>not</u> use the same password twice!</li>
+        </ul>
+    </section>
+</main>
+{% endblock doc_content %}

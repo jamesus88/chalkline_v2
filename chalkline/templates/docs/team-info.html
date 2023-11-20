@@ -1,0 +1,37 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='docs/docs.css')}}">
+</head>
+
+{% extends "docs/doc-template.html" %}
+
+{% block subtitle %}Team Info{% endblock subtitle %}
+
+{% block doc_content %}
+<main>
+    <center>
+        <h1>View Team Info</h1>
+    </center>
+    <section class="text">
+        <h3>Go to <a target="_blank" href="{{url_for('teams.info')}}">Team Info</a></h3>
+        
+    </section>
+    <section class="text">
+        <h3>Team Info</h3>
+        <ul>
+            <li>Use the <b>filters</b> to view a specific team's info.</li>
+            <li>The team name, code, and standings (if available) will be displayed.</li>
+        </ul>
+    </section>
+    <section class="text">
+        <h3>Team Contacts</h3>
+        <ul>
+            <li>You can view all other users who also added their teams.</li>
+            <li>If available, their emails and phone numbers will also be shown.</li>
+            <li>To invite other users to your team, click <b>Share Team</b>.</li>
+            <li>Send this link to other coaches or parents.</li>
+            <li><u>Note:</u> other coaches and parents will need to make a Chalkline&trade; account if they do not already have one.</li>
+        </ul>
+    </section>
+    
+</main>
+{% endblock doc_content %}

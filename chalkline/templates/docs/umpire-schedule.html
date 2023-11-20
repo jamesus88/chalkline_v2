@@ -1,0 +1,33 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='docs/docs.css')}}">
+</head>
+
+{% extends "docs/doc-template.html" %}
+
+{% block subtitle %}Umpire Schedule{% endblock subtitle %}
+
+{% block doc_content %}
+<main>
+    <center>
+        <h1>View Umpire Schedule</h1>
+    </center>
+    <section class="text">
+        <h3>Go to <a target="_blank" href="{{url_for('umpire.schedule')}}">Umpire Schedule</a></h3>
+        
+    </section>
+    <section class="text">
+        <h3>Umpire Schedule</h3>
+        <ul>
+            <li>Use the <b>filters</b> to view different types of games.</li>
+            <li>Click the <i class="fa-solid fa-circle-info"></i> button to view game information.</li>
+            <li>To sign up for games, click <b>+ plate</b> or <b>+ field</b>.</li>
+            <li>If a game does not require a field umpire, it will be filled by <u>League</u>.</li>
+            <li>Youth umpires can sign up for youth spots using <b>+ youth</b>.</li>
+            <li>Some youth umpires may not have permission to add games. If you believe your account is wrongly blocked, contact your admin.</li>
+            <li>Other games may be locked. Umpires will be temporarily limited from these games until the games are updated.</li>
+        </ul>
+        <p>Games signed up for will show up on the <a target="_blank" href="{{url_for('umpire.assignments')}}">My Games</a> page.</p>
+    </section>
+    
+</main>
+{% endblock doc_content %}

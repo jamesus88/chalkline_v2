@@ -14,7 +14,7 @@
                 
                 <h3 class="error">{{msg}}</h3>
                 <table class="center">
-                    <h3>Need Help? Read the <a href="#">docs</a>.</h3>
+                    <h3>Need Help? Read the <a target="_blank" href="{{url_for('docs.account_creation')}}">docs</a>.</h3>
                     <p class="error">* required</p>
                     <tr>
                         <td><label for="location">League <b class="error">*</b></label></td>
@@ -108,6 +108,7 @@
                     <p>A User ID must be unique and kept protected.</p>
                     <p>(recommended: last name + a few numbers)</p>
                     <p>You should treat your User ID like a <b>password</b>!</p>
+                    <p>Your User ID is kept super secret secure via <a target="_blank" href="{{url_for('docs.security')}}">Chalkline&trade; Hashing</a></p>
                 </div>
                 <div>
                     <i class="fa-solid fa-lock large"></i>

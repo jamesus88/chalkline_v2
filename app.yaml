@@ -5,6 +5,15 @@ automatic_scaling:
   max_instances: 1
 
 
+env_variables:
+  USERID_SALT: "$2b$12$/CqCjZdCiLQbeBiheMPjBu"
+  SECRET_KEY: "chalkline14#"
+  MAIL_USERNAME: "chalklinebaseball@gmail.com"
+  MAIL_PASSWORD: "lyhi obpt rxam eago"
+  PYMONGO_CLIENT: "mongodb+srv://aidanhurwitz:Mongo4821@mongo.to6zmzr.mongodb.net/?retryWrites=true&w=majority"  
+
+
+
 handlers:
 
 - url: /static

@@ -1,0 +1,30 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='docs/docs.css')}}">
+</head>
+
+{% extends "docs/doc-template.html" %}
+
+{% block subtitle %}Umpire Assignments{% endblock subtitle %}
+
+{% block doc_content %}
+<main>
+    <center>
+        <h1>View My Games</h1>
+    </center>
+    <section class="text">
+        <h3>Go to <a target="_blank" href="{{url_for('umpire.assignments')}}">My Games</a></h3>
+        
+    </section>
+    <section class="text">
+        <h3>My Games</h3>
+        <ul>
+            <li>Use the <b>filters</b> to view different types of games.</li>
+            <li>Click the <i class="fa-solid fa-circle-info"></i> button to view event information.</li>
+            <li>During <i>Free Drop Week</i>, all umpires will have permission to add and remove games freely.</li>
+            <li>After that, some games may require permission to drop.</li>
+            <li>To remove a game from your schedule, click <b>Remove</b> on the far right.</li>
+            <li>If you do not have permission to remove the game, you will need to contact your assignor and ask them to remove the game.</li>
+        </ul>
+    </section>
+</main>
+{% endblock doc_content %}

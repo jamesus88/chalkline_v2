@@ -1,8 +1,8 @@
 import pymongo, bson, datetime 
 import chalkline.server as server
-from flask import session
+import os
 
-client = pymongo.MongoClient("mongodb+srv://aidanhurwitz:Mongo4821@mongo.to6zmzr.mongodb.net/?retryWrites=true&w=majority", connect=False)
+client = pymongo.MongoClient(os.environ.get('PYMONGO_CLIENT'), connect=False)
 db = client['chalkline']
 
 eventData = db['test_eventData']
@@ -19,7 +19,6 @@ def authenticate(userId = ''):
     user = userData.find_one({'userId': userId})
     if user:
         user['_id'] = str(user['_id'])
-        
         user = appendPermissions(user)
         
         print('login: ', user)

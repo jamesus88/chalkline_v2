@@ -10,13 +10,11 @@ def create_error(i: int = 500):
 @errors.app_errorhandler(404)
 def _404(error):
     user = srv.getUser()
-    print(traceback.format_exc())
     return render_template("errors/404.html", user=user, error=error)
 
 @errors.app_errorhandler(500)
 def _500(error):
     user = srv.getUser()
-    print(traceback.format_exc())
     return render_template("errors/500.html", user=user, error=error)
 
 @errors.app_errorhandler(Exception)

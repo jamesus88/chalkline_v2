@@ -1,0 +1,27 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='docs/docs.css')}}">
+</head>
+
+{% extends "docs/doc-template.html" %}
+
+{% block subtitle %}Master Schedule{% endblock subtitle %}
+
+{% block doc_content %}
+<main>
+    <center>
+        <h1>View Master Schedule</h1>
+    </center>
+    <section class="text">
+        <h3>Go to <a target="_blank" href="{{url_for('league.master_schedule')}}">Master Schedule</a></h3>
+        
+    </section>
+    <section class="text">
+        <h3>Master Schedule</h3>
+        <ul>
+            <li>Use the <b>filters</b> to view different types of games.</li>
+            <li>Each event is designated by type: <b>Game</b>, <b>Practice</b>, or <b>Umpire Duty</b>.</li>
+            <li>Click the <i class="fa-solid fa-circle-info"></i> button to view event information.</li>
+        </ul>
+    </section>
+</main>
+{% endblock doc_content %}

@@ -3,3 +3,4 @@ pymongo[srv]
 gunicorn
 flask_mail
 requests
+bcrypt

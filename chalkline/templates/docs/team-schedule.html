@@ -1,0 +1,40 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='docs/docs.css')}}">
+</head>
+
+{% extends "docs/doc-template.html" %}
+
+{% block subtitle %}Team Schedule{% endblock subtitle %}
+
+{% block doc_content %}
+<main>
+    <center>
+        <h1>View Team Schedule</h1>
+    </center>
+    <section class="text">
+        <h3>Go to <a target="_blank" href="{{url_for('teams.schedule')}}">Team Schedule</a></h3>
+        
+    </section>
+    <section class="text">
+        <h3>Team Schedule</h3>
+        <ul>
+            <li>Use the <b>filters</b> to view a specific team's schedule.</li>
+            <li>Each event is designated by type: <b>Game</b>, <b>Practice</b>, or <b>Umpire Duty</b>.</li>
+            <li>Click the <i class="fa-solid fa-circle-info"></i> button to view event information.</li>
+        </ul>
+    </section>
+    <section class="text">
+        <h3>Requesting Youth Umpires</h3>
+        <ul>
+            <li>Coaches can request youth umpires to cover their umpire responsibilities.</li>
+            <li>To request a youth umpire, find an event designated <b>Umpire Duty</b>.</li>
+            <li>Select <b>Request Youth</b> on the far right.</li>
+            <li>This will send a request to youth umpires to fill this position.</li>
+            <li>Once filled, the event will update to reflect the changes and show the youth umpire's name.</li>
+            <li>To contact your youth umpire, select their name.</li>
+            <li>The youth umpire's phone and email will be shown (if available).</li>
+        </ul>
+    </section>
+    
+</main>
+{% endblock doc_content %}

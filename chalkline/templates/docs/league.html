@@ -1,0 +1,32 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='docs/docs.css')}}">
+</head>
+
+{% extends "docs/doc-template.html" %}
+
+{% block subtitle %}League{% endblock subtitle %}
+
+{% block doc_content %}
+<main>
+    <center>
+        <h1>League</h1>
+    </center>
+    <section class="text">
+        <h3>Go to <a target="_blank" href="{{url_for('league.info')}}">League Info</a></h3>
+        <ul>
+            <li>View contacts for the league.</li>
+            <li>Click links to league websites to view more info.</li>
+        </ul>
+    </section>
+    <section class="text">
+        <h3>Go to <a target="_blank" href="{{url_for('league.status')}}">Field Status</a></h3>
+        <ul>
+            <li>The current director on duty will be displayed.</li>
+            <li>If available, their phone number will also be shown.</li>
+            <li>The field status of all venues in your league is displayed.</li>
+            <li>When the status of the venues is changed, an update is pushed to all users with notifications turned on.</li>
+            <li>You can manage your notificaiton preferences on your <a target="_blank" href="{{url_for('main.profile')}}">Profile</a></li>
+        </ul>
+    </section>
+</main>
+{% endblock doc_content %}

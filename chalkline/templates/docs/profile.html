@@ -1,0 +1,46 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='docs/docs.css')}}">
+</head>
+
+{% extends "docs/doc-template.html" %}
+
+{% block subtitle %}Profile{% endblock subtitle %}
+
+{% block doc_content %}
+<main>
+    <center>
+        <h1>Set Up Profile</h1>
+    </center>
+    <section class="text">
+        <h3>Go to <a target="_blank" href="{{url_for('main.profile')}}">My Profile</a></h3>
+        
+    </section>
+    <section class="text">
+        <h3>Teams</h3>
+        <ul>
+            <li>If you are a <b>Coach</b> or a <b>Parent</b>, you can add teams to your account.</li>
+            <li>This allows you to view the team schedule and/or request youth umpires.</li>
+            <li>Select a team code, then click <b>Add Team</b>.</li>
+            <li>Your team should show under the <b>My Teams</b> heading.</li>
+            <li>To remove teams from your profile, find your team, then click <b>Remove</b>.</li>
+        </ul>
+    </section>
+    <section class="text">
+        <h3>Personal Information</h3>
+        <ul>
+            <li>To edit your personal information, change your first name, last name, email, or phone number.</li>
+            <li>You can also opt-in or opt-out of email/text reminders and alerts.</li>
+            <li>To hide your email or phone from other users, select <b>Hide my email/phone from other users</b>.</li>
+            <li>By default, your email and phone will be available for others in your league to view.</li>
+            <li>Then click <b>Save</b> to update changes.</li>
+        </ul>
+    </section>
+    <section class="text">
+        <h3>Session</h3>
+        <ul>
+            <li>To sign out, click <b>Sign Out</b>.</li>
+            <li>If changes have been made to your account, you may need to sign out and login again.</li>
+        </ul>
+    </section>
+</main>
+{% endblock doc_content %}

@@ -10,10 +10,68 @@
 <main>
     <center>
         <h1>Account Creation</h1>
-        <section>
-            <h2>Chalkline Docs</h2>
-            <h3>Pick a topic above to get started...</h3>
+        <section class="text">
+            <h3>Creating an account</h3>
+            <ul>
+                <li>Select <a target="_blank" href="{{url_for('main.signup')}}">Create an Account</a></li>
+                <li>Select a league.</li>
+                <li>Enter your first and last name.</li>
+                <li>Create a <b>User ID</b></li>
+                <ul>
+                    <li>Your <b>User ID</b> is how you login to your account.</li>
+                    <li>Your <b>User ID</b> should be kept secret and secure, but do <u>not</u> forget it!</li>
+                    <li>Recommended: Your last name + a few numbers or characters.</li>
+                    <li>Ex: last1234#</li>
+                    <li>Chalkine&trade; will always keep your personal information safe. See <a href="">Chalkline&trade; Security</a> for more info.</li>
+                </ul>
+                <li>Enter your email and phone number.</li>
+                <li>Select your phone carrier (optional).</li>
+                <ul>
+                    <li>Chalkline&trade; collects this information to minimize costs when sending text reminders and updates.</li>
+                    <li>Your information will <u>never</u> be sold or shared.</li>
+                </ul>
         </section>
+        <section class="text">
+            <h3>Selecting account roles</h3>
+            <ul>
+                <li>Each account type has access to different sections of Chalkline&trade;</li>
+                <ul>
+                    <b>Coaches</b>
+                    <ul>
+                        <li>Coaches can add teams to their profiles. This will allow them to view their team's unique schedule.</li>
+                        <li>Coaches can also request youth umpires to fill their umpire duties.</li>
+                        <li>Youth umpires can be requested for any game where the umpire duty is listed as the team(s) associated with your account.</li>
+                        <li>To add teams to your profile, see <a href="{{url_for('docs.profile')}}">adding teams to profile</a>.</li>
+                        <li>Coaches do <u>not</u> require a league password to sign up.</li>
+                    </ul>
+                    <b>Parents</b>
+                    <ul>
+                        <li>Parents can add teams to their profiles. This will allow them to view their team's unique schedule.</li>
+                        <li>To add teams to your profile, see <a href="{{url_for('docs.profile')}}">adding teams to profile</a>.</li>
+                        <li>Parents do <u>not</u> require a league password to sign up.</li>
+                    </ul>
+                    <b>Umpires</b>
+                    <ul>
+                        <li>Umpires can add and remove games from their schedule. They can view all games in the schedule per season and can also be assigned games by their assignor if necessary.</li>
+                        <li>Creating an Umpire account <u>requires</u> a league password. If you are looking to sign up as an umpire but do not know your league password, contact your assignor.</li>
+                    </ul>
+                    <b>Youth Umpires</b>
+                    <ul>
+                        <li>Similarly, Youth Umpires can also add and remove games to their own schedule. However, they will only be able to access field duties and cannot sign up for plate slots.</li>
+                        <li>Youth Umpires do <u>not</u> require a league password to sign up.</li>
+                    </ul>
+                    <b>Board Members</b>
+                    <ul>
+                        <li>Board members can sign up for director on duty shifts and view the director schedule.</li>
+                        <li>They can also view the week schedule of games.</li>
+                        <li>Board members <u>require</u> a league password to sign up.</li>
+                    </ul>
+                </ul>
+                <li>Click <b>Next</b>.</li>
+                <li>Set up your <a href="{{url_for('docs.profile')}}">Profile</a></li>
+            </ul>
+        </section>
+
     </center>
     
 </main>

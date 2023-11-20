@@ -118,3 +118,6 @@ details.multiselect > div {
     font-size: large;
     font-weight: bold;
 }
+section.text {
+    text-align: left;
+}

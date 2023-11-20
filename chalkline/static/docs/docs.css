@@ -15,3 +15,6 @@
 #docnav > a {
     margin: 2px 10px;
 }
+li {
+    margin: 8px 0;
+}

@@ -9,14 +9,15 @@
 {% block content %}
 <div id="docnav">
     <a href="{{url_for('docs.account_creation')}}">Account Creation</a> |
-    <a href="">Updating Profile</a> |
-    <a href="">Team Schedule</a> |
-    <a href="">Team Info</a> |
-    <a href="">Umpire Schedule</a> |
-    <a href="">Umpire Assignments</a> |
-    <a href="">Master Schedule</a> |
-    <a href="">League</a> |
-    <a href="">Lost User ID</a>
+    <a href="{{url_for('docs.profile')}}">Updating Profile</a> |
+    <a href="{{url_for('docs.team_schedule')}}">Team Schedule</a> |
+    <a href="{{url_for('docs.team_info')}}">Team Info</a> |
+    <a href="{{url_for('docs.umpire_schedule')}}">Umpire Schedule</a> |
+    <a href="{{url_for('docs.umpire_assignments')}}">Umpire Assignments</a> |
+    <a href="{{url_for('docs.master_schedule')}}">Master Schedule</a> |
+    <a href="{{url_for('docs.league')}}">League</a> |
+    <a href="{{url_for('docs.lost_id')}}">Lost User ID</a> |
+    <a href="{{url_for('docs.security')}}">Chalkline&trade; Security</a>
 </div>
 {% block doc_content %}{% endblock doc_content %}
 {% endblock content %}
