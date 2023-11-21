@@ -1,8 +1,7 @@
 from flask import session
-from chalkline import mail
 from flask_mail import Message
+from chalkline import mail
 import datetime
-import requests
 
 SHARE_LINK = "www.chalklinebaseball.com/"
 MAIL_SENDER = 'Chalkline Baseball'
@@ -25,6 +24,7 @@ def todaysDate(padding_hrs=0):
 
 def safeUser(user, session_user={}):
     user['_id'] = str(user['_id'])
+    user['fLast'] = user['firstName'][0] + '. ' + user['lastName']
     if session_user.get('userId') != user['userId']:
         if user['hidePhone']: user['phone'] = None
         if user['hideEmail']: user['email'] = None
@@ -90,7 +90,7 @@ def sendMail(subject: str = 'Message from Chalkline Baseball', body: str = 'www.
         sender=sender,
         bcc=recipients
     )
-    #mail.send(msg)
+    mail.send(msg)
     print(f'Message sent to {str(msg.bcc)}')
 
 def createEmailList(users):

@@ -1,0 +1,29 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='view_game/view.css')}}">
+</head>
+
+{% extends "design.html" %}
+
+{% block title %}Add Shift{% endblock title %}
+
+{% block content %}
+<main>
+    <center>
+        <h1>Add Shift</h1>
+        <h4 class='error'>{{msg}}</h4>
+    </center>
+    
+    <form method="post" id="addTeam">
+        <div class="split"><button class="action" name="addTeam" value="addTeam" type="submit">Add Shift</button></div>
+        <section>
+            <center>
+                <h3>Start: <input type="datetime-local" name="startDateTime" id="startDateTime" required></h3>
+                <h3>End: <input type="datetime-local" name="endDateTime" id="endDateTime" required></h3>
+            </center>
+        </section>
+        <div class="split"><button class="action" name="addTeam" value="addTeam" type="submit">Add Shift</button></div>
+    </form>
+    
+</main>
+
+{% endblock content %}

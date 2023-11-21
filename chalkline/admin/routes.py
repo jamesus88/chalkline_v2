@@ -1,6 +1,7 @@
 from flask import render_template, redirect, url_for, session, request, Blueprint
 from chalkline import db, get_events
 from chalkline import server as srv
+from chalkline.director import director_db
 admin = Blueprint('admin', __name__)
 
 @admin.route("/events", methods=['GET','POST'])
@@ -186,3 +187,58 @@ def announcement():
     venues = db.getVenues("Sarasota")
     
     return render_template('admin/announcement.html', user=user, msg=msg, allTeams=allTeams, venues=venues)
+
+@admin.route("/dod-data", methods=['GET', 'POST'])
+def dod_data():
+    user = srv.getUser()
+    if user is None:
+        session['next-page'] = 'admin.add_event'
+        return redirect(url_for('main.login'))
+    if 'admin' not in user['role']:
+        return redirect(url_for('main.home'))
+    
+    directorList = db.getUserList({'role': {'$in': ['board']}})
+    hidePast = True
+    msg = ''
+    
+    if request.method == 'POST':
+        if request.form.get('updateFilter'):
+            if request.form['hidePast'] == 'False':
+                hidePast = False
+                
+        if request.form.get('updateShift'):
+            shiftId = request.form['updateShift']
+            form = {}
+            for key, value in request.form.items():
+                if f'_{shiftId}' in key:
+                    form[key.removesuffix(f"_{shiftId}")] = value
+            msg = director_db.updateShift(shiftId, form, directorList)
+            print(f"Shift: {shiftId} updated by {user['userId']}")
+            
+        if request.form.get('deleteShift'):
+            shiftId = request.form['deleteShift']
+            msg = director_db.deleteShift(shiftId)
+            print(f"Shift: {shiftId} deleted by {user['userId']}")
+            
+    
+    shiftList = director_db.getShiftList(directorList, hidePast=hidePast, user=None)
+    
+    return render_template('admin/dod-data.html', user=user, directorList=directorList, shiftList=shiftList, hidePast=hidePast, msg=msg)
+    
+@admin.route("/add-shift", methods=['GET', 'POST'])
+def add_shift():
+    user = srv.getUser()
+    if user is None:
+        session['next-page'] = 'admin.add_event'
+        return redirect(url_for('main.login'))
+    if 'admin' not in user['role']:
+        return redirect(url_for('main.home'))
+    
+    msg = ''
+    
+    if request.method == 'POST':
+        msg = director_db.addShift(user, request.form)
+        if type(msg) != str:
+            return redirect(url_for('admin.dod_data'))
+    
+    return render_template('admin/add-shift.html', user=user, msg=msg)

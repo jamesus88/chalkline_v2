@@ -50,7 +50,7 @@ def schedule():
             msg = db.addDirector(shiftId, user)
     
     
-    shiftList = db.getShiftList(userList, hidePast=hidePast, user=None)
+    shiftList = db.getShiftList(userList, hidePast=hidePast)
     
     return render_template("director/schedule.html", user=user, shiftList=shiftList, hidePast=hidePast, msg=msg)
 
@@ -64,6 +64,7 @@ def shifts():
         return redirect(url_for('main.home'))
     
     userList = master_db.getUserList()
+    
     hidePast = True
     msg = ''
     

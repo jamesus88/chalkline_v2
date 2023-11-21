@@ -5,15 +5,15 @@ import os
 client = pymongo.MongoClient(os.environ.get('PYMONGO_CLIENT'), connect=False)
 db = client['chalkline']
 
-eventData = db['test_eventData']
-userData = db['test_userData']
+eventData = db['eventData']
+userData = db['userData']
 permissions = db['permissions']
-reportData = db['test_reportData']
-teamData = db['test_teamData']
-playerData = db['test_playerData']
-leagueData = db['test_leagueData']
-venueData = db['test_venueData']
-directorData = db['test_directorData']
+reportData = db['reportData']
+teamData = db['teamData']
+playerData = db['playerData']
+leagueData = db['leagueData']
+venueData = db['venueData']
+directorData = db['directorData']
 
 def authenticate(userId = ''):
     user = userData.find_one({'userId': userId})

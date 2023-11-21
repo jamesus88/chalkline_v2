@@ -1,6 +1,7 @@
-from chalkline.db import directorData, authenticate
+from chalkline.db import directorData
 from chalkline.server import safeUser, todaysDate
-import pymongo, bson
+import pymongo, bson, datetime
+
 def getShiftList(userList=[], user=None, criteria={}, hidePast=True):
     criteria['location'] = 'Sarasota'
     if hidePast:
@@ -18,6 +19,7 @@ def getShiftList(userList=[], user=None, criteria={}, hidePast=True):
         shift['_id'] = str(shift['_id'])
         
         shift['directorInfo'] = {
+            '_id': None,
             'firstName': None,
             'lastName': None,
             'fLast': None,
@@ -25,19 +27,21 @@ def getShiftList(userList=[], user=None, criteria={}, hidePast=True):
             'phone': None
         }
         
-        for user in userList:
-            if shift['director'] == user['userId']:
-                shift['directorInfo']['firstName'] = user['firstName']
-                shift['directorInfo']['lastName'] = user['lastName']
-                shift['directorInfo']['fLast'] = user['firstName'][0] + '. ' + user['lastName']
-                if not user['hideEmail']:
-                    shift['directorInfo']['email'] = user['email']
-                if not user['hidePhone']:
-                    shift['directorInfo']['phone'] = user['phone']
+        for director in userList:
+            if shift['director'] == director['userId']:
+                shift['directorInfo'] = {
+                    '_id': str(director['_id']),
+                    'firstName': director['firstName'],
+                    'lastName': director['lastName'],
+                    'fLast': director['firstName'][0] + '. ' + director['lastName'],
+                    'email': director['email'],
+                    'phone': director['phone']
+                }
+                break
         
         shift.pop('director')
         shiftList.append(shift)
-        
+    
     return shiftList
         
 def addDirector(shiftId, user):
@@ -46,11 +50,11 @@ def addDirector(shiftId, user):
         return "Error: shift no longer available"
     
     directorData.update_one({'_id': bson.ObjectId(shiftId)}, {'$set': {'director': user['userId']}})
-    return 'Successfully added shift!'
+    return 'Successfully added shift'
 
 def removeDirector(shiftId, user):
     directorData.update_one({'_id': bson.ObjectId(shiftId)}, {'$set': {'director': None}})
-    return 'Successfully removed shift!'
+    return 'Successfully removed shift'
 
 def getDirector(userList):
     now = todaysDate()
@@ -64,3 +68,59 @@ def getDirector(userList):
                 return safeUser(user)
         
     return {'firstName': None, 'lastName': None, 'fLast': None, 'email': None, 'phone': None}
+
+def getShiftInfo(shiftId, userList):
+    shift = directorData.find_one({'_id': bson.ObjectId(shiftId)})
+    shift['_id'] = str(shift['_id'])
+    
+    shift['directorInfo'] = {
+        '_id': None,
+        'firstName': None,
+        'lastName': None,
+        'fLast': None,
+        'email': None,
+        'phone': None
+    }
+    
+    for user in userList:
+        if user['userId'] == shift['director']:
+            s_user = safeUser(user)
+            shift['directorInfo'] = {
+                '_id': s_user['_id'],
+                'firstName': s_user['firstName'],
+                'lastName': s_user['lastName'],
+                'fLast': s_user['fLast'],
+                'email': s_user['email'],
+                'phone': s_user['phone']
+            }
+            
+    return shift
+
+def updateShift(shiftId: str, form: dict, userList: list):
+    writable = {
+        'startDateTime': datetime.datetime.strptime(form['startDateTime'], "%Y-%m-%dT%H:%M"),
+        'endDateTime': datetime.datetime.strptime(form['endDateTime'], "%Y-%m-%dT%H:%M"),
+        'director': None
+    }
+    for user in userList:
+        if str(user['_id']) == str(form['director']):
+            writable['director'] = user['userId']
+            
+    directorData.update_one({'_id': bson.ObjectId(shiftId)}, {'$set': writable})
+    return "Successfully updated shift"
+
+def deleteShift(shiftId):
+    directorData.delete_one({'_id': bson.ObjectId(shiftId)})
+    return "Deleted one shift"
+    
+def addShift(user, form):
+    writable = {
+        'location': user['location'],
+        'startDateTime': datetime.datetime.strptime(form['startDateTime'], "%Y-%m-%dT%H:%M"),
+        'endDateTime': datetime.datetime.strptime(form['endDateTime'], "%Y-%m-%dT%H:%M"),
+        'director': None
+    }
+    
+    directorData.insert_one(writable)
+    
+    return True
