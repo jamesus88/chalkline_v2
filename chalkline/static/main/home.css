@@ -80,14 +80,14 @@ i.menu {
     margin: 10px 40px;
 }
 button.button-sign-in {
-    width: 100px;
     margin: 10px auto;
+    padding: 12px;
     font-size: 15pt;
     font-weight: bold;
     background-color: var(--highlight-blue);
     color: white;
     border: 2px solid var(--chalkline-navy);
-    border-radius: 10px;
+    border-radius: 15px;
     box-shadow: 10px 10px 20px var(--highlight-blue);
     transition: all 0.3s;
 }

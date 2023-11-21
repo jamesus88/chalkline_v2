@@ -27,7 +27,7 @@ h2 {
     min-height: 100svh;
 }
 .login {
-    padding: 10px;
+    padding: 12px;
     background-color: var(--highlight-blue);
     color: white;
     text-decoration: none;

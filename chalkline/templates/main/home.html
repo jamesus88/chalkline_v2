@@ -18,50 +18,50 @@
         {% if user is not none %}
         <div class="divide">
             {% if 'coach' in user.role or 'parent' in user.role %}
-            <section class="menu">
+            <section class="menu" onclick="toggleOpen('teams-menu')">
                 <h2>Teams</h2>
                 <i class="fa-solid fa-users menu"></i>
-                <div class="hide">
+                <div class="hide" id="teams-menu">
                     <a href="{{url_for('teams.schedule')}}" class="menu">Team Schedule</a>
                     <a href="{{url_for('teams.info')}}" class="menu">Info and Contacts</a>
                 </div> 
             </section>
             {% endif %}
             {% if 'umpire' in user.role or 'youth' in user.role %}
-            <section class="menu">
+            <section class="menu" onclick="toggleOpen('umpire-menu')">
                 <h2>Umpire</h2>
                 <i class="fa-solid fa-clipboard-list menu"></i>
-                <div class="hide">
+                <div class="hide" id="umpire-menu">
                     <a href="{{url_for('umpire.schedule')}}" class="menu">Umpire Schedule</a>
                     <a href="{{url_for('umpire.assignments')}}" class="menu">My Games</a>
                 </div>
             </section>
             {% endif %}
             {% if 'board' in user.role %}
-            <section class="menu">
+            <section class="menu" onclick="toggleOpen('director-menu')">
                 <h2>Director</h2>
                 <i class="fa-solid fa-street-view menu"></i>
-                <div class="hide">
+                <div class="hide" id="director-menu">
                     <a href="{{url_for('director.week')}}" class="menu">This Week's Games</a>
                     <a href="{{url_for('director.schedule')}}" class="menu">Director Schedule</a>
                     <a href="{{url_for('director.shifts')}}" class="menu">My Shifts</a>
                 </div>
             </section>
             {% endif %}
-            <section class="menu">
+            <section class="menu" onclick="toggleOpen('league-menu')">
                 <h2>League</h2>
                 <i class="fa-solid fa-baseball-bat-ball menu"></i>
-                <div class="hide">
+                <div class="hide" id="league-menu">
                     <a href="{{url_for('league.master_schedule')}}" class="menu">Master Schedule</a>
                     <a href="{{url_for('league.info')}}" class="menu">League Info</a>
                     <a href="{{url_for('league.status')}}" class="menu">Field Status</a>
                 </div>
             </section>
             {% if 'admin' in user.role %}
-            <section class="menu">
+            <section class="menu" onclick="toggleOpen('admin-menu')">
                 <h2>Admin</h2>
                 <i class="fa-solid fa-wrench menu"></i>
-                <div class="hide">
+                <div class="hide" id="admin-menu">
                     <a href="{{url_for('admin.event_data')}}" class="menu">Manage Events</a>
                     <a href="{{url_for('admin.team_data')}}" class="menu">Manage Teams</a>
                     <a href="{{url_for('admin.dod_data')}}" class="menu">DoD Shifts</a>
@@ -71,8 +71,11 @@
             {% endif %}
         </div>
         <script>
-            function showLinks(section_id) {
-                document.getElementById(section_id).style.display = 'block';
+            function toggleOpen(section_id) {
+                let menu = document.getElementById(section_id);
+                if (menu.style.display == 'none') {
+                    menu.style.display = 'block';
+                }
             }
         </script>
         {% endif %}
