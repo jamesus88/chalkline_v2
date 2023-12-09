@@ -46,7 +46,7 @@
                     <tr>
                         <td><label for="newTeam">Add Team Code</label></td>
                         <td><select name="newTeam" id="newTeam" required>
-                            <option value="none" disabled selected>Select</option>
+                            <option value="none" selected>Select</option>
                             {% for team in allTeams %}
                                 <option value="{{team.teamId}}">{{team.teamId}}</option>
                             {% endfor %}

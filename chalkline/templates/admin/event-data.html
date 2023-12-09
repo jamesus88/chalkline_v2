@@ -1,6 +1,13 @@
 <head>
     <link rel="stylesheet" href="{{url_for('static', filename='schedule.css')}}">
     <script src="{{url_for('static', filename='schedule.js')}}"></script>
+    <style>
+        @media screen and (max-width: 2000px) {
+            main {
+                width: 95%;
+            }
+        }
+    </style>
 </head>
 
 {% extends "design.html" %}
@@ -11,9 +18,26 @@
     <section class="split">
         <div>
             <h1>Event Data (2024)</h1>
+            <p class="error">{{msg}}</p>
         </div>
         <div class="align-right">
             <h3><a href="{{url_for('admin.add_event')}}">Add Event</a></h3>
+        
+            <details>
+                <summary><b>Other Options</b></summary>
+                <form method="post">
+                <div class="stack">
+                    <button type="submit" class="action" name="freeDrop" value="open">Open <i>Free Drop</i></button>
+                    <button type="submit" class="action" name="freeDrop" value="close">Close <i>Free Drop</i></button>
+                    <button type="submit" class="action" name="lockGames" value="open">Unlock All Games</button>
+                    <button type="submit" class="action" name="lockGames" value="close">Lock All Games</button>
+                    <br>
+                    <button type="submit" class="action" name="updateMisc" value="update" onclick="return confirm('Run Miscellaneous Function? This should only be used by developers!')">Run Misc. Func.</button>
+                </div>
+                </form>
+            </details>
+            
+            
         </div>
     </section>
     <button type="" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>

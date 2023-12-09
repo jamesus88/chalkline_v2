@@ -24,11 +24,12 @@ def signup():
         else:
             user = db.saveUser(response['newUser'])
             session['user'] = user
-            srv.sendMail(
-                subject=f"Welcome to Chalkline, {user['firstName']}!",
-                body="Your account was successfully created! \nwww.chalklinebaseball.com",
-                recipients=[user['email']]
-            )
+            
+            html = render_template("emails/account-created.html", user=user)
+            msg = srv.ChalklineEmail(subject="Chalkline Account Created!", html=html, recipients=[user['email']])
+            srv.sendMail(msg)
+            print(f"Requested mail be sent to {user['userId']}")
+            
             return redirect(url_for('main.profile'))
     
     return render_template("main/create-account.html", user=user, msg=msg)
@@ -38,7 +39,6 @@ def profile():
     user = srv.getUser()
     if user is None:
         return redirect(url_for('main.home'))
-
     
     msg = ''
     
@@ -93,6 +93,8 @@ def login():
             
             if 'next-page' in session:
                 page = session['next-page']
+            elif 'next-url' in session:
+                return redirect(session['next-url'])
             else: page = 'main.home'
             return redirect(url_for(page))
     

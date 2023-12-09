@@ -121,3 +121,8 @@ details.multiselect > div {
 section.text {
     text-align: left;
 }
+div.stack {
+    display: flex;
+    flex-direction: column;
+    row-gap: 3px;
+}

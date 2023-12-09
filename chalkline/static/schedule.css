@@ -20,12 +20,12 @@ section.split {
     text-align: right;
 }
 th {
-    padding: 5px 10px;
+    padding: 5px 15px;
     font-size: 10pt;
 }
 td {
     background-color: var(--section-background);
-    padding: 5px 10px;
+    padding: 5px 15px;
     font-size: 10pt;
 }
 td:first-child, th:first-child {
@@ -74,7 +74,11 @@ input.admin, select.admin {
 input.admin[type=number] {
     width: 50px;
 }
-
+h1, h2, h3 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 0;
+}
 @media screen and (max-width: 850px) {
     main {
         width: 95%;

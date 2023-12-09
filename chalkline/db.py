@@ -1,6 +1,7 @@
 import pymongo, bson, datetime 
 import chalkline.server as server
 import os
+from flask import render_template
 
 client = pymongo.MongoClient(os.environ.get('PYMONGO_CLIENT'), connect=False)
 db = client['chalkline']
@@ -171,6 +172,17 @@ def addPlate(user, gameId):
     
     if game:
         msg = f'Successfully added {user["firstName"][0]}. {user["lastName"]} for plate duty.'
+        if game['fieldRequest'] and game['umpireDuty'] and not game['editRules']['hasField1Umpire']:
+            coach = userData.find_one({'userId': game['fieldRequest']})
+            
+            if coach['emailNotifications']:
+                email = server.ChalklineEmail(
+                    subject="Umpire Shift Covered!",
+                    recipients=[coach['email']],
+                    html=render_template("emails/shift-fulfilled.html", team=game['umpireDuty'], event=game)
+                )
+                server.sendMail(email)
+                print(f"Requested mail be sent to {coach['userId']}")
     else:
         msg = 'Error: position filled or unavailable'
         
@@ -183,6 +195,18 @@ def addField1(user, gameId):
     
     if game:
         msg = f'Successfully added {user["firstName"][0]}. {user["lastName"]} for field duty.'
+        if game['fieldRequest'] and game['umpireDuty']:
+            coach = userData.find_one({'userId': game['fieldRequest']})
+            
+            if coach['emailNotifications']:
+                email = server.ChalklineEmail(
+                    subject="Umpire Shift Covered!",
+                    recipients=[coach['email']],
+                    html=render_template("emails/shift-fulfilled.html", team=game['umpireDuty'], event=game)
+                )
+                server.sendMail(email)
+                print(f"Requested mail be sent to {coach['userId']}")
+        
     else:
         msg = 'Error: position filled or unavailable'
         
@@ -259,10 +283,22 @@ def updateEvent(event, form, userList, editRules=False, editContacts=False):
         else: writable['editRules']['fieldRequestAddable'] = False
         if form.get('requireRemoveRequest'): writable['editRules']['requireRemoveRequest'] = True
         else: writable['editRules']['requireRemoveRequest'] = False
-        if form.get('fieldRequestRemovable'): writable['editRules']['fieldRequestRemovable'] = True
-        else: writable['editRules']['fieldRequestRemovable'] = False
+        if form.get('hasField1Umpire'): writable['editRules']['hasField1Umpire'] = True
+        else: writable['editRules']['hasField1Umpire'] = False
+        if form.get('requireFieldRequest'): writable['editRules']['requireFieldRequest'] = True
+        else: writable['editRules']['requireFieldRequest'] = False
     
-    eventData.update_one({'_id': bson.ObjectId(event['_id'])}, {'$set': writable})
+    old_game = eventData.find_one_and_update({'_id': bson.ObjectId(event['_id'])}, {'$set': writable})
+    new_game = eventData.find_one({'_id': bson.ObjectId(event['_id'])})
+    
+    different_keys = []
+    for key in old_game:
+        if old_game[key] != new_game[key]:
+            different_keys.append(key)
+            
+    if any(key in different_keys for key in ['eventDate', 'eventVenue', 'eventField', 'status']):
+        server.alertUsersOfEvent(old_game, new_game, getUserList())
+            
     
     return 'Successfully updated event.'
 
@@ -303,8 +339,10 @@ def addEvent(user, form):
     else: writable['editRules']['fieldRequestAddable'] = False
     if form.get('requireRemoveRequest'): writable['editRules']['requireRemoveRequest'] = True
     else: writable['editRules']['requireRemoveRequest'] = False
-    if form.get('fieldRequestRemovable'): writable['editRules']['fieldRequestRemovable'] = True
-    else: writable['editRules']['fieldRequestRemovable'] = False
+    if form.get('hasField1Umpire'): writable['editRules']['hasField1Umpire'] = True
+    else: writable['editRules']['hasField1Umpire'] = False
+    if form.get('requireFieldRequest'): writable['editRules']['requireFieldRequest'] = True
+    else: writable['editRules']['requireFieldRequest'] = False
     
     if form['plateUmpire'] != "None":
         writable['plateUmpire'] = form['plateUmpire']
@@ -340,6 +378,7 @@ def deleteTeam(teamId):
 def addTeam(user, form):
     writable = {
         'teamId': form['codePrefix'] + form['codeNum'],
+        'location': user['location'],
         'teamName': form['teamName'],
         'teamAgeGroup': form['teamAgeGroup'],
         'wins': 0,
@@ -359,19 +398,16 @@ def updateFieldStatus(venueId, status, sendAlert=True):
     if sendAlert:
         emailUsers = getUserList({'emailNotifications': True})
         emailList = server.createEmailList(emailUsers)
-        server.sendMail(
-            subject=f"{venue['name']} field status: {status}",
-            body=f"Sarasota Little League has updated {venue['name']} field status to {status}. Visit www.chalklinebaseball.com/league/status for more info.\nwww.chalklinebaseball.com",
-            recipients=emailList
-        )
         
-        phoneUsers = getUserList({'phoneNotifications': True})
-        phoneList = server.createPhoneList(phoneUsers)
-        server.sendMail(
-            subject=None,
-            body=f"Sarasota Little League has updated {venue['name']} field status to {status}. Visit www.chalklinebaseball.com/league/status for more info.\nwww.chalklinebaseball.com",
-            recipients=phoneList
-        )
+        with server.mail.connect() as conn:
+            for user in emailList:
+                msg = server.ChalklineEmail(
+                    subject=f"{venue['name']} Status Update: {status}",
+                    recipients=[user],
+                    html=render_template("emails/field-status.html", venue=venue['name'], status=status)
+                )
+                conn.send(msg)
+
     return f"{venue['name']} field status updated."    
 
 def getVenues(league, criteria={}):

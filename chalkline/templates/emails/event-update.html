@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Update</title>
+</head>
+<body>
+    <main>
+        <h2>This event has been updated to the following details:</h2>
+        <section>
+            <h3>Date: {{new.eventDate.strftime('%a %m/%d @ %H:%M')}}</h3>
+            <h3>Location: {{new.eventVenue}} Field {{new.eventField}}</h3>
+            <h3>Status: {{new.status}}</h3>
+        </section>
+        <br>
+        <h2>This event was perviously:</h2>
+        <section>
+            <h3>Date: {{old.eventDate.strftime('%a %m/%d @ %H:%M')}}</h3>
+            <h3>Location: {{old.eventVenue}} Field {{old.eventField}}</h3>
+            <h3>Status: {{old.status}}</h3>
+        </section>
+        <br>
+        <h4>You were alerted of this change because you or your team is involved with this event.</h4>
+        <p>View event here: www.chalklinebaseball.com/view-info/event/{{new._id}}</p>
+    </main>
+
+    <br><br>
+    <p>Chalkline&trade; &copy;2024</p>
+    <p>Created and Maintained by Aidan Hurwitz</p>
+    <p>www.chalklinebaseball.com</p>
+</body>
+</html>

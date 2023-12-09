@@ -69,7 +69,7 @@
                     <th>Plate</th>
                     <th>Field</th>
                 </tr>
-                {% for event in eventList %}
+                {% for event in eventList if (not event.editRules.requireFieldRequest) or event.fieldRequestInfo.fLast is not none %}
                 <tr class="event-row">
                     <td><a class="icon-link" href="{{url_for('view_info.event', eventId=event._id)}}"><i class="fa-solid fa-info"></i></a></td>
                     <td>{{event.eventDate.strftime('%a %m/%d @ %H:%M')}}</td>
@@ -84,7 +84,7 @@
                     <td>{{event.plateUmpireInfo.fLast}}</td>
                     {% endif %}
 
-                    {% if event.field1UmpireInfo.fLast is none %}
+                    {% if event.editRules.hasField1Umpire and event.editRules.field1UmpireAddable %}
 
                         {% if event.editRules.fieldRequestAddable %}
                             {% if event.fieldRequestInfo.fLast is none %}
@@ -95,7 +95,6 @@
                         {% else %}
                         <td><button class="schedule-action" type="submit" name="addField1" value={{event._id}}>+ field</button></td>
                         {% endif %}
-
 
                     {% else %}
                     <td>{{event.field1UmpireInfo.fLast}}</td>

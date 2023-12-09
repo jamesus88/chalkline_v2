@@ -2,9 +2,10 @@ from flask import render_template, redirect, url_for, session, request, Blueprin
 from chalkline import db, get_events
 from chalkline import server as srv
 from chalkline.director import director_db
+from chalkline.admin import admin_db
 admin = Blueprint('admin', __name__)
 
-@admin.route("/events", methods=['GET','POST'])
+@admin.route("/event-data", methods=['GET','POST'])
 def event_data():
     user = srv.getUser()
     if user is None:
@@ -16,6 +17,7 @@ def event_data():
     eventFilter = get_events.EventFilter()
     allTeams = db.getTeams()
     userList = db.getUserList()
+    msg = ''
     
     if request.method == 'POST':
         if request.form.get('updateFilter'):
@@ -36,10 +38,25 @@ def event_data():
             eventId = request.form['deleteEvent']
             msg = db.deleteEvent(eventId)
             print(f"Event: {eventId} deleted by {user['userId']}")
+            
+        elif request.form.get('freeDrop'):
+            if request.form['freeDrop'] == 'open':
+                msg = admin_db.openFreeDrop()
+            else:
+                msg = admin_db.closeFreeDrop()
+        
+        elif request.form.get('lockGames'):
+            if request.form['lockGames'] == 'open':
+                msg = admin_db.unlockGames()
+            else:
+                msg = admin_db.lockGames()
+                
+        elif request.form.get('updateMisc'):
+            msg = admin_db.updateMisc()
 
     eventList = get_events.getEventList(eventFilter)
     
-    return render_template('admin/event-data.html', user=srv.safeUser(user),eventFilter=eventFilter.asdict(), eventList=eventList, allTeams=allTeams)
+    return render_template('admin/event-data.html', user=srv.safeUser(user),eventFilter=eventFilter.asdict(), eventList=eventList, allTeams=allTeams, msg=msg)
 
 @admin.route("/add-event", methods=['GET', 'POST'])
 def add_event():
@@ -158,14 +175,14 @@ def announcement():
             users = list(db.getUserList())
 
             userList = []
-            for user in users:
+            for target in users:
                 for group in groups:
-                    if group in user['role']:
-                        userList.append(user)
+                    if group in target['role']:
+                        userList.append(target)
             
                 for team in teams:
-                    if team in user['teams']:
-                        userList.append(user)
+                    if team in target['teams']:
+                        userList.append(target)
             
             message = request.form['msg']
             
@@ -177,11 +194,16 @@ def announcement():
                 if request.form.get('email'):
                     emailList = srv.createEmailList(userList)
                     emailList = list(dict.fromkeys(emailList))
-                    srv.sendMail(body=message, recipients=emailList)
-                if request.form.get('text'):
-                    phoneList = srv.createPhoneList(userList)
-                    phoneList = list(dict.fromkeys(phoneList))
-                    srv.sendMail(body=message, recipients=phoneList)
+                    with srv.mail.connect() as conn:
+                        for recipient in emailList:
+                            email = srv.ChalklineEmail(
+                                subject=f"New Message from {user['firstName']} {user['lastName']}",
+                                recipients=[recipient],
+                                html=render_template("emails/announcement.html", user=user, message=message)
+                            )
+                            conn.send(email)
+                            print("Mail sent to ", recipient)
+                        
                 msg = "Message Sent!"
     
     venues = db.getVenues("Sarasota")

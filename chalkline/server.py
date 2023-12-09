@@ -1,4 +1,4 @@
-from flask import session
+from flask import session, render_template
 from flask_mail import Message
 from chalkline import mail
 import datetime
@@ -7,6 +7,10 @@ SHARE_LINK = "www.chalklinebaseball.com/"
 MAIL_SENDER = 'Chalkline Baseball'
 LEAGUE_CODE = "sll2024!"
 
+class ChalklineEmail(Message):
+    def __init__(self, subject='Message from Chalkline', recipients=None, body=None, html=None, sender=MAIL_SENDER, cc=None, bcc=None, attachments=None, reply_to=None, date=None, charset=None, extra_headers=None, mail_options=None, rcpt_options=None):
+        super().__init__(subject, recipients, body, html, sender, cc, bcc, attachments, reply_to, date, charset, extra_headers, mail_options, rcpt_options)
+        
 def getUser():
     if 'user' in session:
         user = session['user']
@@ -17,6 +21,7 @@ def getUser():
 def logout():
     session.pop('user')
     if 'next-page' in session: session.pop('next-page')
+    if 'next-url' in session: session.pop('next-url')
 
 def todaysDate(padding_hrs=0):
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=-4) + datetime.timedelta(hours=padding_hrs)
@@ -83,19 +88,38 @@ def safeEvent(event, userList):
     
     return event
 
-def sendMail(subject: str = 'Message from Chalkline Baseball', body: str = 'www.chalklinebaseball.com', sender: str = MAIL_SENDER, recipients: list = []):
-    msg = Message(
-        subject=subject,
-        body=body,
-        sender=sender,
-        bcc=recipients
-    )
-    mail.send(msg)
-    print(f'Message sent to {str(msg.bcc)}')
-
 def createEmailList(users):
     return [user['email'] for user in users if user['emailNotifications']]
 
 def createPhoneList(users):
     return [user['phone'] + '@' + user['sms-gateway'] for user in users if user['phoneNotifications']]
 
+def sendMail(msg):
+    mail.send(msg)
+    print(f"Mail sent to {msg.recipients}!")
+    return "Success!"
+
+def alertUsersOfEvent(old, new, userList):
+    print('Alerting users of event changes...')
+    users = []
+    
+    for user in userList:
+        if user['userId'] == old['plateUmpire']: users.append(user)
+        elif user['userId'] == old['field1Umpire']: users.append(user)
+        elif user['userId'] == old['fieldRequest']: users.append(user)
+        elif old['awayTeam'] in user['teams']: users.append(user)
+        elif old['homeTeam'] in user['teams']: users.append(user)
+        
+    emailList = createEmailList(users)
+    print("Sending mail to ", emailList)
+    
+    with mail.connect() as conn:
+        for email in emailList:
+            msg = ChalklineEmail(
+                subject=f"New changes: {new['eventAgeGroup']} {new['eventDate'].strftime('%a %m/%d @ %H:%M')}",
+                recipients=[email],
+                html=render_template("emails/event-update.html", old=old, new=new)
+            )
+            conn.send(msg)
+
+    return True

@@ -68,7 +68,7 @@
 
         <section class="schedule-section scrollwrapper">
             {% if eventList|length < 1 %}
-            <h3 class="error">No events found. Try the <a href="#">Master Schedule</a></h3>
+            <h3 class="error">No events found. Try the <a href="{{url_for('league.master_schedule')}}">Master Schedule</a></h3>
             {% endif %}
             <table id="schedule-table" class="event-display">
                 <tr>

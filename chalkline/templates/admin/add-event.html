@@ -101,16 +101,39 @@
 
         <section>
             <center>
-                <h2>Edit Rules</h2>
-                <p>These rules govern how users interact with this event.</p>
-                <h3>Visible: <input type="checkbox" name="visible" id="visible" checked></h3>
-                <h3>Can add plate umpire: <input type="checkbox" name="plateUmpireAddable" id="plateUmpireAddable" checked></h3>
-                <h3>Can add field umpire: <input type="checkbox" name="field1UmpireAddable" id="field1UmpireAddable" checked></h3>
-                <h3>Umpires need permission to remove game: <input type="checkbox" name="requireRemoveRequest" id="requireRemoveRequest" checked></h3>
-                <h3>Can add coach request: <input type="checkbox" name="fieldRequestAddable" id="fieldRequestAddable" checked></h3>
-                <h3>Coaches can remove request: <input type="checkbox" name="fieldRequestRemovable" id="fieldRequestRemovable" checked></h3>
+                <table class="center">
+                    <h2>Edit Rules</h2>
+                    <p>These rules govern how users interact with this event.</p>
+                    <tr>
+                        <td>Visible: </td>
+                        <td><input type="checkbox" name="visible" id="visible" checked></td>
+                    </tr>
+                    <tr>
+                        <td>Can add plate umpire: </td>
+                        <td><input type="checkbox" name="plateUmpireAddable" id="plateUmpireAddable" checked></td>
+                    </tr>
+                    <tr>
+                        <td>Game has field umpire: </td>
+                        <td><input type="checkbox" name="hasField1Umpire" id="hasField1Umpire" checked></td>
+                    </tr>
+                    <tr>
+                        <td>Can add field umpire: </td>
+                        <td><input type="checkbox" name="field1UmpireAddable" id="field1UmpireAddable" checked></td>
+                    </tr>
+                    <tr>
+                        <td>Umpires need permission to remove game: </td>
+                        <td><input type="checkbox" name="requireRemoveRequest" id="requireRemoveRequest" checked></td>
+                    </tr>
+                    <tr>
+                        <td>Can add coach request: </td>
+                        <td><input type="checkbox" name="fieldRequestAddable" id="fieldRequestAddable" checked></td>
+                    </tr>
+                    <tr>
+                        <td>Require field request to add: </td>
+                        <td><input type="checkbox" name="requireFieldRequest" id="requireFieldRequest"></td>
+                    </tr>
+                </table>
             </center>
-
         </section>
         <div class="split"><button class="action" name="updateEvent" value="updateEvent" type="submit">Add Event</button></div>
     </form>

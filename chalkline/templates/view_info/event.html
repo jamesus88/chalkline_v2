@@ -107,6 +107,7 @@
                 </h3>
                 <script>
                     document.getElementById('awayTeam').value = "{{event.awayTeam}}";
+                    document.getElementById('homeTeam').value = "{{event.homeTeam}}";
                     document.getElementById('umpireDuty').value = "{{event.umpireDuty}}";
                 </script>
                 {% else %}
@@ -171,15 +172,40 @@
         </script>
         <section>
             <center>
-                <h2>Edit Rules</h2>
-                <p>These rules govern how users interact with this event.</p>
-                <h3>Visible: <input type="checkbox" name="visible" id="visible"></h3>
-                <h3>Can add plate umpire: <input type="checkbox" name="plateUmpireAddable" id="plateUmpireAddable"></h3>
-                <h3>Can add field umpire: <input type="checkbox" name="field1UmpireAddable" id="field1UmpireAddable"></h3>
-                <h3>Umpires need permission to remove game: <input type="checkbox" name="requireRemoveRequest" id="requireRemoveRequest"></h3>
-                <h3>Can add coach request: <input type="checkbox" name="fieldRequestAddable" id="fieldRequestAddable"></h3>
-                <h3>Coaches can remove request: <input type="checkbox" name="fieldRequestRemovable" id="fieldRequestRemovable"></h3>
+                <table class="center">
+                    <h2>Edit Rules</h2>
+                    <p>These rules govern how users interact with this event.</p>
+                    <tr>
+                        <td>Visible: </td>
+                        <td><input type="checkbox" name="visible" id="visible"></td>
+                    </tr>
+                    <tr>
+                        <td>Can add plate umpire: </td>
+                        <td><input type="checkbox" name="plateUmpireAddable" id="plateUmpireAddable"></td>
+                    </tr>
+                    <tr>
+                        <td>Game has field umpire: </td>
+                        <td><input type="checkbox" name="hasField1Umpire" id="hasField1Umpire"></td>
+                    </tr>
+                    <tr>
+                        <td>Can add field umpire: </td>
+                        <td><input type="checkbox" name="field1UmpireAddable" id="field1UmpireAddable"></td>
+                    </tr>
+                    <tr>
+                        <td>Umpires need permission to remove game: </td>
+                        <td><input type="checkbox" name="requireRemoveRequest" id="requireRemoveRequest"></td>
+                    </tr>
+                    <tr>
+                        <td>Can add coach request: </td>
+                        <td><input type="checkbox" name="fieldRequestAddable" id="fieldRequestAddable"></td>
+                    </tr>
+                    <tr>
+                        <td>Require field request to add: </td>
+                        <td><input type="checkbox" name="requireFieldRequest" id="requireFieldRequest"></td>
+                    </tr>
+                </table>
             </center>
+            
             <script>
                 if ("{{event.editRules.visible}}" == "True") {
                     document.getElementById('visible').checked = true;
@@ -196,8 +222,11 @@
                 if ("{{event.editRules.requireRemoveRequest}}" == "True") {
                     document.getElementById('requireRemoveRequest').checked = true;
                 }
-                if ("{{event.editRules.fieldRequestRemovable}}" == "True") {
-                    document.getElementById('fieldRequestRemovable').checked = true;
+                if ("{{event.editRules.hasField1Umpire}}" == "True") {
+                    document.getElementById('hasField1Umpire').checked = true;
+                }
+                if ("{{event.editRules.requireFieldRequest}}" == "True") {
+                    document.getElementById('requireFieldRequest').checked = true;
                 }
             </script>
         </section>

@@ -7,6 +7,7 @@ view_info = Blueprint('view_info', __name__)
 def event(eventId):
     user = srv.getUser()
     if user is None:
+        session['next-url'] = request.path
         return redirect(url_for('main.login'))
     
     msg = ''
