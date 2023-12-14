@@ -242,8 +242,7 @@ def dod_data():
             msg = director_db.deleteShift(shiftId)
             print(f"Shift: {shiftId} deleted by {user['userId']}")
             
-    
-    shiftList = director_db.getShiftList(directorList, hidePast=hidePast, user=None)
+    shiftList = director_db.getShiftList(directorList, hidePast=hidePast)
     
     return render_template('admin/dod-data.html', user=user, directorList=directorList, shiftList=shiftList, hidePast=hidePast, msg=msg)
     

@@ -78,6 +78,6 @@ def shifts():
             msg = db.removeDirector(shiftId, user)
     
     
-    shiftList = db.getShiftList(userList, user=user, hidePast=hidePast)
+    shiftList = db.getShiftList(userList, add_criteria={'director': user['userId']}, hidePast=hidePast)
     
     return render_template("director/shifts.html", user=user, shiftList=shiftList, hidePast=hidePast, msg=msg)

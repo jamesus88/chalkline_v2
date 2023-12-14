@@ -2,20 +2,15 @@ from chalkline.db import directorData
 from chalkline.server import safeUser, todaysDate
 import pymongo, bson, datetime
 
-def getShiftList(userList=[], user=None, criteria={}, hidePast=True):
-    criteria['location'] = 'Sarasota'
+def getShiftList(userList=[], add_criteria={}, hidePast=True):
+    criteria = [add_criteria]
     if hidePast:
-        criteria['endDateTime'] = {'$gte': todaysDate()}
+        criteria.append({'endDateTime': {'$gte': todaysDate()}})
 
-    shifts = directorData.find(criteria).sort('startDateTime', pymongo.ASCENDING)
+    shifts = directorData.find({'$and': criteria}).sort('endDateTime', pymongo.ASCENDING)
     shiftList = []
     
     for shift in shifts:
-        
-        if user is not None:
-            if shift['director'] != user['userId']:
-                continue
-        
         shift['_id'] = str(shift['_id'])
         
         shift['directorInfo'] = {
@@ -42,6 +37,7 @@ def getShiftList(userList=[], user=None, criteria={}, hidePast=True):
         shift.pop('director')
         shiftList.append(shift)
     
+
     return shiftList
         
 def addDirector(shiftId, user):
