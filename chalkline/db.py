@@ -1,7 +1,7 @@
-import pymongo, bson, datetime 
+import pymongo, bson, datetime, os, uuid
 import chalkline.server as server
-import os
 from flask import render_template
+from werkzeug.security import generate_password_hash, check_password_hash
 
 client = pymongo.MongoClient(os.environ.get('PYMONGO_CLIENT'), connect=False)
 db = client['chalkline']
@@ -16,18 +16,27 @@ leagueData = db['leagueData']
 venueData = db['venueData']
 directorData = db['directorData']
 
-def authenticate(userId = ''):
-    user = userData.find_one({'userId': userId})
+def authenticate(email, pword):
+    user = userData.find_one({'email': email})
     if user:
-        user['_id'] = str(user['_id'])
-        user = appendPermissions(user)
-        
-        print('login: ', user)
-        
-        return user
-    else:
-        return None
+        print(f"Attempted Login: {email}")
+        correct = check_password_hash(user['pword'], pword)
+        print(f"Password Authenticated: {correct}")
+        if correct:
+            user['_id'] = str(user['_id'])
+            user = appendPermissions(user)
+            print(f"Successful Login: {email} ({user['userId']})")
+            return user
+        else:
+            print(f"Failed Login: {email}")
+    
+    return None
 
+def verifyEmail(email):
+    if userData.find_one({'email': email}):
+        return True
+    else: return False
+    
 def appendPermissions(user):
     permissionSet = permissions.find_one({'set': user['permissionSet']})
     permissionSet.pop('_id')
@@ -37,6 +46,9 @@ def appendPermissions(user):
 
 def getUserList(criteria={}):
     return list(userData.find(criteria))
+
+def getUser(_id=None, email=None):
+    return userData.find_one({'$or': [{'_id': bson.ObjectId(_id)}, {'email': email}]})
 
 def checkDuplicateUser(newUser):
     user = userData.find_one({"$or": [{'userId': newUser['userId']}, {'email': newUser['email']}, {'phone': newUser['phone']}]})
@@ -49,10 +61,11 @@ def createUser(form):
           "location": form['location'],
           "firstName": form['firstName'],
           "lastName": form['lastName'],
+          "userId": form['email'],
           "email": form['email'],
           "phone": form['phone'],
           "sms-gateway": form.get('carrier'),
-          "userId": form['userId'],
+          "pword": generate_password_hash(form['pword']),
           "role": [],
           "teams": [],
           "permissionSet": "C0",
@@ -215,7 +228,7 @@ def addField1(user, gameId):
 def removeGame(user, gameId):
     game = eventData.find_one({'_id': bson.ObjectId(gameId)})
     setData = {}
-    if (not game['editRules']['requireRemoveRequest']) or user['canRemoveGame']:
+    if game['editRules']['removable'] or user['canRemoveGame']:
         if user['userId'] == game['plateUmpire']:
             setData['plateUmpire'] = None
         if user['userId'] == game['field1Umpire']:
@@ -275,18 +288,20 @@ def updateEvent(event, form, userList, editRules=False, editContacts=False):
         writable['editRules'] = {}
         if form.get('visible'): writable['editRules']['visible'] = True
         else: writable['editRules']['visible'] = False
+        if form.get('hasPlateUmpire'): writable['editRules']['hasPlateUmpire'] = True
+        else: writable['editRules']['hasPlateUmpire'] = False
         if form.get('plateUmpireAddable'): writable['editRules']['plateUmpireAddable'] = True
         else: writable['editRules']['plateUmpireAddable'] = False
-        if form.get('field1UmpireAddable'): writable['editRules']['field1UmpireAddable'] = True
-        else: writable['editRules']['field1UmpireAddable'] = False
-        if form.get('fieldRequestAddable'): writable['editRules']['fieldRequestAddable'] = True
-        else: writable['editRules']['fieldRequestAddable'] = False
-        if form.get('requireRemoveRequest'): writable['editRules']['requireRemoveRequest'] = True
-        else: writable['editRules']['requireRemoveRequest'] = False
         if form.get('hasField1Umpire'): writable['editRules']['hasField1Umpire'] = True
         else: writable['editRules']['hasField1Umpire'] = False
-        if form.get('requireFieldRequest'): writable['editRules']['requireFieldRequest'] = True
-        else: writable['editRules']['requireFieldRequest'] = False
+        if form.get('field1UmpireAddable'): writable['editRules']['field1UmpireAddable'] = True
+        else: writable['editRules']['field1UmpireAddable'] = False
+        if form.get('hasFieldRequest'): writable['editRules']['hasFieldRequest'] = True
+        else: writable['editRules']['hasFieldRequest'] = False
+        if form.get('fieldRequestAddable'): writable['editRules']['fieldRequestAddable'] = True
+        else: writable['editRules']['fieldRequestAddable'] = False
+        if form.get('removable'): writable['editRules']['removable'] = True
+        else: writable['editRules']['removable'] = False
     
     old_game = eventData.find_one_and_update({'_id': bson.ObjectId(event['_id'])}, {'$set': writable})
     new_game = eventData.find_one({'_id': bson.ObjectId(event['_id'])})
@@ -331,18 +346,20 @@ def addEvent(user, form):
     
     if form.get('visible'): writable['editRules']['visible'] = True
     else: writable['editRules']['visible'] = False
+    if form.get('hasPlateUmpire'): writable['editRules']['hasPlateUmpire'] = True
+    else: writable['editRules']['hasPlateUmpire'] = False
     if form.get('plateUmpireAddable'): writable['editRules']['plateUmpireAddable'] = True
     else: writable['editRules']['plateUmpireAddable'] = False
-    if form.get('field1UmpireAddable'): writable['editRules']['field1UmpireAddable'] = True
-    else: writable['editRules']['field1UmpireAddable'] = False
-    if form.get('fieldRequestAddable'): writable['editRules']['fieldRequestAddable'] = True
-    else: writable['editRules']['fieldRequestAddable'] = False
-    if form.get('requireRemoveRequest'): writable['editRules']['requireRemoveRequest'] = True
-    else: writable['editRules']['requireRemoveRequest'] = False
     if form.get('hasField1Umpire'): writable['editRules']['hasField1Umpire'] = True
     else: writable['editRules']['hasField1Umpire'] = False
-    if form.get('requireFieldRequest'): writable['editRules']['requireFieldRequest'] = True
-    else: writable['editRules']['requireFieldRequest'] = False
+    if form.get('field1UmpireAddable'): writable['editRules']['field1UmpireAddable'] = True
+    else: writable['editRules']['field1UmpireAddable'] = False
+    if form.get('hasFieldRequest'): writable['editRules']['hasFieldRequest'] = True
+    else: writable['editRules']['hasFieldRequest'] = False
+    if form.get('fieldRequestAddable'): writable['editRules']['fieldRequestAddable'] = True
+    else: writable['editRules']['fieldRequestAddable'] = False
+    if form.get('removable'): writable['editRules']['removable'] = True
+    else: writable['editRules']['removable'] = False
     
     if form['plateUmpire'] != "None":
         writable['plateUmpire'] = form['plateUmpire']
@@ -419,3 +436,26 @@ def getVenues(league, criteria={}):
         venueList.append(venue)
     
     return venueList
+
+def sendPasswordReset(email):
+    token = str(uuid.uuid4())
+    
+    user = userData.find_one({'email': email})
+    if user is None:
+        return "Error: User not found."
+    elif 'reset_token' in user:
+        return "Error: Password Reset email already sent."
+    
+    userData.update_one({'email': email}, {'$set': {'reset_token': token}})
+    
+    message = server.ChalklineEmail(
+        subject="Chalkline: Reset Password",
+        recipients=[email],
+        html=render_template("emails/password-reset.html", email=email, token=token)
+    )
+    print(f"Password Reset Sent: {email}")
+    server.sendMail(message)
+    return f"Password Reset email sent to {email}"
+
+def resetPassword(user, pword):
+    pass

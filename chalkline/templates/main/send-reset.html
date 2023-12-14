@@ -1,0 +1,25 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='main/home.css')}}">
+</head>
+{% extends "design.html" %}
+
+{% block title %}Send Reset Link{% endblock title %}
+
+{% block content %}
+<main>
+    <center>
+        <h1>Password Reset</h1>
+        <section id="login">
+            <form method="post">
+                <label class="sign-in" for="email">Email</label>
+                <input type="email" name="email" id="email" required>
+                <br>
+                <button class="button-sign-in" type="submit">Submit</button>
+            </form>
+            <p><b>Enter the email associated with your account to reset your password.</b></p>
+            <h3 class="error">{{msg}}</h3>
+        </section>
+    </center>
+</main>
+
+{% endblock content %}

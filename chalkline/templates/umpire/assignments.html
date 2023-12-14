@@ -85,32 +85,27 @@
                     <td>{{event.status}}</td>
                     <td>
                         {% if event.plateUmpireInfo.fLast is not none %}
-                        <a href="#">{{event.plateUmpireInfo.fLast}}</a>
+                        <a href="{{url_for('view_info.user', user_id=event.plateUmpireInfo._id)}}">{{event.plateUmpireInfo.fLast}}</a>
                         {% else %}
                         {{event.plateUmpireInfo.fLast}}
                         {% endif %}
                     </td>
                     <td>
                         {% if event.field1UmpireInfo.fLast is not none %}
-                        <a href="#">{{event.field1UmpireInfo.fLast}}</a>
+                        <a href="{{url_for('view_info.user', user_id=event.field1UmpireInfo._id)}}">{{event.field1UmpireInfo.fLast}}</a>
                         {% else %}
                         {{event.field1UmpireInfo.fLast}}
                         {% endif %}
                     </td>
                     <td>
-                        {% if event.editRules.requireRemoveRequest %}
-                        <button class="schedule-action" type="submit" name="removeGame" value="{{event._id}}" onclick="return confirm('Remove from game? This game REQUIRES permission before being removed.')">Remove*</button>
-                        {% else %}
+                        {% if event.editRules.removable %}
                         <button class="schedule-action" type="submit" name="removeGame" value="{{event._id}}" onclick="return confirm('Remove game?')">Remove</button>
+                        {% else %}
+                        <button class="schedule-action" type="submit" name="removeGame" value="{{event._id}}" onclick="return confirm('Remove from game? This game REQUIRES permission before being removed.')">Remove*</button>
                         {% endif %}
-                        
                     </td>
-
-                    
-
                 </tr>
                 {% endfor %}
-                
             </table>
             {% endif %}
         </section>

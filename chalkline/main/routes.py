@@ -83,11 +83,12 @@ def login():
     
     msg = ''
     if request.method == 'POST':
-        userId = request.form['userId']
-        user = db.authenticate(userId)
+        email = request.form['email']
+        pword = request.form['pword']
+        user = db.authenticate(email, pword)
         
         if user is None:
-            msg = 'User ID invalid.'
+            msg = 'Invalid email and/or password.'
         else:
             session['user'] = user
             
@@ -99,6 +100,23 @@ def login():
             return redirect(url_for(page))
     
     return render_template("main/login.html",user=user, msg=msg)
+
+@main.route("/send-reset", methods=['GET', 'POST'])
+def send_reset():
+    user = srv.getUser()
+    if user is not None:
+        return redirect(url_for('main.home'))
+    
+    msg = ''
+    
+    if request.method == 'POST':
+        email = request.form['email']
+        if db.verifyEmail(email):
+            msg = db.sendPasswordReset(email)
+        else:
+            msg = 'Invalid Email. Contact Administrator.'
+    
+    return render_template("main/send-reset.html", user=user, msg=msg)
 
 @main.route("/logout")
 def logout():

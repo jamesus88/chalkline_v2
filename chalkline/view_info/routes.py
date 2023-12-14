@@ -1,5 +1,5 @@
 from flask import render_template, redirect, url_for, session, request, Blueprint
-from chalkline import db, get_events
+from chalkline import db
 from chalkline import server as srv
 view_info = Blueprint('view_info', __name__)
 
@@ -30,5 +30,14 @@ def event(eventId):
     return render_template("view_info/event.html", user=user, event=event, teamsList=teamsList, userList=userList, msg=msg)
 
 @view_info.route("/user/<user_id>")
-def user(user_id):
-    return "user"
+def user(user_id=None):
+    user = srv.getUser()
+    if user is None:
+        session['next-url'] = request.path
+        return redirect(url_for('main.login'))
+    elif user_id is None:
+        return redirect(url_for('main.home'))
+    
+    view_user = srv.safeUser(db.getUser(_id=user_id))
+    
+    return render_template("view_info/user.html", user=user, view_user=view_user)

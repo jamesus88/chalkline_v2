@@ -11,8 +11,10 @@
         <section>
             <center>
                 <h1>Sign In</h1>
-                <label class="sign-in" for="userId">User ID</label>
-                <input type="password" name="userId" id="userId" required autofocus>
+                <label class="sign-in"for="email">Email</label>
+                <input type="email" name="email" id="email" required autofocus>
+                <label class="sign-in" for="userId">Password</label>
+                <input type="password" name="pword" id="pword" required>
                 <button class="button-sign-in" type="submit">Sign In</button>
                 <h3 class='error'>{{msg}}</h3>
                 <a href="{{url_for('main.signup')}}">Create Account</a>
@@ -20,9 +22,9 @@
         </section>
         <section class="split">
             <div>
-                <h2>Forgot User ID?</h2>
+                <h2>Forgot Password?</h2>
                 <ul>
-                    <li>(Coming Soon) Request User ID reset</li>
+                    <li><a href="{{url_for('main.send_reset')}}">Reset Password</a></li>
                     OR
                     <li>Contact administrator to locate User ID</li>
                     OR

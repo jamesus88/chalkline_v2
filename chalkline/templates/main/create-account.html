@@ -31,13 +31,13 @@
                         <td><input type="text" name="lastName" id="lastName" required></td>
                     </tr>
                     <tr>
-                        <td><label for="userId">User ID <b class="error">*</b></label></td>
-                        <td><input type="password" name="userId" id="userId" required></td>
-                        <td><a href="#what-is-a-user-id">?</a></td>
-                    </tr>
-                    <tr>
                         <td><label for="email">Email <b class="error">*</b></label></td>
                         <td><input type="email" name="email" id="email" required></td>
+                    </tr>
+                    <tr>
+                        <td><label for="userId">Password <b class="error">*</b></label></td>
+                        <td><input type="password" name="pword" id="pword" required></td>
+                        <td><a href="#password">?</a></td>
                     </tr>
                     <tr>
                         <td><label for="phone">Phone <b class="error">*</b></label></td>
@@ -99,16 +99,13 @@
                 <button class="button-sign-in" type="submit">Next</button>
             </section>
         </form>
-        <section id="what-is-a-user-id">
-            <h2>What is a User ID?</h2>
+        <section id="password">
+            <h2>Your password is Chalkline&trade; Secure.</h2>
             <section class="split">
                 <div>
-                    <h3>Your User ID is your key to everything.</h3>
-                    <p>All you need to sign in to your account is your User ID.</p>
-                    <p>A User ID must be unique and kept protected.</p>
-                    <p>(recommended: last name + a few numbers)</p>
-                    <p>You should treat your User ID like a <b>password</b>!</p>
-                    <p>Your User ID is kept super secret secure via <a target="_blank" href="{{url_for('docs.security')}}">Chalkline&trade; Hashing</a></p>
+                    <h3>Your password is your key to logging in.</h3>
+                    <p>A password must be unique and kept protected.</p>
+                    <p>Your password is kept super secret secure via <a target="_blank" href="{{url_for('docs.security')}}">Chalkline&trade; Hashing</a></p>
                 </div>
                 <div>
                     <i class="fa-solid fa-lock large"></i>

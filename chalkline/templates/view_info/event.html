@@ -180,57 +180,64 @@
                         <td><input type="checkbox" name="visible" id="visible"></td>
                     </tr>
                     <tr>
-                        <td>Can add plate umpire: </td>
+                        <td>Has plate umpire: </td>
+                        <td><input type="checkbox" name="hasPlateUmpire" id="hasPlateUmpire"></td>
+                    </tr>
+                    <tr>
+                        <td>Users can add plate duty: </td>
                         <td><input type="checkbox" name="plateUmpireAddable" id="plateUmpireAddable"></td>
                     </tr>
                     <tr>
-                        <td>Game has field umpire: </td>
+                        <td>Has field umpire: </td>
                         <td><input type="checkbox" name="hasField1Umpire" id="hasField1Umpire"></td>
                     </tr>
                     <tr>
-                        <td>Can add field umpire: </td>
+                        <td>Users can add field duty: </td>
                         <td><input type="checkbox" name="field1UmpireAddable" id="field1UmpireAddable"></td>
                     </tr>
                     <tr>
-                        <td>Umpires need permission to remove game: </td>
-                        <td><input type="checkbox" name="requireRemoveRequest" id="requireRemoveRequest"></td>
+                        <td>Has coach duty: </td>
+                        <td><input type="checkbox" name="hasFieldRequest" id="hasFieldRequest"></td>
                     </tr>
                     <tr>
-                        <td>Can add coach request: </td>
+                        <td>Coaches can add field request: </td>
                         <td><input type="checkbox" name="fieldRequestAddable" id="fieldRequestAddable"></td>
                     </tr>
                     <tr>
-                        <td>Require field request to add: </td>
-                        <td><input type="checkbox" name="requireFieldRequest" id="requireFieldRequest"></td>
+                        <td>Umpires can remove game: </td>
+                        <td><input type="checkbox" name="removable" id="removable"></td>
                     </tr>
                 </table>
             </center>
-            
             <script>
                 if ("{{event.editRules.visible}}" == "True") {
                     document.getElementById('visible').checked = true;
                 }
+                if ("{{event.editRules.hasPlateUmpire}}" == "True") {
+                    document.getElementById('hasPlateUmpire').checked = true;
+                }
                 if ("{{event.editRules.plateUmpireAddable}}" == "True") {
                     document.getElementById('plateUmpireAddable').checked = true;
-                }
-                if ("{{event.editRules.field1UmpireAddable}}" == "True") {
-                    document.getElementById('field1UmpireAddable').checked = true;
-                }
-                if ("{{event.editRules.fieldRequestAddable}}" == "True") {
-                    document.getElementById('fieldRequestAddable').checked = true;
-                }
-                if ("{{event.editRules.requireRemoveRequest}}" == "True") {
-                    document.getElementById('requireRemoveRequest').checked = true;
                 }
                 if ("{{event.editRules.hasField1Umpire}}" == "True") {
                     document.getElementById('hasField1Umpire').checked = true;
                 }
-                if ("{{event.editRules.requireFieldRequest}}" == "True") {
-                    document.getElementById('requireFieldRequest').checked = true;
+                if ("{{event.editRules.field1UmpireAddable}}" == "True") {
+                    document.getElementById('field1UmpireAddable').checked = true;
+                }
+                if ("{{event.editRules.hasFieldRequest}}" == "True") {
+                    document.getElementById('hasFieldRequest').checked = true;
+                }
+                if ("{{event.editRules.fieldRequestAddable}}" == "True") {
+                    document.getElementById('fieldRequestAddable').checked = true;
+                }
+                if ("{{event.editRules.removable}}" == "True") {
+                    document.getElementById('removable').checked = true;
                 }
             </script>
         </section>
         {% endif %}
+        <center><button class="action" name="updateEvent" value="updateEvent" type="submit">Save Changes</button></center>
     </form>
     {% endif %}
     

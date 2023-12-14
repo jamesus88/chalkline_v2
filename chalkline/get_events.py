@@ -67,6 +67,5 @@ def getEventList(filter=EventFilter, add_criteria={}, safe=True, userList=[]):
             events[i]['eventType'] = 'Umpire Duty'
     if safe:
         events = [server.safeEvent(event, userList) for event in events]
-    
     return events
         

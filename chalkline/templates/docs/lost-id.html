@@ -9,13 +9,24 @@
 {% block doc_content %}
 <main>
     <center>
-        <h1>Lost User ID</h1>
+        <h1>Lost Password</h1>
     </center>
     <section class="text">
-        <h3>Lost User ID</h3>
+        <h3>Lost Password</h3>
         <ul>
-            <li>There are currently no User ID recovery options.</li>
-            <li>Contact your administrator.</li>
+            <li>Passwords can be reset in case you have forgotten it or you believe your account may be vulnerable.</li>
+            <li>Click <a target="_blank" href="{{url_for('main.send_reset')}}">Reset Password</a> on the login page.</li>
+            <li>Enter your email and click <b>Submit</b></li>
+            <li><b>Note: You can only request one password reset at a time!</b></li>
+            <li>Login to your email service and locate the email from Chalkline</li>
+            <li>Follow the link in the email to reset your password</li>
+            <li><b>Never share your password over email or text!</b></li>
+            <li>Once you enter a new password, proceed to the <a href="{{url_for('main.login')}}">Login</a> page.</li>
+        </ul>
+    </section>
+    <section class="text">
+        <ul>
+            <li>If you have issues resetting your password, contact an administrator.</li>
         </ul>
     </section>
 </main>

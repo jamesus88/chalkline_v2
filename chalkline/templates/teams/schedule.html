@@ -93,15 +93,14 @@
                     <td>{{event.status}}</td>
                     <td>{{event.awayTeam}}</td>
                     <td>{{event.homeTeam}}</td>
-                    {% if event.umpireDuty == eventFilter.teamId and 'coach' in user.role %}
+                    {% if event.umpireDuty == eventFilter.teamId and 'coach' in user.role and event.editRules.fieldRequestAddable %}
                         {% if event.fieldRequestInfo.fLast is none %}
                             <td><button class="schedule-action" type="submit" name="requestField1Umpire" value="{{event._id}}" onclick="return confirm('Request Youth Umpire for {{event.umpireDuty}} on {{event.eventDate.strftime('%a %m/%d @ %H:%M')}}? This cannot be undone.')">Request Youth</button></td>
                         {% elif event.field1UmpireInfo.fLast is none %}
                             <td>Youth Requested</td>
                         {% else %}
-                            <td>Fulfilled (<a href="#">{{event.field1UmpireInfo.fLast}}</a>)</td>
+                            <td>Fulfilled (<a href="{{url_for('view_info.user', user_id=event.field1UmpireInfo._id)}}">{{event.field1UmpireInfo.fLast}}</a>)</td>
                         {% endif %}
-                    
                     {% else %}
                         <td>{{event.umpireDuty}}</td>
                     {% endif %}
