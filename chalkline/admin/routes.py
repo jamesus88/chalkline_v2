@@ -183,13 +183,26 @@ def announcement():
                 for team in teams:
                     if team in target['teams']:
                         userList.append(target)
-            
-            message = request.form['msg']
+                        
+            # add bcc
+            if request.form.get('bcc'):
+                userList.append(user)
+                        
+            text = request.form['msg']
+
+            if 'file' in request.files:
+                print('html uploaded')
+                message = request.files['file'].read()
+            else:
+                print('custom message')
+                message = render_template("emails/announcement.html", user=user, message=text)
             
             if len(userList) < 1:
                 msg = "Error: no recipients found."
             elif 'email' not in request.form.keys() and 'phone' not in request.form.keys():
                 msg = "Error: select email and/or text."
+            elif len(text) < 1 and 'file' not in request.files:
+                msg = "Error: upload html or enter custom message."
             else:
                 if request.form.get('email'):
                     emailList = srv.createEmailList(userList)
@@ -199,7 +212,7 @@ def announcement():
                             email = srv.ChalklineEmail(
                                 subject=f"New Message from {user['firstName']} {user['lastName']}",
                                 recipients=[recipient],
-                                html=render_template("emails/announcement.html", user=user, message=message)
+                                html=message
                             )
                             conn.send(email)
                             print("Mail sent to ", recipient)

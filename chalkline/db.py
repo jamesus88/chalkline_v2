@@ -17,7 +17,7 @@ venueData = db['venueData']
 directorData = db['directorData']
 
 def authenticate(email, pword):
-    user = userData.find_one({'email': email})
+    user = userData.find_one_and_update({'email': email}, {'$set': {'last_attempt': server.todaysDate()}})
     if user:
         print(f"Attempted Login: {email}")
         correct = check_password_hash(user['pword'], pword)
@@ -25,7 +25,7 @@ def authenticate(email, pword):
         if correct:
             user['_id'] = str(user['_id'])
             user = appendPermissions(user)
-            print(f"Successful Login: {email} ({user['userId']})")
+            print(f"Successful Login: {email}")
             return user
         else:
             print(f"Failed Login: {email}")

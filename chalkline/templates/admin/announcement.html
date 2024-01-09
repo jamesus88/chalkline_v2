@@ -33,7 +33,7 @@
         <div class="divide">
             <section>
                 <h2>Custom Message</h2>
-                <form method="post" class="announcement">
+                <form method="post" class="announcement" enctype="multipart/form-data">
                     <details open class="multiselect">
                         <summary>Type</summary>
                         <div>
@@ -49,6 +49,10 @@
                         <summary>Send To</summary>
                         <div>
                             <button class="action" onclick="selectAll()" type="button">All Users</button>
+                        </div>
+                        <div>
+                            <label for="bcc">Myself</label>
+                            <input type="checkbox" name="bcc" id="bcc">
                         </div>
                         <p><b>Groups</b> - Send to certain groups (every team)</p>
                         <div>
@@ -95,7 +99,10 @@
                         </script>
                     </details>
                     <h3>Message</h3>
-                    <textarea style="resize: none;" name="msg" id="msg" cols="40" rows="5" maxlength="130" onkeyup="updateChars(this, 'chars', 130)" required></textarea>
+                    <p>Upload HTML</p>
+                    <input style="display: block; margin: auto;" class="action" type="file" name="file" id="file" accept="text/html">
+                    <p>or type below</p>
+                    <textarea style="resize: none;" name="msg" id="msg" cols="40" rows="5" maxlength="130" onkeyup="updateChars(this, 'chars', 130)"></textarea>
                     <p class="error" id='chars'>Characters remaining: 130</p>
                     <button class="action" type="submit" name="sendMessage" value="sendMessage" onclick="return confirm('Send message?')">Send</button>
                 </form>
