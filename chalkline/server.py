@@ -100,9 +100,8 @@ def alertUsersOfEvent(old, new, userList):
         elif old['awayTeam'] in user['teams']: users.append(user)
         elif old['homeTeam'] in user['teams']: users.append(user)
         
-    #emailList = createEmailList(users)
-    emailList = ["aidan.hurwitz88@gmail.com"] * 8
-    print("Sending mail to ", emailList)
+    emailList = createEmailList(users)
+    
     msgList = []
                 
     for email in emailList:

@@ -206,9 +206,9 @@ def announcement():
                 msg = "Error: upload html or enter custom message."
             else:
                 if request.form.get('email'):
-                    #emailList = srv.createEmailList(userList)
-                    #emailList = list(dict.fromkeys(emailList))
-                    emailList = ["aidan.hurwitz88@gmail.com"] * 10
+                    emailList = srv.createEmailList(userList)
+                    emailList = list(dict.fromkeys(emailList))
+                    
                     msgList = []
                     for recipient in emailList:
                         email = send_mail.ChalklineEmail(
