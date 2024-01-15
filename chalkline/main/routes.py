@@ -1,5 +1,5 @@
 from flask import render_template, redirect, url_for, session, request, Blueprint
-from chalkline import db
+from chalkline import db, send_mail
 from chalkline import server as srv
 main = Blueprint('main', __name__)
 
@@ -26,9 +26,8 @@ def signup():
             session['user'] = user
             
             html = render_template("emails/account-created.html", user=user)
-            msg = srv.ChalklineEmail(subject="Chalkline Account Created!", html=html, recipients=[user['email']])
-            srv.sendMail(msg)
-            print(f"Requested mail be sent to {user['userId']}")
+            msg = send_mail.ChalklineEmail(subject="Chalkline Account Created!", html=html, recipients=[user['email']])
+            send_mail.sendMail(msg)
             
             return redirect(url_for('main.profile'))
     

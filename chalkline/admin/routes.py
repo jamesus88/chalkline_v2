@@ -1,5 +1,5 @@
 from flask import render_template, redirect, url_for, session, request, Blueprint
-from chalkline import db, get_events
+from chalkline import db, get_events, send_mail
 from chalkline import server as srv
 from chalkline.director import director_db
 from chalkline.admin import admin_db
@@ -14,7 +14,8 @@ def event_data():
     if 'admin' not in user['role']:
         return redirect(url_for('main.home'))
     
-    eventFilter = get_events.EventFilter()
+    eventFilter = get_events.EventFilter({'admin': True})
+
     allTeams = db.getTeams()
     userList = db.getUserList()
     msg = ''
@@ -190,13 +191,13 @@ def announcement():
                         
             text = request.form['msg']
 
-            if 'file' in request.files:
+            if 'file' in request.files and request.files['file'].filename != '':
                 print('html uploaded')
                 message = request.files['file'].read()
             else:
                 print('custom message')
                 message = render_template("emails/announcement.html", user=user, message=text)
-            
+            print(message)
             if len(userList) < 1:
                 msg = "Error: no recipients found."
             elif 'email' not in request.form.keys() and 'phone' not in request.form.keys():
@@ -205,18 +206,20 @@ def announcement():
                 msg = "Error: upload html or enter custom message."
             else:
                 if request.form.get('email'):
-                    emailList = srv.createEmailList(userList)
-                    emailList = list(dict.fromkeys(emailList))
-                    with srv.mail.connect() as conn:
-                        for recipient in emailList:
-                            email = srv.ChalklineEmail(
-                                subject=f"New Message from {user['firstName']} {user['lastName']}",
-                                recipients=[recipient],
-                                html=message
-                            )
-                            conn.send(email)
-                            print("Mail sent to ", recipient)
+                    #emailList = srv.createEmailList(userList)
+                    #emailList = list(dict.fromkeys(emailList))
+                    emailList = ["aidan.hurwitz88@gmail.com"] * 10
+                    msgList = []
+                    for recipient in emailList:
+                        email = send_mail.ChalklineEmail(
+                            subject=f"New Message from {user['firstName']} {user['lastName']}",
+                            recipients=[recipient],
+                            html=message
+                        )
+                        msgList.append(email)
                         
+                    send_mail.sendBulkMail(msgList)
+
                 msg = "Message Sent!"
     
     venues = db.getVenues("Sarasota")

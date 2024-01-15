@@ -87,11 +87,13 @@
                 {% if event.eventType == 'Game' %}
                 <h3>(away) 
                     <select name="awayTeam" id="awayTeam">
+                        <option value="None">None</option>
                         {% for team in teamsList %}
                             <option value="{{team.teamId}}">{{team.teamId}}</option>
                         {% endfor %}
                     </select> vs. 
                     <select name="homeTeam" id="homeTeam">
+                        <option value="None">None</option>
                         {% for team in teamsList %}
                             <option value="{{team.teamId}}">{{team.teamId}}</option>
                         {% endfor %}

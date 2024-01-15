@@ -6,9 +6,10 @@ class EventFilter:
     eventTypeFilter = None
     teamId = None
     ageGroup = None
+    admin = False
     
-    def __init__(self, **kwargs) -> None:
-        for key, value in kwargs:
+    def __init__(self, args: dict = {}) -> None:
+        for key, value in args.items():
             setattr(self, key, value)
     
     def update(self, form):
@@ -39,6 +40,9 @@ class EventFilter:
     
 def getEventList(filter=EventFilter, add_criteria={}, safe=True, userList=[]):
     criteria = [add_criteria]
+    
+    if not filter.admin:
+        criteria.append({'visible': True})
     
     if filter.hidePast:
         criteria.append({'eventDate': {'$gte': server.todaysDate(padding_hrs=2)}})
