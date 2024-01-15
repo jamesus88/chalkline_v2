@@ -13,6 +13,9 @@
         <a href="{{url_for('main.signup')}}">Create Account</a>
         {% else %}
         <h1>Hello, {{user.firstName}}!</h1>
+            {% if ('coach' in user.role or 'parent' in user.role) and user.teams == [] %}
+                <h3 class="error">You have 0 teams linked to your account. Add one to your <a href="{{url_for('main.profile')}}">profile</a>!</h3>
+            {% endif %}
         {% endif %}
     <br>
         {% if user is not none %}

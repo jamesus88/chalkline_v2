@@ -1,5 +1,6 @@
 import pymongo, bson, datetime, os, uuid
 import chalkline.server as server
+import chalkline.send_mail as send_mail
 from flask import render_template
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -189,13 +190,12 @@ def addPlate(user, gameId):
             coach = userData.find_one({'userId': game['fieldRequest']})
             
             if coach['emailNotifications']:
-                email = server.ChalklineEmail(
+                email = send_mail.ChalklineEmail(
                     subject="Umpire Shift Covered!",
                     recipients=[coach['email']],
                     html=render_template("emails/shift-fulfilled.html", team=game['umpireDuty'], event=game)
                 )
-                server.sendMail(email)
-                print(f"Requested mail be sent to {coach['userId']}")
+                send_mail.sendMail(email)
     else:
         msg = 'Error: position filled or unavailable'
         
@@ -212,13 +212,12 @@ def addField1(user, gameId):
             coach = userData.find_one({'userId': game['fieldRequest']})
             
             if coach['emailNotifications']:
-                email = server.ChalklineEmail(
+                email = send_mail.ChalklineEmail(
                     subject="Umpire Shift Covered!",
                     recipients=[coach['email']],
                     html=render_template("emails/shift-fulfilled.html", team=game['umpireDuty'], event=game)
                 )
-                server.sendMail(email)
-                print(f"Requested mail be sent to {coach['userId']}")
+                send_mail.sendMail(email)
         
     else:
         msg = 'Error: position filled or unavailable'
@@ -415,15 +414,14 @@ def updateFieldStatus(venueId, status, sendAlert=True):
     if sendAlert:
         emailUsers = getUserList({'emailNotifications': True})
         emailList = server.createEmailList(emailUsers)
-        
-        with server.mail.connect() as conn:
-            for user in emailList:
-                msg = server.ChalklineEmail(
-                    subject=f"{venue['name']} Status Update: {status}",
-                    recipients=[user],
-                    html=render_template("emails/field-status.html", venue=venue['name'], status=status)
-                )
-                conn.send(msg)
+        msgList = []
+        for user in emailList:
+            msg = send_mail.ChalklineEmail(
+                subject=f"{venue['name']} Status Update: {status}",
+                recipients=[user],
+                html=render_template("emails/field-status.html", venue=venue['name'], status=status)
+            )
+            msgList.append(msg)
 
     return f"{venue['name']} field status updated."    
 
@@ -448,14 +446,11 @@ def sendPasswordReset(email):
     
     userData.update_one({'email': email}, {'$set': {'reset_token': token}})
     
-    message = server.ChalklineEmail(
+    message = send_mail.ChalklineEmail(
         subject="Chalkline: Reset Password",
         recipients=[email],
         html=render_template("emails/password-reset.html", email=email, token=token)
     )
     print(f"Password Reset Sent: {email}")
-    server.sendMail(message)
+    send_mail.sendMail(message)
     return f"Password Reset email sent to {email}"
-
-def resetPassword(user, pword):
-    pass
