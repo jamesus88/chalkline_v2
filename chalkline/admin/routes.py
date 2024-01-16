@@ -32,13 +32,11 @@ def event_data():
                 if f'_{eventId}' in key:
                     form[key.removesuffix(f"_{eventId}")] = value
             
-            msg = db.updateEvent(this_event, form, userList)
-            print(f"Event: {eventId} updated by {user['userId']}")
+            msg = db.updateEvent(user, this_event, form, userList)
             
         elif request.form.get('deleteEvent'):
             eventId = request.form['deleteEvent']
-            msg = db.deleteEvent(eventId)
-            print(f"Event: {eventId} deleted by {user['userId']}")
+            msg = db.deleteEvent(user, eventId)
             
         elif request.form.get('freeDrop'):
             if request.form['freeDrop'] == 'open':

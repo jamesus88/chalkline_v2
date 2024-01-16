@@ -258,9 +258,12 @@ def getEventInfo(eventId, add_criteria={}):
     add_criteria['_id'] = bson.ObjectId(eventId)
     return eventData.find_one(add_criteria)
 
-def updateEvent(event, form, userList, editRules=False, editContacts=False):
-    writable = {}
+def updateEvent(user, event, form, userList, editRules=False, editContacts=False, ignoreDate=False):
+    if event['eventDate'] < server.todaysDate(padding_hrs=2) and not ignoreDate:
+        return "Error: cannot edit past events."
     
+    writable = {}
+
     if editContacts:
         writable['plateUmpire'] = None
         writable['field1Umpire'] = None
@@ -316,14 +319,15 @@ def updateEvent(event, form, userList, editRules=False, editContacts=False):
     
     return 'Successfully updated event.'
 
-def deleteEvent(eventId, ignoreDate=False):
+def deleteEvent(user, eventId, ignoreDate=False):
     criteria = {'_id': bson.ObjectId(eventId)}
     event = eventData.find_one(criteria)
-    if event['eventDate'] < server.todaysDate() or ignoreDate:
-        return "Error: cannot edit past events"
-    else:
+    if (event['eventDate'] > server.todaysDate() or ignoreDate) and 'admin' in user['role']:
         eventData.delete_one(criteria)
+        print(f"Event {eventId} deleted by {user['userId']}")
         return "Successfully deleted game"
+    else:
+        return "Error: cannot edit past events"
     
 def addEvent(user, form):
     writable = {
