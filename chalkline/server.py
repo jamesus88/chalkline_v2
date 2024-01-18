@@ -1,6 +1,5 @@
 from flask import session, render_template
 import datetime
-from threading import Thread
 import chalkline.send_mail as send_mail
 
 SHARE_LINK = "https://chalklinebaseball.com/"
