@@ -48,7 +48,7 @@
                         <td><select name="newTeam" id="newTeam" required>
                             <option value="none" selected>Select</option>
                             {% for team in allTeams %}
-                                <option value="{{team.teamId}}">{{team.teamId}}</option>
+                                <option value="{{team.teamId}}">{{team.teamId}} ({{team.teamName}})</option>
                             {% endfor %}
                         </select></td>
                     </tr>
