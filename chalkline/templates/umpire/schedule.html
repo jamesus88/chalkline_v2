@@ -78,13 +78,13 @@
                     <td>{{event.eventAgeGroup}}</td>
                     <td>{{event.status}}</td>
 
-                    {% if event.editRules.hasPlateUmpire and event.editRules.plateUmpireAddable and event.plateUmpireInfo.fLast is none and event.eventAgeGroup not in user.permissions.prohibitedPlate %}
+                    {% if event.editRules.hasPlateUmpire and (event.editRules.plateUmpireAddable or user.priority) and event.plateUmpireInfo.fLast is none and event.eventAgeGroup not in user.permissions.prohibitedPlate %}
                     <td><button class="schedule-action" type="submit" name="addPlate" value={{event._id}}>+ plate</button></td>
                     {% else %}
                     <td>{{event.plateUmpireInfo.fLast}}</td>
                     {% endif %}
 
-                    {% if event.editRules.hasField1Umpire and event.editRules.field1UmpireAddable and event.field1UmpireInfo.fLast is none %}
+                    {% if event.editRules.hasField1Umpire and (event.editRules.field1UmpireAddable or user.priority) and event.field1UmpireInfo.fLast is none %}
 
                         {% if event.editRules.hasFieldRequest %}
                             {% if event.fieldRequestInfo.fLast is none %}

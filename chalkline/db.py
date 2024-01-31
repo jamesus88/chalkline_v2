@@ -74,7 +74,8 @@ def createUser(form):
           "emailNotifications": True,
           "phoneNotifications": True,
           "hideEmail": False,
-          "hidePhone": False
+          "hidePhone": False,
+          "priority": False
         },
         'error': None
     }
