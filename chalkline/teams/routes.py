@@ -56,6 +56,5 @@ def info():
     
     return render_template("teams/info.html", user=user, team=team, msg=msg, teamContacts=teamContacts, link=link)
     
-    
-    
+
     

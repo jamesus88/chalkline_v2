@@ -18,7 +18,7 @@ venueData = db['venueData']
 directorData = db['directorData']
 
 def authenticate(email, pword):
-    user = userData.find_one_and_update({'email': email}, {'$set': {'last_attempt': server.todaysDate()}})
+    user = userData.find_one_and_update({'email': email}, {'$set': {'last_attempt': server.todaysDate()}}, return_document=pymongo.ReturnDocument.AFTER)
     if user:
         print(f"Attempted Login: {email}")
         correct = check_password_hash(user['pword'], pword)
