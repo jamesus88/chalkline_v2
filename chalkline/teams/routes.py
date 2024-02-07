@@ -70,6 +70,8 @@ def rentals():
     eventFilter.eventTypeFilter = 'Practice'
     if len(user['teams']) > 0:
         eventFilter.teamId = user['teams'][0]
+    elif len(user['teams']) < 1:
+        return redirect(url_for('main.profile'))
         
     if request.method == 'POST':
         if request.form.get('updateFilter'):
