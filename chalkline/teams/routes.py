@@ -26,6 +26,11 @@ def schedule():
             gameId = request.form['requestField1Umpire']
             msg = db.requestField1Umpire(user, gameId)
             
+        if request.form.get('removeRequest'):
+            gameId = request.form['removeRequest']
+            msg = db.removeRequest(user, gameId)
+            
+            
     userList = db.getUserList()
     eventList = get_events.getEventList(eventFilter, userList=userList)
     

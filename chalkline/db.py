@@ -256,6 +256,21 @@ def requestField1Umpire(user, gameId):
         
     return msg
 
+def removeRequest(user, gameId):
+    game = eventData.find_one({'_id': bson.ObjectId(gameId)})
+    msg = ''
+    
+    if 'coach' not in user['role']:
+        msg = 'Error: You do not have permission to remove this umpire request.'
+        
+    if game['field1Umpire'] is not None:
+        msg = 'Error: Umpire Request already fulfilled.'
+    else:
+        eventData.update_one({'_id': bson.ObjectId(gameId)}, {'$set': {'fieldRequest': None}})
+        msg = 'Successfully removed request.'
+    
+    return msg
+
 def getEventInfo(eventId, add_criteria={}):
     add_criteria['_id'] = bson.ObjectId(eventId)
     return eventData.find_one(add_criteria)
