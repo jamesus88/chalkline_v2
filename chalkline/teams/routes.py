@@ -56,5 +56,36 @@ def info():
     
     return render_template("teams/info.html", user=user, team=team, msg=msg, teamContacts=teamContacts, link=link)
     
-
+@teams.route("/rentals", methods=['GET', 'POST'])
+def rentals():
+    user = srv.getUser()
+    if user is None:
+        return redirect(url_for('main.login'))
+    elif 'coach' not in user['role'] and 'parent' not in user['role']:
+        return redirect(url_for('main.home'))
+    
+    msg = ''
+    
+    eventFilter = get_events.EventFilter()
+    eventFilter.eventTypeFilter = 'Practice'
+    if len(user['teams']) > 0:
+        eventFilter.teamId = user['teams'][0]
+        
+    if request.method == 'POST':
+        if request.form.get('updateFilter'):
+            eventFilter.update(request.form)
+            
+        if request.form.get('rentEquipment'):
+            eventId, rentalName = request.form['rentEquipment'].split(sep='_')
+            msg = db.rentEquipment(user, eventId, rentalName)
+            
+        if request.form.get('returnRental'):
+            eventId, rentalName = request.form['rentEquipment'].split(sep='_')
+            msg = db.returnRental(user, eventId)
+            
+    
+    userList = db.getUserList()
+    eventList = get_events.getEventList(eventFilter, userList=userList)
+    rentalList = db.getRentalList(eventFilter.teamId)
+    return render_template("teams/rentals.html", user=user, eventList=eventList, rentalList=rentalList, eventFilter=eventFilter.asdict(), msg=msg)
     

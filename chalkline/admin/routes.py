@@ -277,3 +277,65 @@ def add_shift():
             return redirect(url_for('admin.dod_data'))
     
     return render_template('admin/add-shift.html', user=user, msg=msg)
+
+@admin.route('/rental-data', methods=['GET', 'POST'])
+def rental_data():
+    user = srv.getUser()
+    if user is None:
+        session['next-page'] = 'admin.add_event'
+        return redirect(url_for('main.login'))
+    if 'admin' not in user['role']:
+        return redirect(url_for('main.home'))
+    
+    msg = ''
+    
+    if request.method == 'POST':
+        
+        if request.form.get('updateRental'):
+            rentalName = request.form['updateRental']
+            form = {}
+            for key, value in request.form.items():
+                if f'_{rentalName}' in key:
+                    form[key.removesuffix(f"_{rentalName}")] = value
+                    
+            form['ageGroups'] = request.form.getlist('ageGroups_'+rentalName)
+            msg = admin_db.updateRental(user, rentalName, form)
+            
+        elif request.form.get('removeReserve'):
+            rentalName = request.form['removeReserve']
+            msg = admin_db.removeReserve(user, rentalName)
+            
+        elif request.form.get('deleteRental'):
+            rentalName = request.form['deleteRental']
+            msg = admin_db.deleteRental(user, rentalName)
+
+    rentalList = db.getRentalList(teamId='', admin=True)
+    return render_template('admin/rental-data.html', user=user, msg=msg, rentalList=rentalList)
+
+@admin.route('/add-equipment', methods=['GET', 'POST'])
+def add_equipment():
+    user = srv.getUser()
+    if user is None:
+        session['next-page'] = 'admin.add_event'
+        return redirect(url_for('main.login'))
+    if 'admin' not in user['role']:
+        return redirect(url_for('main.home'))
+    
+    msg = ''
+    
+    if request.method == 'POST':
+        
+        if request.form.get('addRental'):
+            form = {
+                'location': user['location'],
+                'name': request.form['name'],
+                'desc': request.form['desc'],
+                'field': request.form['field'],
+                'active': True,
+                'ageGroups': request.form.getlist('ageGroups'),
+                'rentalDates': []
+            }
+            msg = admin_db.addRental(user, form)
+            if msg is None:
+                return redirect(url_for('admin.rental_data'))
+    return render_template('admin/add-rental.html', user=user, msg=msg)

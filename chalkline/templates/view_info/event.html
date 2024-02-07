@@ -55,7 +55,7 @@
         </section>  
         {% endif %}
     {% else %}
-    <form method="post" id="updateEvent">
+        <form method="post" id="updateEvent">
         <div class="split">
             <h3 class="urgent">You are authorized to edit event data.</h3>
             <button class="action" name="updateEvent" value="updateEvent" type="submit">Save Changes</button>
@@ -172,6 +172,7 @@
             document.getElementById('field1Umpire').value = "{{event.field1UmpireInfo._id}}";
             document.getElementById('fieldRequest').value = "{{event.fieldRequestInfo._id}}";
         </script>
+        {% endif %}
         <section>
             <center>
                 <table class="center">
@@ -238,7 +239,6 @@
                 }
             </script>
         </section>
-        {% endif %}
         <center><button class="action" name="updateEvent" value="updateEvent" type="submit">Save Changes</button></center>
     </form>
     {% endif %}

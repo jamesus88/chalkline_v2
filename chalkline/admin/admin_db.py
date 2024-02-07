@@ -1,4 +1,4 @@
-from chalkline.db import userData, eventData
+from chalkline.db import userData, eventData, rentalData
 
 def openFreeDrop(criteria={}):
     criteria['eventType'] = 'Game'
@@ -30,3 +30,42 @@ def lockGames(criteria={}):
 
 def updateMisc(criteria={}):
     return "Events have been updated with a predefined method. Contact a developer immediately if this function was accidentally run."
+
+def updateRental(user, rentalName, form):
+    if 'admin' not in user['role']:
+        return "Error: permission denied."
+    
+    new = {
+        'active': True if form['active'] == 'True' else False,
+        'desc': form['desc'],
+        'ageGroups': form['ageGroups'],
+        'field': form['field']
+    }
+    
+    rentalData.update_one({'name': rentalName}, {'$set': new})
+    print(f"Rental Update: {user['userId']} updated {rentalName}")
+    return f"Successfully updated {rentalName}"
+    
+def removeReserve(user, rentalName):
+    if 'admin' not in user['role']:
+        return "Error: permission denied."
+    
+    rentalData.update_one({'name': rentalName}, {'$set': {'rentalDates': []}})
+    print(f"Rental Update: {user['userId']} removed all reservations for {rentalName}")
+    return f"Successfully removed reservations for {rentalName}"
+
+def deleteRental(user, rentalName):
+    if 'admin' not in user['role']:
+        return "Error: permission denied."
+    
+    rentalData.delete_one({'name': rentalName})
+    print(f"Rental Deleted: {user['userId']} deleted {rentalName}")
+    return f"Successfully deleted {rentalName}"
+
+def addRental(user, form):
+    if rentalData.find_one({'name': form['name']}):
+        return "Error: equipment name must be unique."
+    
+    rentalData.insert_one(form)
+    print(f"Rental Added: {user['userId']} added {form['name']}")
+    return None

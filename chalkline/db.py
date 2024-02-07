@@ -16,6 +16,7 @@ playerData = db['playerData']
 leagueData = db['leagueData']
 venueData = db['venueData']
 directorData = db['directorData']
+rentalData = db['rentalData']
 
 def authenticate(email, pword):
     user = userData.find_one_and_update({'email': email}, {'$set': {'last_attempt': server.todaysDate()}}, return_document=pymongo.ReturnDocument.AFTER)
@@ -459,3 +460,60 @@ def sendPasswordReset(email):
     print(f"Password Reset Sent: {email}")
     send_mail.sendMail(message)
     return f"Password Reset email sent to {email}"
+
+def getRentalList(teamId=None, admin=False):
+    if admin:
+        rentals = rentalData.find({})
+    else:
+        team = teamData.find_one({'teamId': teamId})
+        ageGroup = team['teamAgeGroup']
+        rentals = rentalData.find({'active': True, 'ageGroups': ageGroup})
+        
+    rentalList = []
+    for item in rentals:
+        item['_id'] = str(item['_id'])
+        rentalList.append(item)
+    return rentalList
+
+def rentEquipment(user, eventId, rentalName, admin=False):
+    event = eventData.find_one({'_id': bson.ObjectId(eventId)})
+    if not event:
+        return "Error: Event not found."
+    
+    if rentalName == 'None':
+        rentalData.find_one_and_update({'rentalDates.event': eventId}, {'$pull': {'rentalDates': {'event': eventId}}})
+        return "Successfully removed rental."
+    
+    rental = rentalData.find_one({'name': rentalName, 'rentalDates.event': {'$ne': eventId}})
+    if not rental:
+        return
+    
+    if 'coach' not in user['role'] and 'admin' not in user['role']:
+        return "Error: You do not have permission to rent equipment."
+    
+    current_rental = rentalData.find_one({'$and': [{'rentalDates.renter': user['userId']}, {'rentalDates.returned': False}, {'end': {'$lt': server.todaysDate()}}]})
+    if current_rental and not admin:
+        return f"Error: You have not returned {current_rental['name']} ({current_rental['desc']})"
+    
+    for slot in rental['rentalDates']:
+        if (slot['start'] <= event['eventDate'] < slot['end']) and not(slot['returned']):
+            return f"Error: This equipment has already been rented for {slot['start'].strftime('%m/%d at %H:%M')}"
+    
+    rentalData.update_one(rental, {'$push': {'rentalDates': 
+        {'renter': user['userId'], 
+        'start': event['eventDate'],
+        'end': event['eventDate'] + datetime.timedelta(hours=2),
+        'event': str(event['_id']),
+        'returned': False}
+    }})
+    
+    print(f"Rental: {rentalName} by {user['userId']} for {event['eventDate'].strftime('%m/%d at %H:%M')}")
+    return f"Successfully rented {rentalName} for {event['eventDate'].strftime('%m/%d at %H:%M')}"
+
+def returnRental(user, eventId):
+    rental = rentalData.update_one({'rentalDates.event': eventId}, {'$set': {'rentalDates.$.returned': True}})
+    if rental:
+        print(f"Rental Return: {user['userId']} for {eventId}")
+        return f"Successfully returned equipment!"
+    else:
+        return "Error: No rental found."

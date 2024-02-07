@@ -27,6 +27,7 @@
                 <div class="hide" id="teams-menu">
                     <a href="{{url_for('teams.schedule')}}" class="menu">Team Schedule</a>
                     <a href="{{url_for('teams.info')}}" class="menu">Info and Contacts</a>
+                    <a href="{{url_for('teams.rentals')}}" class="menu">Rental Equipment</a>
                 </div> 
             </section>
             {% endif %}
@@ -68,6 +69,7 @@
                     <a href="{{url_for('admin.event_data')}}" class="menu">Manage Events</a>
                     <a href="{{url_for('admin.team_data')}}" class="menu">Manage Teams</a>
                     <a href="{{url_for('admin.dod_data')}}" class="menu">DoD Shifts</a>
+                    <a href="{{url_for('admin.rental_data')}}" class="menu">Rental Data</a>
                     <a href="{{url_for('admin.announcement')}}" class="menu">Send Announcement</a>
                 </div>
             </section>
@@ -84,15 +86,14 @@
         {% endif %}
         <h2>Chalkline News</h2>
         <section>
-            <h3 class="urgent">Spring 2024 Youth Umpire Clinic</h3>
-            <h4>Thu. 2/8 6pm - 8pm @ <a href="{{url_for('league.status')}}">Twin Lakes Park</a></h4>
-            <h4>11 - 17 year olds welcome</h4>
-            <h4>Email <a href="mailto:dm4gators@yahoo.com">Dave Miller</a> with any questions.</h4>
-            <h5>Hosted by Sarasota Little League</h5>
-        </section>
-        <section>
             <h3>Find a bug?</h3>
             <h4>Report it immediately to Aidan Hurwitz at <a href="mailto:chalklinebaseball@gmail.com">chalklinebaseball@gmail.com</a></h4>
+        </section>
+        <section id="supporters">
+            <h3 class="urgent">Thank you to supporters of Chalkline&trade;!</h3>
+            <p>Dave Miller</p>
+            <p>Chris Riley</p>
+            <h3>You can support Chalkline&trade; <a target='_blank' href="https://buymeacoffee.com/aidanhurwitz">here!</a></h3>
         </section>
         <section>
             <h3>v4.0.0 is here.</h3>

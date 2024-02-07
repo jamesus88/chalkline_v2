@@ -1,0 +1,81 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='schedule.css')}}">
+    <script src="{{url_for('static', filename='schedule.js')}}"></script>
+</head>
+
+{% extends "design.html" %}
+{% block title %}Team Data{% endblock title %}
+
+{% block content %}
+<main>
+    <section class="split">
+        <div>
+            <h1>Rental Data</h1>
+        </div>
+        <div class="align-right">
+            <h3><a href="{{url_for('admin.add_equipment')}}">Add Equipment</a></h3>
+        </div>
+    </section>
+    <h3 class="error">{{msg}}</h3>
+<form method="post">
+    <section class="schedule-section scrollwrapper">
+        {% if rentalList|length < 1 %}
+        <h3 class="error">No equipment found.</h3>
+        {% endif %}
+        <table id="schedule-table" class="event-display admin">
+            <tr>
+                <th>Name</th>
+                <th>Active</th>
+                <th>Desc.</th>
+                <th>Age Groups</th>
+                <th>Field</th>
+                <th>Update</th>
+                <th>Remove Reservations</th>
+                <th>Delete</th>
+            </tr>
+            {% for rental in rentalList %}
+            <tr class="event-row">
+                <td>{{rental.name}}</td>
+                <td><select name="active_{{rental.name}}" id="active_{{rental.name}}">
+                    <option value="True" selected>Active</option>
+                    <option value="False">Inactive</option>
+                </select></td>
+                <td><input class="admin" type="text" name="desc_{{rental.name}}" id="desc_{{rental.name}}" value="{{rental.desc}}"></td>
+                <td><select multiple class="admin" name="ageGroups_{{rental.name}}" id="ageGroups_{{rental.name}}">
+                    <option value="T-Ball">T-Ball</option>
+                    <option value="Coach Pitch">Coach Pitch</option>
+                    <option value="AA">AA</option>
+                    <option value="AAA">AAA</option>
+                    <option value="Majors">Majors</option>
+                    <option value="50/70">50/70</option>
+                    <option value="Juniors">Juniors</option>
+                </select></td>
+                <td><input class="admin" type="number" name="field_{{rental.name}}" id="field_{{rental.name}}" value="{{rental.field}}"></td>
+                <td><button class="schedule-action" type="submit" name="updateRental" value="{{rental.name}}">Update</button></td>
+                <td><button class="schedule-action" type="submit" name="removeReserve" value="{{rental.name}}" onclick="return confirm('Remove all reservations? This cannot be undone!')">Remove Reservations</button></td>
+                <td><button class="schedule-action" type="submit" name="deleteRental" value="{{rental.name}}" onclick="return confirm('Delete team? This cannot be undone!')">Delete</button></td>
+            </tr>
+            {% endfor %}
+
+            <script>
+                let rentalList = {{ rentalList | tojson }};
+                for (rental of rentalList) {
+                    let active = document.getElementById('active_'+rental.name);
+                    let selectAges = document.getElementById('ageGroups_'+rental.name);
+                    for (let i = 0, len = selectAges.options.length, o; i < len; i++) {
+                        o = selectAges.options[i]
+                        if (rental.ageGroups.indexOf(o.text) != -1) {
+                            o.selected = true;
+                        }
+                    }
+                    if (!rental.active) {
+                        active.value = "False";
+                    }
+                    console.log(rental.active)
+                }
+            </script>
+        </table>
+    </section>
+</form>
+</main>
+{% endblock content %}
