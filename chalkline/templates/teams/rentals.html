@@ -1,0 +1,144 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='schedule.css')}}">
+    <script src="{{url_for('static', filename='schedule.js')}}"></script>
+</head>
+
+{% extends "design.html" %}
+{% block title %}Rental Equipment{% endblock title %}
+
+{% block content %}
+<main>
+    <section class="split">
+        <div>
+            <h1>Rental Equipment - {{eventFilter.teamId}}</h1>
+
+            {% if user.teams|length == 1 %}
+            <h3>Your team: {{user.teams[0]}}</h3>
+            {% elif user.teams|length > 1 %}
+            <h3>Your teams: {% for team in user.teams %}{{team}}, {% endfor %}</h3>
+            {% else %}
+            <h3>Your teams: None</h3>
+            {% endif %}
+            
+        </div>
+        <div class="align-right">
+        </div>
+    </section>
+    {% if user.teams|length > 0 %}
+    <button type="" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
+    <form method="post">
+        <section id="filter-section" class="filter-section">
+            <select name="updateFilter" id="updateFilter" style="display: none;">
+                <option value="updateFilter" selected>UpdateFilter</option>
+            </select>
+            <select class="filter" name="hidePast" id="hidePast" onchange="this.form.submit()">
+                <option value="true" selected>Future only</option>
+                <option value="false">Past and Future</option>
+            </select>
+            <select class="filter" name="teamId" id="teamId" onchange="this.form.submit()">
+                {% for team in user.teams %}
+                <option value="{{team}}">{{team}}</option>
+                {% endfor %}
+            </select>
+        
+            <script>
+                // for use lower down
+                let hasRental = false;
+                let returned = false;
+
+                let filter = {{ eventFilter | tojson }};
+                console.log(filter)
+                document.getElementById('hidePast').value = filter.hidePast;
+                document.getElementById('teamId').value = filter.teamId;
+
+                function toggleFilterSection(section) {
+                    let sect = document.getElementById(section);
+                    if (sect.style.display == 'none') {
+                        sect.style.display = 'block';
+                    }
+                    else {
+                        sect.style.display = 'none';
+                    }
+                }
+            </script>
+        </section>
+        {% if msg %}<h3 class="error">{{msg}}</h3>{% endif %}
+        <section class="schedule-section scrollwrapper">
+            {% if eventList|length < 1 %}
+            <h3 class="error">No practices found.</h3>
+            {% endif %}
+            <table id="schedule-table" class="event-display">
+                <tr>
+                    <th></th>
+                    <th>Event</th>
+                    <th>Date/Time</th>
+                    <th>Venue</th>
+                    <th>Field</th>
+                    <th>Status</th>
+                    <th>Rental</th>
+                    <th>Return</th>
+                    
+                </tr>
+                {% for event in eventList %}
+                <tr class="event-row">
+                    <td><a class="icon-link" href="{{url_for('view_info.event', eventId=event._id)}}"><i class="fa-solid fa-info"></i></a></td>
+                    <td class="event-type">{{event.eventType}}</td>
+                    <td>{{event.eventDate.strftime('%a %m/%d @ %H:%M')}}</td>
+                    <td>{{event.eventVenue}}</td>
+                    <td>{{event.eventField}}</td>
+                    <td>{{event.status}}</td>
+                    <td>
+                        <select name="rentEquipment" id="{{event._id}}_rentEquipment" onchange="this.form.submit()">
+                            <option disabled selected>Select</option>
+                            <option value="{{event._id}}_None">None</option>
+                            {% for equipment in rentalList %}
+                                {% if equipment.field == event.eventField %}
+                                    <option value="{{event._id}}_{{equipment.name}}">{{equipment.name}}- {{equipment.desc}}</option>
+                                {% endif %}
+                                {% for rental in equipment.rentalDates %}
+                                    {% if rental.event == event._id %}
+                                        <script>
+                                            let select = document.getElementById("{{event._id}}_rentEquipment");
+                                            select.value = "{{event._id}}_{{equipment.name}}"; 
+                                            console.log('{{equipment.name}}');
+                                            hasRental = true;
+                                        </script>
+                                        {% if rental.returned %}
+                                            <script>returned = true;</script>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <button class="schedule-action" name="returnRental" value="{{event._id}}_returnRental" id="{{event._id}}_returnRental">Return</button>
+                        <script>
+                            let xbut = document.getElementById("{{event._id}}_returnRental");
+                            if (!hasRental) {
+                                xbut.disabled = true;
+                                xbut.classList.add('disabled');
+                                console.log('return button disabled');
+                            }
+                            if (returned) {
+                                select.disabled = true;
+                                xbut.disabled = true;
+                                xbut.classList.add('disabled');
+                                xbut.innerHTML = "Returned!"
+                            }
+                        </script>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </section>
+    </form>
+    {% else %}
+    <h3 class='error'>Your account is linked to 0 teams in {{user.location}}. Add teams to your <a href="{{url_for('main.profile')}}">Profile</a> to view their unique schedules.</h3>
+    {% endif %}
+</main>
+<script>
+    let tbl = document.getElementById('schedule-table');
+    colorifySchedule(tbl);
+</script>
+{% endblock content %}
