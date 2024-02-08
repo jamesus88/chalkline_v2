@@ -61,7 +61,7 @@
                     {% if shift.directorInfo.fLast is none %}
                     <td><button class="schedule-action" type="submit" name="addDirector" value="{{shift._id}}">+ director</button></td>
                     {% else %}
-                    <td><a href="#">{{shift.directorInfo.fLast}}</a></td>
+                    <td><a target='_blank' href="{{url_for('view_info.user', user_id=shift.directorInfo._id)}}">{{shift.directorInfo.fLast}}</a></td>
                     {% endif %}
                 </tr>
                 {% endfor %}

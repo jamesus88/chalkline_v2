@@ -21,10 +21,8 @@ def schedule():
             eventFilter.update(request.form)
             
         if request.form.get('addPlate'):
-            print('add plate')
             msg = db.addPlate(user, request.form['addPlate'])
         if request.form.get('addField1'):
-            print('add field1')
             msg = db.addField1(user, request.form['addField1'])
     
     userList = db.getUserList()

@@ -100,13 +100,11 @@ def team_data():
             for key, value in request.form.items():
                 if f'_{teamId}' in key:
                     form[key.removesuffix(f"_{teamId}")] = value
-            msg = db.updateTeam(this_team, form)
-            print(f"Team: {teamId} updated by {user['userId']}")
+            msg = db.updateTeam(user, this_team, form)
             
         elif request.form.get('deleteTeam'):
             teamId = request.form['deleteTeam']
-            msg = db.deleteTeam(teamId)
-            print(f"Team: {teamId} deleted by {user['userId']}")
+            msg = db.deleteTeam(user, teamId)
     
     criteria = {}
     if ageGroupFilter != 'None':

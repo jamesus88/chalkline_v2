@@ -28,7 +28,7 @@ def signup():
             html = render_template("emails/account-created.html", user=user)
             msg = send_mail.ChalklineEmail(subject="Chalkline Account Created!", html=html, recipients=[user['email']])
             send_mail.sendMail(msg)
-            
+            print(f"New User: {user['userId']}")
             return redirect(url_for('main.profile'))
     
     return render_template("main/create-account.html", user=user, msg=msg)

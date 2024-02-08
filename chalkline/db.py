@@ -1,4 +1,4 @@
-import pymongo, bson, datetime, os, uuid
+import pymongo, bson, datetime, os, uuid, re
 import chalkline.server as server
 import chalkline.send_mail as send_mail
 from flask import render_template
@@ -61,10 +61,10 @@ def createUser(form):
     response = {
         'newUser': {
           "location": form['location'],
-          "firstName": form['firstName'],
-          "lastName": form['lastName'],
-          "userId": form['email'],
-          "email": form['email'],
+          "firstName": form['firstName'].title().strip(),
+          "lastName": form['lastName'].title().strip(),
+          "userId": form['email'].strip(),
+          "email": form['email'].strip(),
           "phone": form['phone'],
           "sms-gateway": form.get('carrier'),
           "pword": generate_password_hash(form['pword']),
@@ -80,6 +80,16 @@ def createUser(form):
         },
         'error': None
     }
+    tel = form['phone']
+    tel = tel.removeprefix("+")
+    tel = tel.removeprefix("1")     # remove leading +1 or 1
+    tel = re.sub("[ ()-]", '', tel) # remove space, (), -
+
+    try: tel = f"{tel[:3]}-{tel[3:6]}-{tel[6:]}"
+    except: response['error'] = "Invalid phone number."
+    
+    response['newUser']['phone'] = tel
+
     
     if form.get('role-coach'):
         response['newUser']['role'].append('coach')
@@ -188,6 +198,7 @@ def addPlate(user, gameId):
     
     if game:
         msg = f'Successfully added {user["firstName"][0]}. {user["lastName"]} for plate duty.'
+        print(f"Plate added: {user['userId']} for {gameId}")
         if game['fieldRequest'] and game['umpireDuty'] and not game['editRules']['hasField1Umpire']:
             coach = userData.find_one({'userId': game['fieldRequest']})
             
@@ -210,6 +221,7 @@ def addField1(user, gameId):
     
     if game:
         msg = f'Successfully added {user["firstName"][0]}. {user["lastName"]} for field duty.'
+        print(f"Field1 added: {user['userId']} for {gameId}")
         if game['fieldRequest'] and game['umpireDuty']:
             coach = userData.find_one({'userId': game['fieldRequest']})
             
@@ -238,7 +250,7 @@ def removeGame(user, gameId):
         eventData.update_one({'_id': bson.ObjectId(gameId)}, {'$set': setData})
 
         msg = 'Successfully removed 1 game.'
-    
+
     else:
         msg = "Error: you do not have permission to remove this game. Contact administrator."
         
@@ -250,6 +262,7 @@ def requestField1Umpire(user, gameId):
     if game['editRules']['fieldRequestAddable'] and 'coach' in user['role'] and game['fieldRequest'] is None:
         eventData.update_one({'_id': bson.ObjectId(gameId)}, {'$set': {'fieldRequest': user['userId']}})
         msg = 'Successfully requested youth umpire.'
+        print(f"Youth Umpire Requested: {gameId} by {user['userId']}")
     
     else:
         msg = 'Error: you do not have permission to request a field umpire for this game.'
@@ -333,7 +346,7 @@ def updateEvent(user, event, form, userList, editRules=False, editContacts=False
     if any(key in different_keys for key in ['eventDate', 'eventVenue', 'eventField', 'status']):
         server.alertUsersOfEvent(old_game, new_game, getUserList())
             
-    
+    print(f"Event updated: {event['_id']} by {user['userId']}")
     return 'Successfully updated event.'
 
 def deleteEvent(user, eventId, ignoreDate=False):
@@ -341,7 +354,7 @@ def deleteEvent(user, eventId, ignoreDate=False):
     event = eventData.find_one(criteria)
     if (event['eventDate'] > server.todaysDate() or ignoreDate) and 'admin' in user['role']:
         eventData.delete_one(criteria)
-        print(f"Event {eventId} deleted by {user['userId']}")
+        print(f"Event Deleted: {eventId} by {user['userId']}")
         return "Successfully deleted game"
     else:
         return "Error: cannot edit past events"
@@ -388,15 +401,15 @@ def addEvent(user, form):
     if form['fieldRequest'] != "None":
         writable['fieldRequest'] = form['fieldRequest']
 
-    eventData.insert_one(writable)
-    
+    res = eventData.insert_one(writable)
+    print(f"Event Added: {str(res['_id'])} by {user['userId']}")
     return True
 
 def getTeamInfo(teamId):
     team = teamData.find_one({'teamId': teamId})
     return team
 
-def updateTeam(team, form):
+def updateTeam(user, team, form):
     teamId = team['teamId']
     writable = {
         'teamName': form['teamName'],
@@ -406,10 +419,12 @@ def updateTeam(team, form):
         'ties': int(form['ties']),
     }
     teamData.update_one({'teamId': teamId}, {'$set': writable})
+    print(f"Team Updated: {teamId} by {user['userId']}")
     return f"Successfully updated {teamId}"
 
-def deleteTeam(teamId):
+def deleteTeam(user, teamId):
     teamData.delete_one({'teamId': teamId})
+    print(f"Team Deleted: {teamId} by {user['userId']}")
     return f"Successfully deleted {teamId}"
 
 def addTeam(user, form):

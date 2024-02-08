@@ -4,7 +4,7 @@
 
 {% extends "design.html" %}
 
-{% block title %}View Event{% endblock title %}
+{% block title %}View User{% endblock title %}
 
 {% block content %}
 <main>
@@ -17,6 +17,12 @@
             <h2>{{view_user.firstName}} {{view_user.lastName}}</h2>
             <h3>Email: {{view_user.email}}</h3>
             <h3>Phone: {{view_user.phone}}</h3>
+        </center>
+    </section>
+    <section>
+        <center>
+            <h3>Teams: {{view_user.teams|join(', ')}}</h3>
+            <h3>Roles: {{view_user.role|join(', ')}}</h3>
         </center>
     </section>
 </main>
