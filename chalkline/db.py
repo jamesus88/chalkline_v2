@@ -119,6 +119,7 @@ def createUser(form):
 def saveUser(user):
     userData.insert_one(user)
     user['_id'] = str(user['_id'])
+    user = appendPermissions(user)
     return user
 
 def updateProfile(userId, form):

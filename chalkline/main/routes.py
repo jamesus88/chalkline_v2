@@ -23,6 +23,7 @@ def signup():
             msg = response['error']
         else:
             user = db.saveUser(response['newUser'])
+            user = db.appendPermissions(user)
             session['user'] = user
             
             html = render_template("emails/account-created.html", user=user)

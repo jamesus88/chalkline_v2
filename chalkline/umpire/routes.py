@@ -16,7 +16,6 @@ def schedule():
     msg = ''
     
     if request.method == 'POST':
-        print(request.form.keys())
         if request.form.get('updateFilter'):
             eventFilter.update(request.form)
             
