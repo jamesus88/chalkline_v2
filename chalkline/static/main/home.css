@@ -136,6 +136,14 @@ div.hide {
 section.menu:hover div.hide {
     display: block;
 }
+.about-page {
+    box-shadow: 0px 0px 50px rgb(47, 0, 141);
+}
+div.pricing {
+    background-color: white;
+    border-radius: 20px;
+    text-align: left;
+}
 @media screen and (max-width: 1000px) {
     main {
         width: 95%;
@@ -144,10 +152,10 @@ section.menu:hover div.hide {
         flex-direction: column-reverse;
         padding: 5px;
     }
-    #about-page .split:nth-child(odd) {
+    .about-page .split:nth-child(odd) {
         flex-direction: column;
     }
-    #about-page .split {
+    .about-page .split {
         text-align: center;
         width: 100%;
     }

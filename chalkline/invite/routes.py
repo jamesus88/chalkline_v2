@@ -43,3 +43,9 @@ def password_reset(email=None, token=None):
     
     return render_template("main/reset-password.html", email=user['email'], msg=msg, user=None)
     
+@invite.route('/daily-reminders')
+def daily_reminders():
+    if request.headers.get('X-AppEngine-Cron') is None:
+        return "Error: Unauthorized access", 403
+    else:
+        return 'Cron successful!'

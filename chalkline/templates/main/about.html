@@ -28,36 +28,39 @@
                 <h3>Contact Aidan Hurwitz at <a href="mailto:chalklinebaseball@gmail.com">chalklinebaseball@gmail.com</a> for more info!</h3>
             </center>
         </section>
-        <section id="about-page">
-            <h2>What is Chalkline?</h2>
+        <section class="about-page">
+            <h2 class='urgent'>How the magic works <i class="fa-solid fa-wand-magic-sparkles"></i></h2>
             <section class="split">
                 <div>
-                    <h3>Chalkline, your all-in-one website for everything Little League Baseball.*</h3>
-                    <p>Chalkline incorporates scheduling, umpiring, coaching, and league services into one, simple webapp.</p>
+                    <h3>It all starts with a league...</h3>
+                    <p>Your league creates a Chalkline&trade; setup and imports any data necessary for the season.</p>
+                    <p>Customizing your league is easy and built-in.</p>
+                    <p>Chalkline&trade; supports as many teams and users as you provide.</p>
                 </div>
                 <div>
-                    <i class="fa-solid fa-baseball large"></i>
+                    <i class="fa-solid fa-baseball-bat-ball large"></i>
                 </div>
             </section>
             <section class="split">
                 <div>
-                    <i class="fa-solid fa-clipboard-check large"></i>
+                    <i class="fa-solid fa-calendar-days large"></i>
                 </div>
                 <div>
-                    <h3>Schedule practices, games, and umpires easily with one click.</h3>
+                    <h3>Scheduling is key.</h3>
+                    <p>Import your schedule or have Chalkline&trade; create one for you.*</p>
                     <p>Master schedules are easily accessible and custom views are available for each user.</p>
                     <p>Teams can view the standings and their upcoming games or practices.</p>
                 </div>
             </section>
             <section class="split">
                 <div>
-                    <h3>Umpiring made simple.</h3>
-                    <p>Chalkline allows umpires to schedule themselves, without the need for an assignor.</p>
+                    <h3>Umpires are the cogs of the machine.</h3>
+                    <p>Chalkline&trade; allows umpires to schedule themselves, without the need for an assignor.</p>
                     <p>Leagues can assign games manually, or let umpires choose their own schedule.</p>
-                    <p>Coaches can request field umpires to fill their umpire duty.</p>
+                    <p>Coaches can request field umpires to fill their umpire duty, saving time and money.</p>
                 </div>
                 <div>
-                    <i class="fa-solid fa-glasses large"></i>
+                    <i class="fa-solid fa-gears large"></i>
                 </div>
             </section>
             <section class="split">
@@ -66,15 +69,17 @@
                 </div>
                 <div>
                     <h3>Never miss an update.</h3>
-                    <p>Coaches can send announcments to their entire team.</p>
-                    <p>League administrators can send game/field updates to all users.</p>
+                    <p>Leagues can send announcments to everyone, or to individual groups/teams.</p>
+                    <p>Rain delay alerts and field closures can be displayed and users can be alerted in seconds.</p>
+                    <p>Automatic reminders are sent out when umpire shifts are filled or game details are changed.</p>
                 </div>
             </section>
             <section class="split">
                 <div>
                     <h3>Always improving.</h3>
                     <p>Updates with new features are pushed out every week.</p>
-                    <p>View the <a href="#developers-log">Developer's Log</a>.</p>
+                    <p>Literally. Every week.</p>
+                    <p>View the <a href="{{url_for('main.about', _anchor="developers-log")}}">Developer's Log</a>.</p>
                 </div>
                 <div>
                     <i class="fa-solid fa-wrench large"></i>
@@ -82,18 +87,19 @@
             </section>
             <section class="split">
                 <div>
-                    <i class="fa-solid fa-scale-balanced large"></i>
+                    <i class="fa-solid fa-piggy-bank large"></i>
                 </div>
                 <div>
-                    <h3>Affordable pricing.</h3>
-                    <p>All Stars services included.</p>
-                    <p>All features included.</p>
+                    <h3>Dirt cheap.</h3>
+                    <p>Pay by season as you need. Pricing is always negotiable.</p>
+                    <p>All features included, no additional purchases needed.</p>
                     <p>Standard messaging and data rates apply for each user.</p>
                 </div>
             </section>
         </section>
     </center>
-    <p>* Chalkline&trade; is unaffiliated with Little League Baseball</p>
+        <p>* Chalkline&trade; automatic scheduling is currently under development</p>
+    <center>
     <br>
     <center>
         <p>Chalkline&trade; is developed and maintained by Aidan Hurwitz</p>
@@ -105,6 +111,16 @@
         <h2>Developer's Log</h2>
     </section>
     <section>
+        <div class="split">
+            <div>
+                <p>Added automatic email reminders at 07:00 every day.</p>
+                <p>Updated about page.</p>
+            </div>
+            <div>
+                <h3>v4.8.0</h3>
+                <h4>Feb. 12 2024</h4>
+            </div>
+        </div>
         <div class="split">
             <div>
                 <p>Squashed bug - permissions not loading in after creating account.</p>
