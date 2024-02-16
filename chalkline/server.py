@@ -1,5 +1,5 @@
 from flask import session, render_template
-import datetime
+import datetime, time
 import chalkline.send_mail as send_mail
 
 SHARE_LINK = "https://chalklinebaseball.com/"
@@ -153,7 +153,8 @@ def sendReminders(eventList, userList, shiftList = None):
         mailList.append(mail)
         
     print(f'Sending {len(mailList)} daily reminders...')
-    send_mail.sendBulkMail(mailList)
+    
+    send_mail.sendBulkMail(mailList, asynchronous=False)
     
     return "Successfully sent daily reminders", 200
         

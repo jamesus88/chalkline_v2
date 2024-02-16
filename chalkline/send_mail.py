@@ -2,7 +2,7 @@ from flask_mail import Message
 from chalkline import mail
 from flask import copy_current_request_context
 from threading import Thread
-
+import time
 MAIL_SENDER = 'Chalkline Baseball'
 
 class ChalklineEmail(Message):
@@ -16,7 +16,7 @@ def sendMail(msg):
     except:
         print("Unable to send mail to", msg.recipients)
 
-def sendBulkMail(msgList):
+def sendBulkMail(msgList, asynchronous = True):
     @copy_current_request_context
     def sendAsync(msgList):
         with mail.connect() as conn:
@@ -27,10 +27,15 @@ def sendBulkMail(msgList):
                 except:
                     print("Unable to send mail to", msg.recipients)
                     
-        print("Finished Mail Thread process.")
+        if asynchronous: print("Finished Mail Thread process.")
         
-    Thread(target=sendAsync, args=(msgList, )).start()
+    if asynchronous: 
+        print("Started Mail Thread...")
+        Thread(target=sendAsync, args=(msgList, )).start()
+    else:
+        print("Sending mail synchronously")
+        sendAsync(msgList)
     
-    print("Started Mail Thread...")
+    
 
 
