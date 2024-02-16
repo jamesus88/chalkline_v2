@@ -147,14 +147,12 @@ def sendReminders(eventList, userList, shiftList = None):
         
         mail = send_mail.ChalklineEmail(
             subject='Reminder: You have events today!',
-            recipients=["aidan.hurwitz88@gmail.com"],
+            recipients=[email],
             html=render_template("emails/reminder.html", user=events['user'], events=events['events'])
         )
         mailList.append(mail)
         
-        break
-        
-    
+    print(f'Sending {len(mailList)} daily reminders...')
     send_mail.sendBulkMail(mailList)
     
     return "Successfully sent daily reminders", 200
