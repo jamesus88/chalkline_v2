@@ -1,5 +1,0 @@
-cron:
-- description: "daily reminder job"
-  url: /invite/daily-reminders
-  schedule: every day 09:00
-  timezone: America/New_York

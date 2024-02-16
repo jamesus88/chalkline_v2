@@ -114,3 +114,49 @@ def alertUsersOfEvent(old, new, userList):
     send_mail.sendBulkMail(msgList)
 
     return True
+
+def sendReminders(eventList, userList, shiftList = None):
+    # {
+    #     'data': [{event: data, role: str}]
+    # }
+    data = {}
+    
+    for event in eventList:
+        for user in userList:
+            userId = user['userId']
+            role = None
+            if event['plateUmpire'] == userId:
+                role = 'Plate Umpire'
+            elif event['field1Umpire'] == userId:
+                role = 'Field Umpire'
+            elif event['homeTeam'] in user['teams']:
+                role = 'Home Team'
+            elif event['awayTeam'] in user['teams']:
+                role = 'Away Team'
+            elif event['umpireDuty'] in user['teams'] and event['field1Umpire'] is None:
+                role = 'Umpire Duty'
+        
+            if role is not None and user['emailNotifications']:
+                if user['email'] not in data:
+                    data[user['email']] = {'user': user, 'events': [{'event': event, 'role': role}]}
+                else:
+                    data[user['email']]['events'].append({'event': event, 'role': role})
+                    
+    mailList = []
+    for email, events in data.items():
+        
+        mail = send_mail.ChalklineEmail(
+            subject='Reminder: You have events today!',
+            recipients=["aidan.hurwitz88@gmail.com"],
+            html=render_template("emails/reminder.html", user=events['user'], events=events['events'])
+        )
+        mailList.append(mail)
+        
+        break
+        
+    
+    send_mail.sendBulkMail(mailList)
+    
+    return "Successfully sent daily reminders", 200
+        
+    

@@ -15,4 +15,5 @@ env_variables:
   SECRET_KEY: "chalkline14#"
   MAIL_USERNAME: "chalklinebaseball@gmail.com"
   MAIL_PASSWORD: "lyhi obpt rxam eago"
-  PYMONGO_CLIENT: "mongodb+srv://aidanhurwitz:Mongo4821@mongo.to6zmzr.mongodb.net/?retryWrites=true&w=majority"  
+  PYMONGO_CLIENT: "mongodb+srv://aidanhurwitz:Mongo4821@mongo.to6zmzr.mongodb.net/?retryWrites=true&w=majority"
+  CHALKLINE_AUTH: "ff433aa8-21f9-4e30-83d0-b8e0da840456"

@@ -1,7 +1,8 @@
 from flask import redirect, url_for, session, Blueprint, render_template, request
-from chalkline import db
+from chalkline import db, get_events
 from chalkline import server as srv
 from werkzeug.security import generate_password_hash
+import os
 invite = Blueprint('invite', __name__)
 
 @invite.route('/add-team/<teamId>')
@@ -43,9 +44,19 @@ def password_reset(email=None, token=None):
     
     return render_template("main/reset-password.html", email=user['email'], msg=msg, user=None)
     
-@invite.route('/daily-reminders')
+@invite.post('/daily-reminders')
 def daily_reminders():
-    if request.headers.get('x-appengine-cron') is None:
-        return "Error: Unauthorized access", 403
+    print('Daily Reminder Job Attempted...')
+    if request.args.get('chalkline_auth') == os.environ.get('CHALKLINE_AUTH'):
+        today = srv.todaysDate
+        eventFilter = get_events.EventFilter()
+        eventList = get_events.getEventList(eventFilter, {'eventDate': {'$gte': today(), '$lte': today(17)}}, safe=False)
+        userList = db.getUserList()
+        
+        msg, code = srv.sendReminders(eventList, userList)
+        
+        print('Daily Reminder Job executed.')
+        return msg, code
     else:
-        return 'Cron successful!'
+        print("Error: Authorization failed.")
+        return "Error: Unauthorized access", 403
