@@ -18,7 +18,11 @@ def logout():
     if 'next-url' in session: session.pop('next-url')
 
 def todaysDate(padding_hrs=0):
-    now = datetime.datetime.utcnow() + datetime.timedelta(hours=-4) + datetime.timedelta(hours=padding_hrs)
+    '''
+    #### padding_hrs: int x -> adds x hrs to EST
+    ex: todaysDate(2) = right now + 2 hours into the future.
+    '''
+    now = datetime.datetime.utcnow() + datetime.timedelta(hours=-5) + datetime.timedelta(hours=padding_hrs)
     return now
 
 def safeUser(user, session_user={}):

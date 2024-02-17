@@ -289,8 +289,11 @@ def getEventInfo(eventId, add_criteria={}):
     add_criteria['_id'] = bson.ObjectId(eventId)
     return eventData.find_one(add_criteria)
 
-def updateEvent(user, event, form, userList, editRules=False, editContacts=False, ignoreDate=False):
-    if event['eventDate'] < server.todaysDate(padding_hrs=2) and not ignoreDate:
+def updateEvent(_user, event, form, userList, editRules=False, editContacts=False, ignoreDate=False):
+    if 'admin' not in _user['role']:
+        return "Error: You do not have permission to edit events."
+    
+    if event['eventDate'] < server.todaysDate(padding_hrs=-2) and not ignoreDate:
         return "Error: cannot edit past events."
     
     writable = {}
@@ -347,7 +350,7 @@ def updateEvent(user, event, form, userList, editRules=False, editContacts=False
     if any(key in different_keys for key in ['eventDate', 'eventVenue', 'eventField', 'status']):
         server.alertUsersOfEvent(old_game, new_game, getUserList())
             
-    print(f"Event updated: {event['_id']} by {user['userId']}")
+    print(f"Event updated: {event['_id']} by {_user['userId']}")
     return 'Successfully updated event.'
 
 def deleteEvent(user, eventId, ignoreDate=False):

@@ -17,6 +17,12 @@ def _500(error):
     user = srv.getUser()
     return render_template("errors/500.html", user=user, error=error), 500
 
+@errors.app_errorhandler(PermissionError)
+def permission_error(error):
+    user = srv.getUser()
+    print(error)
+    return render_template("errors/generic.html", user=user, error=error), 403
+
 @errors.app_errorhandler(Exception)
 def generic(error):
     user = srv.getUser()

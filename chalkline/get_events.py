@@ -45,7 +45,7 @@ def getEventList(filter=EventFilter, add_criteria={}, safe=True, userList=[]):
        criteria.append({'editRules.visible': True})
     
     if filter.hidePast:
-        criteria.append({'eventDate': {'$gte': server.todaysDate(padding_hrs=2)}})
+        criteria.append({'eventDate': {'$gte': server.todaysDate(padding_hrs=-2)}})
         
     if filter.eventTypeFilter:
         if filter.eventTypeFilter == 'Umpire Duty':
@@ -71,6 +71,6 @@ def getEventList(filter=EventFilter, add_criteria={}, safe=True, userList=[]):
             events[i]['eventType'] = 'Umpire Duty'
     if safe:
         events = [server.safeEvent(event, userList) for event in events]
-        
+    
     return events
         

@@ -44,10 +44,11 @@ def password_reset(email=None, token=None):
     
     return render_template("main/reset-password.html", email=user['email'], msg=msg, user=None)
     
-@invite.post('/daily-reminders')
+@invite.route('/daily-reminders', methods=['GET', 'POST'])
 def daily_reminders():
     print('Daily Reminder Job Attempted...')
-    if request.args.get('chalkline_auth') == os.environ.get('CHALKLINE_AUTH'):
+    
+    if request.args.get('chalkline_auth') == os.environ.get('CHALKLINE_AUTH') and request.method == 'POST':
         today = srv.todaysDate
         eventFilter = get_events.EventFilter()
         eventList = get_events.getEventList(eventFilter, {'eventDate': {'$gte': today(), '$lte': today(17)}}, safe=False)
@@ -58,5 +59,4 @@ def daily_reminders():
         print('Daily Reminder Job executed.')
         return msg, code
     else:
-        print("Error: Authorization failed.")
-        return "Error: Unauthorized access", 403
+        raise PermissionError('PermissionError: Resource is Forbidden.')

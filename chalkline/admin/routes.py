@@ -247,12 +247,10 @@ def dod_data():
                 if f'_{shiftId}' in key:
                     form[key.removesuffix(f"_{shiftId}")] = value
             msg = director_db.updateShift(shiftId, form, directorList)
-            print(f"Shift: {shiftId} updated by {user['userId']}")
             
         if request.form.get('deleteShift'):
             shiftId = request.form['deleteShift']
             msg = director_db.deleteShift(shiftId)
-            print(f"Shift: {shiftId} deleted by {user['userId']}")
             
     shiftList = director_db.getShiftList(directorList, hidePast=hidePast)
     
