@@ -405,8 +405,8 @@ def addEvent(user, form):
     if form['fieldRequest'] != "None":
         writable['fieldRequest'] = form['fieldRequest']
 
-    res = eventData.insert_one(writable)
-    print(f"Event Added: {str(res['_id'])} by {user['userId']}")
+    eventData.insert_one(writable)
+    print(f"Event Added: {writable} by {user['userId']}")
     return True
 
 def getTeamInfo(teamId):
