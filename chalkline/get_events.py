@@ -64,7 +64,7 @@ def getEventList(filter=EventFilter, add_criteria={}, safe=True, userList=[]):
         else:
             criteria.append({'$or': [{'awayTeam': filter.teamId}, {'homeTeam': filter.teamId}, {'umpireDuty': filter.teamId}]})
     
-    events = list(db.eventData.find({'$and': criteria}).sort('eventDate', pymongo.ASCENDING))
+    events = list(db.eventData.find({'$and': criteria}).sort([('eventDate', pymongo.ASCENDING), ('eventField', pymongo.ASCENDING)]))
 
     for i in range(len(events)):
         if events[i]['umpireDuty'] == filter.teamId:
