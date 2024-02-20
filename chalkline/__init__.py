@@ -9,11 +9,11 @@ def create_app():
     
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
     app.config['MAIL_SERVER']='smtp.gmail.com'
-    app.config['MAIL_PORT'] = 465
+    app.config['MAIL_PORT'] = 587
     app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME') 
     app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-    app.config['MAIL_USE_TLS'] = False
-    app.config['MAIL_USE_SSL'] = True
+    app.config['MAIL_USE_TLS'] = True
+    app.config['MAIL_USE_SSL'] = False
     
     mail.init_app(app)
     
