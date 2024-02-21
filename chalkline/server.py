@@ -150,7 +150,7 @@ def sendReminders(eventList, userList, shiftList = None):
     for email, events in data.items():
         
         mail = send_mail.ChalklineEmail(
-            subject='Reminder: You have events today!',
+            subject='Weekly Reminder: You have events this week!',
             recipients=[email],
             html=render_template("emails/reminder.html", user=events['user'], events=events['events'])
         )

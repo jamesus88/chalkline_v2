@@ -50,11 +50,16 @@ def daily_reminders():
     
     if request.args.get('chalkline_auth') == os.environ.get('CHALKLINE_AUTH') and request.method == 'POST':
         today = srv.todaysDate
+        nextWeek = today(17 + 24*6) # rest of today (7:00) + 6 days
         eventFilter = get_events.EventFilter()
-        eventList = get_events.getEventList(eventFilter, {'eventDate': {'$gte': today(), '$lte': today(17)}}, safe=False)
+        eventList = get_events.getEventList(eventFilter, {'eventDate': {'$gte': today(), '$lte': nextWeek}}, safe=False)
+        
+        day = srv.todaysDate().weekday() # [0, 1, ... , 6]
         userList = db.getUserList()
         
-        msg, code = srv.sendReminders(eventList, userList)
+        usersToMail = userList[day::7]
+        
+        msg, code = srv.sendReminders(eventList, usersToMail)
         
         print('Daily Reminder Job executed.')
         return msg, code
