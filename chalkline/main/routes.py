@@ -83,7 +83,7 @@ def login():
     
     msg = ''
     if request.method == 'POST':
-        email = request.form['email']
+        email = request.form['email'].lower()
         pword = request.form['pword']
         user = db.authenticate(email, pword)
         
@@ -110,7 +110,7 @@ def send_reset():
     msg = ''
     
     if request.method == 'POST':
-        email = request.form['email']
+        email = request.form['email'].lower()
         if db.verifyEmail(email):
             msg = db.sendPasswordReset(email)
         else:
