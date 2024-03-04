@@ -12,6 +12,7 @@
         <h1>View Event</h1>
         <h4 class='error'>{{msg}}</h4>
     </center>
+
     {% if 'admin' not in user.role %}
         <section>
             <center>
@@ -32,6 +33,69 @@
             </center>
         </section>
         {% if event.eventType == 'Game' %}
+            <!-- substitutions -->
+            {% if user._id == event.plateUmpireInfo._id or user._id == event.field1UmpireInfo._id %}
+            <section id="substitute">
+                <form method="post">
+                <center>
+                    <h2>Request Substitute</h2>
+                    <p class="urgent">If a conflict arises, you may request another umpire to take your game.</p>
+                </center>
+                
+                {% if smsg %}
+                <center>
+                    <h3 class="error">{{smsg}}</h3>
+                </center>
+                {% endif %}
+
+                <table class="center">
+                    <tr>
+                        <td id="pos" style="font-weight: bold;"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="sub">Substitute Umpire: </label></td>
+                        <td><select name="sub" id="sub" required>
+                            <option value="" selected diabled>Select</option>
+                        </select></td>
+                    </tr>
+                </table>
+            <center>
+                {% if 'sub-code' not in event %}
+                <button class="action" type="submit" name="subGame" value="subGame" onclick="return confirm('Request selected umpire to cover this game?')">Request Substitute</button>
+                {% else %}
+                <button class="action disabled" disabled>Request Unavailable</button>
+                {% endif %}
+            </center>
+            </form>
+
+            <script>
+                let userList = {{userList | tojson}}
+                let sub = document.getElementById('sub');
+                let isPlate = "{{user._id}}" == "{{event.plateUmpireInfo._id}}";
+                let isField1 = "{{user._id}}" == "{{event.field1UmpireInfo._id}}";
+                let pos = document.getElementById('pos');
+                
+                if (isPlate) {
+                    pos.innerHTML = "Position: Plate Umpire";
+                }
+                else {
+                    pos.innerHTML = "Position: Field Umpire";
+                }
+
+                for (umpire of userList) {
+                    if (umpire.role.includes('umpire') || umpire.role.includes('youth')) {
+                        opt = document.createElement('option');
+                        opt.value = umpire._id;
+                        opt.innerHTML = umpire.lastName + ', ' + umpire.firstName;
+                        sub.appendChild(opt);
+                    }
+
+                }
+
+            </script>
+            </section>
+            {% endif %}
+
         <section>
             <center>
                 <h2>Plate Umpire: {{event.plateUmpireInfo.fLast}}</h2>
@@ -242,7 +306,6 @@
         <center><button class="action" name="updateEvent" value="updateEvent" type="submit">Save Changes</button></center>
     </form>
     {% endif %}
-    
 </main>
 
 {% endblock content %}

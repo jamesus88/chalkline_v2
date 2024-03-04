@@ -68,11 +68,32 @@ def profile():
                 user = response
                 session['user'] = user
                 msg = f'Added {teamCode} to your teams'
+        
+        elif request.form.get('admin-features'):
+            if not session['admin']: 
+                raise PermissionError('PermissionError: Admin features required')
+            
+            if request.form['admin-features'] == 'True':
+                if 'admin' not in session['user']['role']:
+                    user['role'].append('admin')
+                    user.pop('msg', None)
+                    session['user'] = user
+                    msg = "Admin features are now on"
+            else:
+                user['role'].remove('admin')
+                user['msg'] = "Admin features are currently disabled..."
+                session['user'] = user
+                msg = "Admin features are turned off" 
                 
     teamsList = db.getTeamsFromUser(user['teams'])
     allTeams = db.getTeams()
+    
+    if session['admin']:
+        admin_features = 'admin' in session['user']['role']
+    else:
+        admin_features = None
 
-    return render_template('main/profile.html', user=user, teamsList=list(teamsList), allTeams=allTeams, msg=msg)
+    return render_template('main/profile.html', user=user, teamsList=list(teamsList), allTeams=allTeams, msg=msg, admin_features=admin_features)
     
 
 @main.route("/login", methods=['GET', 'POST'])
@@ -91,6 +112,8 @@ def login():
             msg = 'Invalid email and/or password.'
         else:
             session['user'] = user
+            
+            session['admin'] = 'admin' in user['role']
             
             if 'next-page' in session:
                 page = session['next-page']

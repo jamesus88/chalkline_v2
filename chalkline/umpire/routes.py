@@ -52,6 +52,10 @@ def assignments():
             game = request.form['removeGame']
             msg = db.removeGame(user, game)
             
+        if request.form.get('subGame'):
+            game = request.form['subGame']
+            return redirect(url_for('view_info.event', eventId=game, _anchor="substitute"))
+            
     userList = db.getUserList()
     eventList = get_events.getEventList(eventFilter, add_criteria=add_criteria, userList=userList)
     

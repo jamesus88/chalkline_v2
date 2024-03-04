@@ -119,10 +119,24 @@
         <section>
             <h3>Session</h3>
             <form method="post" id="logout">
+                {% if admin_features is not none %}
+                    <table class="center">
+                        <tr>
+                            <td><label for="admin-features">Admin Features: </label></td>
+                            <td><select name="admin-features" id="admin-features" onchange="this.form.submit()">
+                                <option value="True">On</option>
+                                <option value="False">Off</option>
+                            </select></td>
+                        </tr>
+                    </table>
+                    <script>
+                        document.getElementById('admin-features').value = "{{admin_features}}";
+                    </script>
+                {% endif %}
+
                 <button class="action" type="submit" name="logout" value="logout"><b>Sign Out</b></button>
             </form>
         </section>
-            
     </center>
 </main>
 

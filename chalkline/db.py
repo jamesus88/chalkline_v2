@@ -2,6 +2,7 @@ import pymongo, bson, datetime, os, uuid, re
 import chalkline.server as server
 import chalkline.send_mail as send_mail
 from flask import render_template
+from random import randint
 from werkzeug.security import generate_password_hash, check_password_hash
 
 client = pymongo.MongoClient(os.environ.get('PYMONGO_CLIENT'), connect=False)
@@ -46,11 +47,16 @@ def appendPermissions(user):
     
     return user
 
-def getUserList(criteria={}):
-    return list(userData.find(criteria))
+def getUserList(criteria={}, safe=False):
+    if safe:
+        return [server.safeUser(user) for user in userData.find(criteria).sort('lastName', pymongo.ASCENDING)]
+    
+    return list(userData.find(criteria).sort('lastName', pymongo.ASCENDING))
 
-def getUser(_id=None, email=None):
-    return userData.find_one({'$or': [{'_id': bson.ObjectId(_id)}, {'email': email}]})
+def getUser(_id=None, email=None, userId=None):
+    user = userData.find_one({'$or': [{'_id': bson.ObjectId(_id)}, {'email': email}, {'userId': userId}]})
+    user = appendPermissions(user)
+    return user
 
 def checkDuplicateUser(newUser):
     user = userData.find_one({"$or": [{'userId': newUser['userId']}, {'email': newUser['email']}, {'phone': newUser['phone']}]})
@@ -192,12 +198,19 @@ def addTeamToUser(user, teamCode):
     user = appendPermissions(user)
     return user
 
-def addPlate(user, gameId):
-    criteria = [{'_id': bson.ObjectId(gameId)}, {'plateUmpire': None}, {'eventAgeGroup': {'$nin': user['permissions']['prohibitedPlate']}}]
+def addPlate(user, gameId, check_empty=True, check_conflicts=True):
+    criteria = [{'_id': bson.ObjectId(gameId)}, {'eventAgeGroup': {'$nin': user['permissions']['prohibitedPlate']}}]
+    if check_empty: criteria.append({'plateUmpire': None})
     
-    game = eventData.find_one_and_update({'$and': criteria}, {'$set': {'plateUmpire': user['userId']}})
+    game = eventData.find_one({'$and': criteria})
     
     if game:
+        if check_conflicts:
+            conflicts = getConflicts(user, game)
+            if conflicts:
+                return f"Error: you are already registered for an event at this date and time (Field {conflicts[0]['eventField']})."
+
+        eventData.update_one({'_id': game['_id']}, {'$set': {'plateUmpire': user['userId']}})
         msg = f'Successfully added {user["firstName"][0]}. {user["lastName"]} for plate duty.'
         print(f"Plate added: {user['userId']} for {gameId}")
         if game['fieldRequest'] and game['umpireDuty'] and not game['editRules']['hasField1Umpire']:
@@ -215,12 +228,18 @@ def addPlate(user, gameId):
         
     return msg
 
-def addField1(user, gameId):
-    criteria = [{'_id': bson.ObjectId(gameId)}, {'field1Umpire': None}, {'eventAgeGroup': {'$nin': user['permissions']['prohibitedField']}}]
+def addField1(user, gameId, check_empty=True, check_conflicts=True):
+    criteria = [{'_id': bson.ObjectId(gameId)}, {'eventAgeGroup': {'$nin': user['permissions']['prohibitedField']}}]
+    if check_empty: criteria.append({'field1Umpire': None})
     
-    game = eventData.find_one_and_update({'$and': criteria}, {'$set': {'field1Umpire': user['userId']}})
+    game = eventData.find_one({'$and': criteria})
     
     if game:
+        if check_conflicts:
+            if getConflicts(user, game):
+                return 'Error: you are already registered for an event at this date and time.'
+        
+        eventData.update_one({'_id': game['_id']}, {'$set': {'field1Umpire': user['userId']}})
         msg = f'Successfully added {user["firstName"][0]}. {user["lastName"]} for field duty.'
         print(f"Field1 added: {user['userId']} for {gameId}")
         if game['fieldRequest'] and game['umpireDuty']:
@@ -233,7 +252,6 @@ def addField1(user, gameId):
                     html=render_template("emails/shift-fulfilled.html", team=game['umpireDuty'], event=game)
                 )
                 send_mail.sendMail(email)
-        
     else:
         msg = 'Error: position filled or unavailable'
         
@@ -285,6 +303,58 @@ def removeRequest(user, gameId):
     
     return msg
 
+def getConflicts(user, event):
+    criteria = []
+    criteria.append({'$or': [{'plateUmpire': user['userId']}, {'field1Umpire': user['userId']}]})
+    criteria.append({'eventDate': {'$gte': event['eventDate'], '$lte': event['eventDate'] + datetime.timedelta(hours=1.5)}})
+    subConflict = list(eventData.find({'$and': criteria}))
+    
+    if len(subConflict) < 1:
+        return None
+    else:
+        return subConflict
+    
+def substituteUmpire(user, event, sub):
+    isPlate, isField = False, False
+    if user['userId'] == event['plateUmpire']: isPlate = True
+    if user['userId'] == event['field1Umpire']: isField = True
+    
+    if isPlate:
+        if event['eventAgeGroup'] in sub['permissions']['prohibitedPlate']:
+            return "Error: selected umpire is not cleared for this level"
+    elif isField:
+        if event['eventAgeGroup'] in sub['permissions']['prohibitedField']:
+            return "Error: selected umpire is not cleared for this level"
+    else:
+        return "Error: you are no longer signed up for this event."
+    
+    if event['eventDate'] < server.todaysDate():
+        return "Error: cannot edit past events."
+    
+    if 'sub-code' in event:
+        return "Error: this event has an open request already. Contact an administrator."
+    
+    if getConflicts(sub, event):
+        return "Error: substitute umpire is already registered for a game at this time."
+    
+    pos = ('Plate Umpire', 0) if isPlate else ('Field Umpire', 1)
+    code = randint(0, 99999999)
+    
+    eventData.update_one({'_id': event['_id']}, {'$set': {'sub-code': code}})
+    
+    msg = send_mail.ChalklineEmail(
+        subject=f"New Substitute Request from {user['firstName'][0]}. {user['lastName']}",
+        recipients=['aidan.hurwitz88@gmail.com'],
+        html=render_template('emails/substitute-req.html', user=user, event=event, pos=pos, code=code)
+    )
+    send_mail.sendMail(msg)
+    
+    return f"Successfully requested {sub['firstName'][0]}. {sub['lastName']} to sub-in as {pos[0]}!"
+    
+def removeSubCode(eventId):
+    eventData.update_one({'_id': bson.ObjectId(eventId)}, {'$unset': {'sub-code': 1}})
+    return True
+    
 def getEventInfo(eventId, add_criteria={}):
     add_criteria['_id'] = bson.ObjectId(eventId)
     return eventData.find_one(add_criteria)
@@ -399,11 +469,11 @@ def addEvent(user, form):
     else: writable['editRules']['removable'] = False
     
     if form['plateUmpire'] != "None":
-        writable['plateUmpire'] = form['plateUmpire']
+        writable['plateUmpire'] = getUser(_id=form['plateUmpire'])['userId']
     if form['field1Umpire'] != "None":
-        writable['field1Umpire'] = form['field1Umpire']
+        writable['field1Umpire'] = getUser(_id=form['field1Umpire'])['userId']
     if form['fieldRequest'] != "None":
-        writable['fieldRequest'] = form['fieldRequest']
+        writable['fieldRequest'] = getUser(_id=form['fieldRequest'])['userId']
 
     eventData.insert_one(writable)
     print(f"Event Added: {writable} by {user['userId']}")

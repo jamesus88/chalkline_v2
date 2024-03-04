@@ -38,6 +38,11 @@ def umpire_assignments():
     user = srv.getUser()
     return render_template("docs/umpire-assignments.html", user=user)
 
+@docs.route("/umpire-substitutions")
+def umpire_substitutions():
+    user = srv.getUser()
+    return render_template("docs/umpire-substitutions.html", user=user)
+
 @docs.route("/master-schedule")
 def master_schedule():
     user = srv.getUser()

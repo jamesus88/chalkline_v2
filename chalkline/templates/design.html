@@ -85,11 +85,19 @@
         </div>
     </nav>
 
-    <body>{% block content %}{% endblock content %}</body>
+    <body>
+        {% if user %}
+            {% if 'msg' in user %}
+                <p class="error">{{user.msg}}</p>
+            {% endif %}
+        {% endif %}
+
+        {% block content %}{% endblock content %}
+    </body>
     
     <footer>
         <p>Created and Maintained by Aidan Hurwitz</p>
-        <p>Chalkline&trade; v4.9.0</p>
+        <p>Chalkline&trade; v4.10.0</p>
         <p>Copyright &copy; 2023 - 2024 Aidan Hurwitz</p>
     </footer>
 

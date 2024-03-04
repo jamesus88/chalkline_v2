@@ -15,6 +15,14 @@ section {
     border-radius: 15px;
     margin: 10px 0;
 }
+table.center {
+    margin: auto;
+    border-collapse: separate;
+    border-spacing: 10px 10px;
+}
+table.center > tr {
+    margin: 10px;
+}
 @media screen and (max-width: 1000px) {
     main {
         width: 95%;

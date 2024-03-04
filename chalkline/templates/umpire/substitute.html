@@ -1,0 +1,51 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='view_game/view.css')}}">
+</head>
+
+{% extends "design.html" %}
+
+{% block title %}Substitute{% endblock title %}
+
+{% block content %}
+<main>
+<center>
+    <h1>Substitute Umpire</h1>
+    <form method="post">
+        <button type="submit" name="accept" value="accept" class="action" style="background-color: green;" onclick="return confirm('Accept substitution?')">Accept</button>
+        <button type="submit" name="decline" value="decline" class="action" style="background-color: red;" onclick="return confirm('Decline substitution?')">Decline</button>
+    </form>
+    <h3 class="error">{{msg}}</h3>
+    <section>
+        <center>
+            <h2>{{event.eventLocation}} - {{pos[0]}}</h2>
+            <h3>{{event.eventDate.strftime('%a %m/%d @ %H:%M')}}</h3>
+            <h3>{{event.eventVenue}} Field {{event.eventField}}</h3>
+            {% if event.eventType == 'Game' %}
+            <h3>(away) {{event.awayTeam}} vs. {{event.homeTeam}} (home)</h3>
+            <h3>Umpire Duty: {{event.umpireDuty}}</h3>
+            {% else %}
+            <h3>Team: {{event.homeTeam}}</h3>
+            {% endif %}
+        </center>
+    </section>
+    <h3 class="urgent">
+        {% if pos[1] == 0 %}
+        You will be replacing {{event.plateUmpireInfo.fLast}} behind the plate!
+        {% else %}
+        You will be replacing {{event.field1UmpireInfo.fLast}} in the field!
+        {% endif %}
+    </h3>
+    <section>
+        <h3>Current Plate Umpire: {{event.plateUmpireInfo.fLast}}</h3>
+        <h4>Email: {{event.plateUmpireInfo.email}}</h4>
+        <h4>Phone: {{event.plateUmpireInfo.phone}}</h4>
+    </section>
+    <section>
+        <h3>Current Field Umpire: {{event.field1UmpireInfo.fLast}}</h3>
+        <h4>Email: {{event.field1UmpireInfo.email}}</h4>
+        <h4>Phone: {{event.field1UmpireInfo.phone}}</h4>
+    </section>
+</center>
+</main>
+
+{% endblock content %}

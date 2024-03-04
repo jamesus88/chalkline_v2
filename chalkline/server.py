@@ -14,8 +14,9 @@ def getUser():
 
 def logout():
     session.pop('user')
-    if 'next-page' in session: session.pop('next-page')
-    if 'next-url' in session: session.pop('next-url')
+    session.pop('admin', None)
+    session.pop('next-page', None)
+    session.pop('next-url', None)
 
 def todaysDate(padding_hrs=0):
     '''
@@ -33,6 +34,16 @@ def safeUser(user, session_user={}):
         if user['hideEmail']: user['email'] = None
     
     user.pop('userId')
+    user.pop('pword')
+    user.pop('hideEmail')
+    user.pop('hidePhone')
+    user.pop('sms-gateway')
+    user.pop('teams')
+    user.pop('permissionSet')
+    user.pop('last_attempt', None)
+    user.pop('phoneNotifications', None)
+    user.pop('emailNotifications', None)
+    
     return user
 
 def safeEvent(event, userList):
@@ -56,8 +67,8 @@ def safeEvent(event, userList):
             event['plateUmpireInfo']['firstName'] = user['firstName']
             event['plateUmpireInfo']['lastName'] = user['lastName']
             event['plateUmpireInfo']['fLast'] = user['firstName'][0] + '. ' + user['lastName']
-            event['plateUmpireInfo']['phone'] = user['phone']
-            event['plateUmpireInfo']['email'] = user['email']
+            event['plateUmpireInfo']['phone'] = user['phone'] if not user['hidePhone'] else None
+            event['plateUmpireInfo']['email'] = user['email'] if not user['hideEmail'] else None
             event['plateUmpireInfo']['teams'] = user['teams']
             
         if event['field1Umpire'] == user['userId']:
@@ -65,8 +76,8 @@ def safeEvent(event, userList):
             event['field1UmpireInfo']['firstName'] = user['firstName']
             event['field1UmpireInfo']['lastName'] = user['lastName']
             event['field1UmpireInfo']['fLast'] = user['firstName'][0] + '. ' + user['lastName']
-            event['field1UmpireInfo']['phone'] = user['phone']
-            event['field1UmpireInfo']['email'] = user['email']
+            event['field1UmpireInfo']['phone'] = user['phone'] if not user['hidePhone'] else None
+            event['field1UmpireInfo']['email'] = user['email'] if not user['hideEmail'] else None
             event['field1UmpireInfo']['teams'] = user['teams']
             
         if event['fieldRequest'] == user['userId']:
@@ -74,8 +85,8 @@ def safeEvent(event, userList):
             event['fieldRequestInfo']['firstName'] = user['firstName']
             event['fieldRequestInfo']['lastName'] = user['lastName']
             event['fieldRequestInfo']['fLast'] = user['firstName'][0] + '. ' + user['lastName']
-            event['fieldRequestInfo']['phone'] = user['phone']
-            event['fieldRequestInfo']['email'] = user['email']
+            event['fieldRequestInfo']['phone'] = user['phone'] if not user['hidePhone'] else None
+            event['fieldRequestInfo']['email'] = user['email'] if not user['hideEmail'] else None
             event['fieldRequestInfo']['teams'] = user['teams']
         
     event.pop('plateUmpire')

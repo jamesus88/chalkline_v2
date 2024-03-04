@@ -73,6 +73,7 @@
                     <th>Status</th>
                     <th>Plate</th>
                     <th>Field</th>
+                    <th>Substitute&nbsp;<a href="#substituting">?</a></th>
                     <th>Remove</th>
                 </tr>
                 {% for event in eventList %}
@@ -98,6 +99,9 @@
                         {% endif %}
                     </td>
                     <td>
+                        <button class="schedule-action" type="submit" name="subGame" value="{{event._id}}">Substitute</button>
+                    </td>
+                    <td>
                         {% if event.editRules.removable %}
                         <button class="schedule-action" type="submit" name="removeGame" value="{{event._id}}" onclick="return confirm('Remove game?')">Remove</button>
                         {% else %}
@@ -110,6 +114,13 @@
             {% endif %}
         </section>
     </form>
+    <section id="substituting">
+        <h3>Substituting Games</h3>
+        <p>A game may be substitued with another umpire if a conflict arises. <br>Selecting <b>Subsitute</b>
+        will allow you to select another umpire and send them an email with the game information. <br> 
+        The recipient umpire may then accept the game, at which point it will be removed from your schedule.</p>
+        <p>For more info, see <a target="_blank" href="{{url_for('docs.umpire_substitutions')}}">Substituting Games</a></p>
+    </section>
 </main>
 
 <script>

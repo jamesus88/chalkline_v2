@@ -126,3 +126,11 @@ div.stack {
     flex-direction: column;
     row-gap: 3px;
 }
+button.disabled {
+    color: grey;
+    border-color: grey;
+}
+button.disabled:hover {
+    color: grey;
+    background-color: inherit;
+}

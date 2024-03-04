@@ -1,0 +1,44 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='docs/docs.css')}}">
+</head>
+
+{% extends "docs/doc-template.html" %}
+
+{% block subtitle %}Umpire Substitutions{% endblock subtitle %}
+
+{% block doc_content %}
+<main>
+    <center>
+        <h1>Substituting Games</h1>
+    </center>
+    <section class="text">
+        <p><b>Subsituting games allows umpires to remove games from their schedule when conflicts arise if and only if they find a viable replacement umpire.</b></p>
+        <h3>Go to <a target="_blank" href="{{url_for('umpire.assignments')}}">My Games</a></h3>
+    </section>
+    <section class="text">
+        <h3>Requesting a Substitute</h3>
+        <ul>
+            <li>Locate the game you wish to substitute under the <a target="_blank" href="{{url_for('umpire.assignments')}}">My Games</a> page.</li>
+            <li>Select <b>Substitute</b> on the right-hand side.</li>
+            <li>Select the umpire you want to request as a substitute for your game.</li>
+            <li>Select <b>Send Request</b>.</li>
+            <li><b>Note: You will receive an error message if</b></li>
+            <ul>
+                <li>the umpire selected does not have permission to accept your position</li>
+                <li>the umpire selected already has a game at the requested time</li>
+                <li>another substitution has already been requested for this game (including other umpires)</li>
+            </ul>
+        </ul>
+    </section>
+    <section class="text">
+        <h3>Receiving a Substitution Request</h3>
+        <ul>
+            <li>If another has requested you to fill their position, you will receive an email from Chalkline.</li>
+            <li>Check your email and locate the request.</li>
+            <li>Follow the link in the email labeled <b>View Request</b>.</li>
+            <li>View the game information and select either <b>Accept</b> or <b>Decline</b>.</li>
+            <li>If accepted, the position will transfer to you and the game will now show under the <a target="_blank" href="{{url_for('umpire.assignments')}}">My Games</a> page.</li>
+        </ul>
+    </section>
+</main>
+{% endblock doc_content %}
