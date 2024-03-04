@@ -70,7 +70,7 @@ def daily_reminders():
 @invite.route('/sub-request/<eventId>')
 @invite.route('/sub-request/<eventId>/<code>')
 @invite.route('/sub-request/<eventId>/<code>/<pos>', methods=['POST', 'GET'])
-def sub_request(eventId: None|str=None, code: None|str=None, pos: None|str = None):
+def sub_request(eventId=None, code=None, pos=None):
     user = srv.getUser()
     if user is None:
         session['next-url'] = request.path
