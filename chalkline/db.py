@@ -344,7 +344,7 @@ def substituteUmpire(user, event, sub):
     
     msg = send_mail.ChalklineEmail(
         subject=f"New Substitute Request from {user['firstName'][0]}. {user['lastName']}",
-        recipients=['aidan.hurwitz88@gmail.com'],
+        recipients=[sub['email']],
         html=render_template('emails/substitute-req.html', user=user, event=event, pos=pos, code=code)
     )
     send_mail.sendMail(msg)

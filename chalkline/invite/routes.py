@@ -120,7 +120,7 @@ def sub_request(eventId: None|str=None, code: None|str=None, pos: None|str = Non
                     db.removeSubCode(eventId)
                     email = send_mail.ChalklineEmail(
                         subject="Substitution Request Accepted!",
-                        recipients=['aidan.hurwitz88@gmail.com'],
+                        recipients=[old_umpire['email']],
                         html=render_template("emails/shift-fulfilled.html", event=event, team=pos[0])
                     )
                     send_mail.sendMail(email)
@@ -130,8 +130,6 @@ def sub_request(eventId: None|str=None, code: None|str=None, pos: None|str = Non
             db.removeSubCode(eventId)
             return redirect(url_for('main.home'))
             
-            
-    # correct code and event
     userList = db.getUserList()
     return render_template("umpire/substitute.html", user=user, event=srv.safeEvent(event, userList), pos=pos, msg=msg)
     
