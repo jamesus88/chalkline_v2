@@ -38,7 +38,6 @@ def safeUser(user, session_user={}):
     user.pop('hideEmail')
     user.pop('hidePhone')
     user.pop('sms-gateway')
-    user.pop('teams')
     user.pop('permissionSet')
     user.pop('last_attempt', None)
     user.pop('phoneNotifications', None)
