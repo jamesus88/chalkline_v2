@@ -148,6 +148,7 @@ def announcement():
         if request.form.get('updateStatus'):
             if request.form.get('sendStatusAlert'): sendAlert = True
             else: sendAlert = False
+            print(sendAlert)
             venue = request.form['updateStatus']
             msg = db.updateFieldStatus(venue, request.form['fieldStatus'], sendAlert)
             

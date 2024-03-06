@@ -532,6 +532,8 @@ def updateFieldStatus(venueId, status, sendAlert=True):
                 html=render_template("emails/field-status.html", venue=venue['name'], status=status)
             )
             msgList.append(msg)
+            
+        send_mail.sendBulkMail(msgList)
 
     return f"{venue['name']} field status updated."    
 
