@@ -1,4 +1,4 @@
-runtime: python39
+runtime: python312
 entrypoint: gunicorn -b :$PORT app:app --timeout 120
 instance_class: F1
 automatic_scaling:

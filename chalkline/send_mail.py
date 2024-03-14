@@ -2,7 +2,7 @@ from flask_mail import Message
 from chalkline import mail
 from flask import copy_current_request_context
 from threading import Thread
-import time
+
 MAIL_SENDER = 'Chalkline Baseball'
 
 class ChalklineEmail(Message):

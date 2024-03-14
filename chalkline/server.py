@@ -1,5 +1,5 @@
 from flask import session, render_template
-import datetime, time
+import datetime
 import chalkline.send_mail as send_mail
 
 SHARE_LINK = "https://chalklinebaseball.com/"
@@ -23,7 +23,7 @@ def todaysDate(padding_hrs=0):
     #### padding_hrs: int x -> adds x hrs to EST
     ex: todaysDate(2) = right now + 2 hours into the future.
     '''
-    now = datetime.datetime.utcnow() + datetime.timedelta(hours=-5) + datetime.timedelta(hours=padding_hrs)
+    now = datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=-5) + datetime.timedelta(hours=padding_hrs)
     return now
 
 def safeUser(user, session_user={}):

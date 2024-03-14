@@ -148,7 +148,6 @@ def announcement():
         if request.form.get('updateStatus'):
             if request.form.get('sendStatusAlert'): sendAlert = True
             else: sendAlert = False
-            print(sendAlert)
             venue = request.form['updateStatus']
             msg = db.updateFieldStatus(venue, request.form['fieldStatus'], sendAlert)
             
@@ -192,9 +191,8 @@ def announcement():
                 print('html uploaded')
                 message = request.files['file'].read()
             else:
-                print('custom message')
+                print('custom message:', text)
                 message = render_template("emails/announcement.html", user=user, message=text)
-            print(message)
             if len(userList) < 1:
                 msg = "Error: no recipients found."
             elif 'email' not in request.form.keys() and 'phone' not in request.form.keys():

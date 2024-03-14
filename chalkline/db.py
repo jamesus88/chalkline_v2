@@ -4,8 +4,9 @@ import chalkline.send_mail as send_mail
 from flask import render_template
 from random import randint
 from werkzeug.security import generate_password_hash, check_password_hash
+import certifi
 
-client = pymongo.MongoClient(os.environ.get('PYMONGO_CLIENT'), connect=False)
+client = pymongo.MongoClient(os.environ.get('PYMONGO_CLIENT'), connect=False,  tlsCAFile=certifi.where())
 db = client['chalkline']
 
 eventData = db['eventData']
