@@ -23,8 +23,8 @@ def todaysDate(padding_hrs=0):
     #### padding_hrs: int x -> adds x hrs to EST
     ex: todaysDate(2) = right now + 2 hours into the future.
     '''
-    now = datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=-5) + datetime.timedelta(hours=padding_hrs)
-    return now
+    now = datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=-4) + datetime.timedelta(hours=padding_hrs)
+    return now.replace(tzinfo=None)
 
 def safeUser(user, session_user={}):
     user['_id'] = str(user['_id'])

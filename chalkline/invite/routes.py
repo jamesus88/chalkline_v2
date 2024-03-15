@@ -68,9 +68,8 @@ def daily_reminders():
 
 @invite.route('/sub-request')
 @invite.route('/sub-request/<eventId>')
-@invite.route('/sub-request/<eventId>/<code>')
-@invite.route('/sub-request/<eventId>/<code>/<pos>', methods=['POST', 'GET'])
-def sub_request(eventId=None, code=None, pos=None):
+@invite.route('/sub-request/<eventId>/<code>', methods=['POST', 'GET'])
+def sub_request(eventId=None, code=None):
     user = srv.getUser()
     if user is None:
         session['next-url'] = request.path
@@ -78,7 +77,7 @@ def sub_request(eventId=None, code=None, pos=None):
     elif 'umpire' not in user['role'] and 'youth' not in user['role']:
         raise PermissionError("Error: You are not authorized to umpire games")
     
-    if not(eventId and code and pos):
+    if not(eventId and code):
         raise Exception("Pre-condition failure: missing url parameters")
     
     event = db.getEventInfo(eventId)
@@ -88,7 +87,7 @@ def sub_request(eventId=None, code=None, pos=None):
     if event['eventDate'] < srv.todaysDate():
         raise Exception("Error: cannot edit past events.")
     
-    if not code.isdigit() or not pos.isdigit():
+    if not code.isdigit():
         raise Exception("Error: invalid parameters.")
 
     if 'sub-code' not in event:
@@ -97,9 +96,9 @@ def sub_request(eventId=None, code=None, pos=None):
     if int(code) != event['sub-code']:
         raise PermissionError("Error: invalid sub-code")
     
-    if pos == '0':
+    if str(code)[-1] == '0':
         pos = ('Plate Umpire', 0)
-    elif pos == '1':
+    elif str(code)[-1] == '1':
         pos = ('Field Umpire', 1)
     else:
         raise Exception("Error: invalid position")

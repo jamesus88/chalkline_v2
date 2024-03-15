@@ -48,7 +48,8 @@ def appendPermissions(user):
     
     return user
 
-def getUserList(criteria={}, safe=False):
+def getUserList(criteria={}, safe=False, active=True):
+    if active: criteria['active'] = True
     if safe:
         return [server.safeUser(user) for user in userData.find(criteria).sort('lastName', pymongo.ASCENDING)]
     
@@ -339,16 +340,18 @@ def substituteUmpire(user, event, sub):
         return "Error: substitute umpire is already registered for a game at this time."
     
     pos = ('Plate Umpire', 0) if isPlate else ('Field Umpire', 1)
-    code = randint(0, 99999999)
+    code = randint(0, 99999999) * 10 + pos[1]
     
     eventData.update_one({'_id': event['_id']}, {'$set': {'sub-code': code}})
     
     msg = send_mail.ChalklineEmail(
         subject=f"New Substitute Request from {user['firstName'][0]}. {user['lastName']}",
         recipients=[sub['email']],
-        html=render_template('emails/substitute-req.html', user=user, event=event, pos=pos, code=code)
+        html=render_template('emails/substitute-req.html', user=user, event=event, code=code, pos=pos)
     )
     send_mail.sendMail(msg)
+
+    print(f"Sub Request: {pos[0]} {sub['userId']} for {user['userId']} ({str(event['_id'])})")
     
     return f"Successfully requested {sub['firstName'][0]}. {sub['lastName']} to sub-in as {pos[0]}!"
     

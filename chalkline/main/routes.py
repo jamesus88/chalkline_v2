@@ -6,6 +6,7 @@ main = Blueprint('main', __name__)
 @main.route("/")
 @main.route("/home")
 def home():
+    print(srv.todaysDate())
     user = srv.getUser()
     return render_template("main/home.html", user=user)
 
