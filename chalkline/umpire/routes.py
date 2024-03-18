@@ -27,7 +27,6 @@ def schedule():
     userList = db.getUserList()
     eventList = get_events.getEventList(eventFilter, userList=userList, add_criteria={'eventType': 'Game'})
     
-    
     return render_template('umpire/schedule.html', user=srv.safeUser(user), eventList=eventList, eventFilter=eventFilter.asdict(), msg=msg)
 
 @umpire.route('/assignments', methods=['GET', 'POST'])

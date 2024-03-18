@@ -12,4 +12,23 @@ function colorifySchedule(tbl) {
         }
     }
 }
+
+function loadMore(tbl, page, limit) {
+    for (let i = 0; i < tbl.rows.length; i++) {
+        tbl.rows[i].style.display = "";
+    }
+
+    let count = tbl.rows.length - 1;
+    if (count < limit * page) {
+        return 0
+    }
+
+    while (count > (limit * page)) {
+        tbl.rows[count].style.display = "none";
+        count--
+    }
+
+    return page
+}
+
 console.log('schedule.js loaded')

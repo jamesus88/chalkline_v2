@@ -129,6 +129,7 @@ div.stack {
 button.disabled {
     color: grey;
     border-color: grey;
+    background-color: inherit;
 }
 button.disabled:hover {
     color: grey;

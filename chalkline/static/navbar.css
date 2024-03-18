@@ -95,7 +95,7 @@ footer > p {
 #title {
     font-size: 15pt;
 }
-@media screen and (max-width: 850px) {
+@media screen and (max-width: 900px) {
     .topnav a:not(#menu-title, .menu-bars, .sign-in), .dropdown .dropdown-button {
         display: none;
     }
@@ -104,7 +104,7 @@ footer > p {
         display: block;
     }
 }
-@media screen and (max-width: 850px) {
+@media screen and (max-width: 900px) {
     .topnav.responsive {position: relative;}
     .topnav.responsive a.menu-bars {
         position: absolute;

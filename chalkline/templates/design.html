@@ -7,12 +7,12 @@
     <link rel="stylesheet" href="{{url_for('static', filename='design.css')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='navbar.css')}}">
     <link rel="shortcut icon" href="{{url_for('static', filename='chalkline-icon.png')}}" type="image/x-icon">
-    <title>Chalkline | {% block title %}{% endblock title %}</title>
+    <title>Chalkline Baseball | {% block title %}{% endblock title %}</title>
 </head>
 
 <div id="html-container">
     <nav id="main-navbar" class="topnav">
-        <a id="menu-title" href="{{url_for('main.home')}}"><b id="title">Chalkline</b></a>
+        <a id="menu-title" href="{{url_for('main.home')}}"><b id="title">Chalkline Baseball</b>&trade;</a>
 
             {% if user is not none %}
 
@@ -72,7 +72,7 @@
 
             {% endif %}
 
-        <a href="{{url_for('main.about')}}">About</a>
+        <a href="{{url_for('main.home', _anchor='about')}}">About</a>
         
         <div class="nav-right">
             {% if user is none %}
@@ -97,7 +97,7 @@
     
     <footer>
         <p>Created and Maintained by Aidan Hurwitz</p>
-        <p>Chalkline&trade; v4.10.3</p>
+        <p>Chalkline Baseball&trade; v4.10.3</p>
         <p>Copyright &copy; 2023 - 2024 Aidan Hurwitz</p>
     </footer>
 

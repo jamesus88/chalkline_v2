@@ -146,11 +146,25 @@
                 {% endfor %}
             </table>
         </section>
+        <button id="load-more" type="button" class="action" onclick="load()">Load More</button>
     </form>
 </main>
 
 <script>
+    let page = 1
     let tbl = document.getElementById('schedule-table');
     colorifySchedule(tbl);
+    loadMore(tbl, page, 50);
+
+    function load() {
+        page = loadMore(tbl, page + 1, 50);
+        if (page == 0) {
+            let button = document.getElementById('load-more');
+            button.classList.add('disabled');
+            button.disabled = true;
+            button.innerHTML = "All Events Shown";
+        }
+    }
+    
 </script>
 {% endblock content %}

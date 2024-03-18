@@ -1,5 +1,5 @@
 from flask import session, render_template
-import datetime
+import datetime, os
 import chalkline.send_mail as send_mail
 
 SHARE_LINK = "https://chalklinebaseball.com/"
@@ -172,4 +172,10 @@ def sendReminders(eventList, userList, shiftList = None):
     
     return "Successfully sent daily reminders", 200
         
-    
+def getPageObject(**kwargs):
+    obj = {}
+    obj['app'] = 'Chalkline'
+    obj['copyright'] = os.environ.get('COPYRIGHT')
+    obj['version'] = os.environ.get('VERSION')
+    obj.update(kwargs)
+    return obj
