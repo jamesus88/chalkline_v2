@@ -334,3 +334,16 @@ def add_equipment():
             if msg is None:
                 return redirect(url_for('admin.rental_data'))
     return render_template('admin/add-rental.html', user=user, msg=msg)
+
+@admin.route("/users", methods=['GET', 'POST'])
+def users():
+    user = srv.getUser()
+    if user is None:
+        session['next-page'] = 'admin.users'
+        return redirect(url_for('main.login'))
+    if 'admin' not in user['role']:
+        return redirect(url_for('main.home'))
+    
+    msg = ''
+
+    
