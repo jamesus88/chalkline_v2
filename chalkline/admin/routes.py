@@ -335,15 +335,34 @@ def add_equipment():
                 return redirect(url_for('admin.rental_data'))
     return render_template('admin/add-rental.html', user=user, msg=msg)
 
-@admin.route("/users", methods=['GET', 'POST'])
-def users():
+@admin.route("/user-data", methods=['GET', 'POST'])
+def user_data():
     user = srv.getUser()
     if user is None:
-        session['next-page'] = 'admin.users'
+        session['next-page'] = 'admin.user_data'
         return redirect(url_for('main.login'))
     if 'admin' not in user['role']:
         return redirect(url_for('main.home'))
     
     msg = ''
+    userFilter = {'active': True}
 
-    
+    if request.method == 'POST':
+        if request.form.get('updateFilter'):
+            if request.form['active'] == 'undefined':
+                userFilter.pop('active')
+            if request.form['role'] != 'undefined':
+                userFilter['role'] = request.form['role']
+        
+        if request.form.get('updateUser'):
+            user_id = request.form['updateUser']
+            priority = True if request.form[f'priority_{user_id}'] == 'True' else False
+            canRemoveGame = True if request.form[f'canRemoveGame_{user_id}'] == 'True' else False
+            active = True if request.form[f'active_{user_id}'] == 'True' else False
+            msg = admin_db.updateUser(user, user_id, {'priority': priority, 'canRemoveGame': canRemoveGame, 'active': active})
+
+        elif request.form.get('manageUser'):
+            return redirect(url_for('view_info.user', user_id=request.form['manageUser']))
+
+    userList = db.getUserList(criteria=userFilter, safe=True, active=False)
+    return render_template("admin/user-data.html", user=user, userList=userList, userFilter=userFilter, msg=msg)

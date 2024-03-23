@@ -1,5 +1,6 @@
 from flask import render_template, redirect, url_for, session, request, Blueprint
 from chalkline import db
+from chalkline.admin import admin_db
 from chalkline import server as srv
 view_info = Blueprint('view_info', __name__)
 
@@ -35,7 +36,7 @@ def event(eventId):
     
     return render_template("view_info/event.html", user=user, event=event, teamsList=teamsList, userList=userList, msg=msg, smsg=smsg)
 
-@view_info.route("/user/<user_id>")
+@view_info.route("/user/<user_id>", methods=['GET', 'POST'])
 def user(user_id=None):
     user = srv.getUser()
     if user is None:
@@ -45,5 +46,35 @@ def user(user_id=None):
         return redirect(url_for('main.home'))
     
     view_user = srv.safeUser(db.getUser(_id=user_id))
-    
-    return render_template("view_info/user.html", user=user, view_user=view_user)
+    msg = ''
+
+    if request.method == 'POST':
+        if 'admin' not in user['role']:
+            raise PermissionError('Error: admin credentials required.')
+
+        if request.form.get('permissionSet'):
+            ps = request.form['permissionSet']
+            view_user['permissionSet'] = ps
+            msg = admin_db.updateUser(user, user_id, {'permissionSet': ps})
+
+        elif request.form.get('addRole'):
+            role = request.form['addRole']
+            if role in view_user['role']:
+                msg = 'Error: user already has that role.'
+            else:
+                user_roles = view_user['role']
+                user_roles.append(role)
+                view_user['role'] = user_roles
+                msg = admin_db.updateUser(user, user_id, {'role': user_roles})
+
+        elif request.form.get('removeRole'):
+            role = request.form['removeRole']
+            if role not in view_user['role']:
+                msg = 'Error: user does not have that role.'
+            else:
+                user_roles = view_user['role']
+                user_roles.remove(role)
+                view_user['role'] = user_roles
+                msg = admin_db.updateUser(user, user_id, {'role': user_roles})
+
+    return render_template("view_info/user.html", user=user, view_user=view_user, msg=msg)

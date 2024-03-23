@@ -25,6 +25,84 @@
             <h3>Roles: {{view_user.role|join(', ')}}</h3>
         </center>
     </section>
+    {% if 'admin' in user.role %}
+    <center>
+        <p class="urgent">Admin Actions</p>
+    </center>
+    <section>
+        <center>
+            <h2>Umpire Permissions</h2>
+            <form method="post">
+                <label for="permissionSet">Umpire Permission Type: </label>
+                <select name="permissionSet" id="permissionSet" required onchange="updateForm()">
+                    <option value="U0">Umpire (any slot)</option>
+                    <option value="Y0">Youth (AA - MAJ field)</option>
+                    <option value="Y3">Youth (any field)</option>
+                    <option value="Y1">Youth (AA - AAA plate, any field)</option>
+                    <option value="Y2">Youth (AA - MAJ plate, any field)</option>
+                    <option value="C0">Coach (none)</option>
+                </select><br><br>
+                <button id="submitPermission" class="action" type="submit">Update</button>
+            </form>
+        </center>
+    </section>
+    <section>
+        <center>
+            <h2>Add Role</h2>
+            <form method="post">
+                <label for="addRole">Add Role: </label>
+                <select name="addRole" id="addRole" required>
+                    <option value="" selected disabled>Select</option>
+                    <option value="umpire">Umpire</option>
+                    <option value="youth">Youth Umpire</option>
+                    <option value="coach">Coach</option>
+                    <option value="parent">Parent</option>
+                    <option value="board">Director</option>
+                </select><br><br>
+                <button class="action" type="submit">Add</button>
+            </form>
+        </center>
+    </section>
+    <section>
+        <center>
+            <h2>Remove Role</h2>
+            <form method="post">
+                <label for="removeRole">Remove Role: </label>
+                <select name="removeRole" id="removeRole" required>
+                    <option value="" selected disabled>Select</option>
+                    <option value="umpire">Umpire</option>
+                    <option value="youth">Youth Umpire</option>
+                    <option value="coach">Coach</option>
+                    <option value="parent">Parent</option>
+                    <option value="board">Director</option>
+                </select><br><br>
+                <button class="action" type="submit">Remove</button>
+            </form>
+        </center>
+    </section>
+    {% endif %}
 </main>
+
+<script>
+    let permission = "{{view_user.permissionSet}}";
+    let permissionSelect = document.getElementById('permissionSet');
+    let submit = document.getElementById('submitPermission');
+
+    permissionSelect.value = permission;
+
+    function updateForm() {
+        if (permission == permissionSelect.value) {
+            submit.disabled = true;
+            submit.classList.add('disabled');
+        }
+        else {
+            submit.disabled = false;
+            submit.classList.remove('disabled');
+        }
+    }
+
+    updateForm()
+
+</script>
 
 {% endblock content %}

@@ -1,4 +1,5 @@
 from chalkline.db import userData, eventData, rentalData
+from bson import ObjectId
 
 def openFreeDrop(criteria={}):
     criteria['eventType'] = 'Game'
@@ -69,3 +70,11 @@ def addRental(user, form):
     rentalData.insert_one(form)
     print(f"Rental Added: {user['userId']} added {form['name']}")
     return None
+
+def updateUser(user, target_id, update):
+    if 'admin' not in user['role']:
+        raise PermissionError('Error: admin credentials required')
+    
+    target = userData.find_one_and_update({'_id': ObjectId(target_id)}, {'$set': update})
+    print(f'User Updated: {target['userId']} by {user['userId']}')
+    return f"Successfully updated {target['firstName'][0]}. {target['lastName']}"
