@@ -11,7 +11,7 @@
         <h1>Profile</h1>
         <h3>Need Help? Check the <a href="{{url_for('docs.profile')}}">Docs</a>. Or <a href="{{url_for('main.home')}}">Return Home</a>.</h3>
         <h4></h4>
-        <h3 class='error'>{{msg}}</h3>
+        <h3 class='error'>{{sobj.msg}}</h3>
 
         {% if 'coach' in user.role or 'parent' in user.role %}
         <section>
@@ -117,6 +117,45 @@
             </form>
         </section>
         <section>
+            <form method="post" id="leagues">
+                <h3>My Leagues</h3>
+                <table id="leagues" class="center">
+                        <tr>
+                            <th>League</th>
+                            <th>Remove</th>
+                        </tr>
+                        {% for loc in user.locations %}
+                        <tr>
+                            <td>{{loc}}</td>
+                            <td><button id="removeLoc" name="removeLoc" value="{{loc}}" 
+                                {% if user.locations|length == 1 %}
+                                class="action disabled"
+                                disabled
+                                {% else %}
+                                class="action"
+                                {% endif %}
+                                >Remove</button></td>
+                        </tr>
+                        {% endfor %}
+                </table>
+                {% if user.locations|length < 1 %}
+                <p class="error">No leagues found for this account.</p>
+                {% endif %}
+            </form>
+
+            <h3>Add League</h3>
+
+            <form method="post">
+                <table class="center">
+                    <tr>
+                        <td><label for="newLoc">Add League Code</label></td>
+                        <td><input type="text" id="newLod" name="newLoc" placeholder="Code" required></td>
+                    </tr>
+                </table>
+                <button class="action" type="submit" name="addLoc" value="addLoc">Add League</button>
+            </form>
+        </section>
+        <section>
             <h3>Session</h3>
             <form method="post" id="logout">
                 {% if admin_features is not none %}
@@ -134,8 +173,20 @@
                     </script>
                 {% endif %}
 
-                <button class="action" type="submit" name="logout" value="logout"><b>Sign Out</b></button>
+                <label for="location">Location: </label>
+                <select name="location" id="location" onchange="this.form.submit()">
+                    {% for loc in user.locations %}
+                    <option value="{{loc}}">{{loc}}</option>
+                    {% endfor %}
+                </select>
+                <script>
+                    document.getElementById('location').value = "{{sobj.location}}";
+                </script>
+
             </form>
+        </section>
+        <section>
+            <form method="post"><button class="action" type="submit" name="logout" value="logout"><b>Sign Out</b></button></form>
         </section>
     </center>
 </main>

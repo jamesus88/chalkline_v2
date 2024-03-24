@@ -58,7 +58,7 @@
                 }
             </script>
         </section>
-        <p class="error">{{msg}}</p>
+        <p class="error">{{sobj.msg}}</p>
         <section class="schedule-section scrollwrapper">
             {% if eventList|length < 1 %}
             <h3 class="error">You have no upcoming games. Add games on the <a href="{{url_for('umpire.schedule')}}">Umpire Schedule</a></h3>

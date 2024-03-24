@@ -48,8 +48,10 @@ def appendPermissions(user):
     
     return user
 
-def getUserList(criteria={}, safe=False, active=True):
+def getUserList(location, criteria={}, safe=False, active=True):
+    search = {'locations': {'$in': [location]}}
     if active: criteria['active'] = True
+    criteria = {'$and': [search, criteria]}
     if safe:
         return [server.safeUser(user) for user in userData.find(criteria).sort('lastName', pymongo.ASCENDING)]
     
@@ -68,7 +70,7 @@ def checkDuplicateUser(newUser):
 def createUser(form):
     response = {
         'newUser': {
-          "location": form['location'],
+          "locations": [form['location']],
           "firstName": form['firstName'].title().strip(),
           "lastName": form['lastName'].title().strip(),
           "userId": form['email'].strip().lower(),
@@ -168,7 +170,8 @@ def getTeamsFromUser(teamCodes):
     
     return teamsList
 
-def getTeams(criteria={}):
+def getTeams(location, criteria={}):
+    criteria['location'] = location
     teams = teamData.find(criteria)
 
     teamsList = []
@@ -363,7 +366,7 @@ def getEventInfo(eventId, add_criteria={}):
     add_criteria['_id'] = bson.ObjectId(eventId)
     return eventData.find_one(add_criteria)
 
-def updateEvent(_user, event, form, userList, editRules=False, editContacts=False, ignoreDate=False):
+def updateEvent(location, _user, event, form, userList, editRules=False, editContacts=False, ignoreDate=False):
     if 'admin' not in _user['role']:
         return "Error: You do not have permission to edit events."
     
@@ -422,7 +425,7 @@ def updateEvent(_user, event, form, userList, editRules=False, editContacts=Fals
             different_keys.append(key)
             
     if any(key in different_keys for key in ['eventDate', 'eventVenue', 'eventField', 'status']):
-        server.alertUsersOfEvent(old_game, new_game, getUserList())
+        server.alertUsersOfEvent(old_game, new_game, getUserList(location))
             
     print(f"Event updated: {event['_id']} by {_user['userId']}")
     return 'Successfully updated event.'
@@ -437,10 +440,10 @@ def deleteEvent(user, eventId, ignoreDate=False):
     else:
         return "Error: cannot edit past events"
     
-def addEvent(user, form):
+def addEvent(location, user, form):
     writable = {
         'eventType': form['eventType'],
-        'eventLocation': user['location'],
+        'eventLocation': location,
         'eventVenue': form['eventVenue'],
         'eventDate': datetime.datetime.strptime(form['eventDate'], "%Y-%m-%dT%H:%M"),
         'eventAgeGroup': form['eventAgeGroup'],
@@ -505,10 +508,10 @@ def deleteTeam(user, teamId):
     print(f"Team Deleted: {teamId} by {user['userId']}")
     return f"Successfully deleted {teamId}"
 
-def addTeam(user, form):
+def addTeam(location, user, form):
     writable = {
         'teamId': form['codePrefix'] + form['codeNum'],
-        'location': user['location'],
+        'location': location,
         'teamName': form['teamName'],
         'teamAgeGroup': form['teamAgeGroup'],
         'wins': 0,
@@ -526,7 +529,7 @@ def addTeam(user, form):
 def updateFieldStatus(venueId, status, sendAlert=True):
     venue = venueData.find_one_and_update({'venueId': venueId}, {'$set': {'status': status}})
     if sendAlert:
-        emailUsers = getUserList({'emailNotifications': True})
+        emailUsers = getUserList(venue['location'], {'emailNotifications': True})
         emailList = server.createEmailList(emailUsers)
         msgList = []
         for user in emailList:
@@ -571,13 +574,13 @@ def sendPasswordReset(email):
     send_mail.sendMail(message)
     return f"Password Reset email sent to {email}"
 
-def getRentalList(teamId=None, admin=False):
+def getRentalList(location, teamId=None, admin=False):
     if admin:
-        rentals = rentalData.find({})
+        rentals = rentalData.find({'location': location})
     else:
         team = teamData.find_one({'teamId': teamId})
         ageGroup = team['teamAgeGroup']
-        rentals = rentalData.find({'active': True, 'ageGroups': ageGroup})
+        rentals = rentalData.find({'active': True, 'ageGroups': ageGroup, 'location': location})
         
     rentalList = []
     for item in rentals:

@@ -31,10 +31,10 @@ def schedule():
             msg = db.removeRequest(user, gameId)
             
             
-    userList = db.getUserList()
-    eventList = get_events.getEventList(eventFilter, userList=userList)
-    
-    return render_template('teams/schedule.html', user=srv.safeUser(user), eventList=eventList, eventFilter=eventFilter.asdict(), msg=msg)
+    userList = db.getUserList(session['location'])
+    eventList = get_events.getEventList(session['location'], eventFilter, userList=userList)
+    sobj=srv.getSessionObj(session, msg=msg)
+    return render_template('teams/schedule.html', user=srv.safeUser(user), eventList=eventList, eventFilter=eventFilter.asdict(), sobj=sobj)
 
 @teams.route("/info", methods=['GET', 'POST'])
 def info():
@@ -55,11 +55,12 @@ def info():
     if request.method == 'POST':
         teamId = request.form.get('teamId')
     
-    team = db.getTeams({'teamId': teamId})[0]
-    teamContacts = [srv.safeUser(contact, user) for contact in db.getUserList({'teams': teamId})]
+    team = db.getTeams(session['location'], {'teamId': teamId})[0]
+    teamContacts = [srv.safeUser(contact, user) for contact in db.getUserList(session['location'], {'teams': teamId})]
     link = srv.SHARE_LINK + f"invite/add-team/{teamId}"
     
-    return render_template("teams/info.html", user=user, team=team, msg=msg, teamContacts=teamContacts, link=link)
+    sobj=srv.getSessionObj(session, msg=msg)
+    return render_template("teams/info.html", user=user, team=team, sobj=sobj, teamContacts=teamContacts, link=link)
     
 @teams.route("/rentals", methods=['GET', 'POST'])
 def rentals():
@@ -91,8 +92,9 @@ def rentals():
             msg = db.returnRental(user, eventId)
             
     
-    userList = db.getUserList()
-    eventList = get_events.getEventList(eventFilter, userList=userList)
-    rentalList = db.getRentalList(eventFilter.teamId)
-    return render_template("teams/rentals.html", user=user, eventList=eventList, rentalList=rentalList, eventFilter=eventFilter.asdict(), msg=msg)
-    
+    userList = db.getUserList(session['location'])
+    eventList = get_events.getEventList(session['location'], eventFilter, userList=userList)
+    rentalList = db.getRentalList(session['location'], eventFilter.teamId)
+
+    sobj=srv.getSessionObj(session, msg=msg)
+    return render_template("teams/rentals.html", user=user, eventList=eventList, rentalList=rentalList, eventFilter=eventFilter.asdict(), sobj=sobj)

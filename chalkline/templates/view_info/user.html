@@ -10,7 +10,7 @@
 <main>
     <center>
         <h1>View User</h1>
-        <h4 class='error'>{{msg}}</h4>
+        <h4 class='error'>{{sobj.msg}}</h4>
     </center>
     <section>
         <center>
@@ -23,6 +23,7 @@
         <center>
             <h3>Teams: {{view_user.teams|join(', ')}}</h3>
             <h3>Roles: {{view_user.role|join(', ')}}</h3>
+            <h3>Leagues: {{view_user.locations|join(', ')}}</h3>
         </center>
     </section>
     {% if 'admin' in user.role %}
@@ -80,7 +81,17 @@
             </form>
         </center>
     </section>
+    {% if sobj.location in view_user.locations %}
+    <section>
+        <form method="post">
+            <center>
+                <h2 class="error">Remove From League</h2>
+                <button name="removeLoc" value="removeLoc" type="submit" class="action" style="background-color: red;" onclick="return confirm('Remove this user from your league? This cannot be undone!')">Remove</button>
+            </center>
+        </form>
+    </section>
     {% endif %}
+{% endif %}
 </main>
 
 <script>

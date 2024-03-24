@@ -16,7 +16,7 @@
             <h3><a href="{{url_for('admin.add_equipment')}}">Add Equipment</a></h3>
         </div>
     </section>
-    <h3 class="error">{{msg}}</h3>
+    <h3 class="error">{{sobj.msg}}</h3>
 <form method="post">
     <section class="schedule-section scrollwrapper">
         {% if rentalList|length < 1 %}

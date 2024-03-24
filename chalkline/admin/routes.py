@@ -16,8 +16,8 @@ def event_data():
     
     eventFilter = get_events.EventFilter({'admin': True})
 
-    allTeams = db.getTeams()
-    userList = db.getUserList()
+    allTeams = db.getTeams(session['location'])
+    userList = db.getUserList(session['location'])
     msg = ''
     
     if request.method == 'POST':
@@ -32,7 +32,7 @@ def event_data():
                 if f'_{eventId}' in key:
                     form[key.removesuffix(f"_{eventId}")] = value
             
-            msg = db.updateEvent(user, this_event, form, userList)
+            msg = db.updateEvent(session['location'], user, this_event, form, userList)
             
         elif request.form.get('deleteEvent'):
             eventId = request.form['deleteEvent']
@@ -53,9 +53,10 @@ def event_data():
         elif request.form.get('updateMisc'):
             msg = admin_db.updateMisc()
 
-    eventList = get_events.getEventList(eventFilter)
+    eventList = get_events.getEventList(session['location'], eventFilter)
+    sobj=srv.getSessionObj(session, msg=msg)
     
-    return render_template('admin/event-data.html', user=srv.safeUser(user),eventFilter=eventFilter.asdict(), eventList=eventList, allTeams=allTeams, msg=msg)
+    return render_template('admin/event-data.html', user=srv.safeUser(user),eventFilter=eventFilter.asdict(), eventList=eventList, allTeams=allTeams, sobj=sobj)
 
 @admin.route("/add-event", methods=['GET', 'POST'])
 def add_event():
@@ -67,15 +68,16 @@ def add_event():
         return redirect(url_for('main.home'))
     
     msg = ''
-    teamsList = db.getTeams()
-    userList = db.getUserList()
+    teamsList = db.getTeams(session['location'])
+    userList = db.getUserList(session['location'])
     
     if request.method == 'POST':
-        msg = db.addEvent(user, request.form)
+        msg = db.addEvent(session['location'], user, request.form)
         if type(msg) != str:
             return redirect(url_for('admin.event_data'))
     
-    return render_template("admin/add-event.html", user=user, msg=msg, userList=userList, teamsList=teamsList)
+    sobj=srv.getSessionObj(session, msg=msg)
+    return render_template("admin/add-event.html", user=user, sobj=sobj, userList=userList, teamsList=teamsList)
 
 @admin.route("/team-data", methods=['GET', 'POST'])
 def team_data():
@@ -110,9 +112,10 @@ def team_data():
     if ageGroupFilter != 'None':
         criteria['teamAgeGroup'] = ageGroupFilter
         
-    teamsList = db.getTeams(criteria)
+    teamsList = db.getTeams(session['location'], criteria)
+    sobj=srv.getSessionObj(session, msg=msg)
     
-    return render_template("admin/team-data.html", user=user, teamsList=teamsList, ageGroupFilter=ageGroupFilter, msg=msg)
+    return render_template("admin/team-data.html", user=user, teamsList=teamsList, ageGroupFilter=ageGroupFilter, sobj=sobj)
     
 @admin.route("/add-team", methods=['GET', 'POST'])
 def add_team():
@@ -126,11 +129,12 @@ def add_team():
     msg = ''
     
     if request.method == 'POST':
-        msg = db.addTeam(user, request.form)
+        msg = db.addTeam(session['location'], user, request.form)
         if type(msg) != str:
             return redirect(url_for('admin.team_data'))
+    sobj=srv.getSessionObj(session, msg=msg)
     
-    return render_template("admin/add-team.html", user=user, msg=msg)
+    return render_template("admin/add-team.html", user=user, sobj=sobj)
 
 @admin.route("/announcement", methods=['GET', 'POST'])
 def announcement():
@@ -142,7 +146,7 @@ def announcement():
         return redirect(url_for('main.home'))
     
     msg = ''
-    allTeams = db.getTeams()
+    allTeams = db.getTeams(session['location'])
     
     if request.method == 'POST':
         if request.form.get('updateStatus'):
@@ -169,7 +173,7 @@ def announcement():
                 if request.form.get(team['teamId']):
                     teams.append(team['teamId'])
                     
-            users = list(db.getUserList())
+            users = list(db.getUserList(session['location']))
 
             userList = []
             for target in users:
@@ -217,9 +221,10 @@ def announcement():
 
                 msg = "Message Sent!"
     
-    venues = db.getVenues("Sarasota")
+    venues = db.getVenues(session['location'])
+    sobj=srv.getSessionObj(session, msg=msg)
     
-    return render_template('admin/announcement.html', user=user, msg=msg, allTeams=allTeams, venues=venues)
+    return render_template('admin/announcement.html', user=user, sobj=sobj, allTeams=allTeams, venues=venues)
 
 @admin.route("/dod-data", methods=['GET', 'POST'])
 def dod_data():
@@ -230,7 +235,7 @@ def dod_data():
     if 'admin' not in user['role']:
         return redirect(url_for('main.home'))
     
-    directorList = db.getUserList({'role': {'$in': ['board']}})
+    directorList = db.getUserList(session['location'], {'role': {'$in': ['board']}})
     hidePast = True
     msg = ''
     
@@ -251,9 +256,10 @@ def dod_data():
             shiftId = request.form['deleteShift']
             msg = director_db.deleteShift(shiftId)
             
-    shiftList = director_db.getShiftList(directorList, hidePast=hidePast)
+    shiftList = director_db.getShiftList(session['location'], directorList, hidePast=hidePast)
+    sobj=srv.getSessionObj(session, msg=msg)
     
-    return render_template('admin/dod-data.html', user=user, directorList=directorList, shiftList=shiftList, hidePast=hidePast, msg=msg)
+    return render_template('admin/dod-data.html', user=user, directorList=directorList, shiftList=shiftList, hidePast=hidePast, sobj=sobj)
     
 @admin.route("/add-shift", methods=['GET', 'POST'])
 def add_shift():
@@ -267,11 +273,12 @@ def add_shift():
     msg = ''
     
     if request.method == 'POST':
-        msg = director_db.addShift(user, request.form)
+        msg = director_db.addShift(session['location'], user, request.form)
         if type(msg) != str:
             return redirect(url_for('admin.dod_data'))
+    sobj=srv.getSessionObj(session, msg=msg)
     
-    return render_template('admin/add-shift.html', user=user, msg=msg)
+    return render_template('admin/add-shift.html', user=user, sobj=sobj)
 
 @admin.route('/rental-data', methods=['GET', 'POST'])
 def rental_data():
@@ -304,8 +311,10 @@ def rental_data():
             rentalName = request.form['deleteRental']
             msg = admin_db.deleteRental(user, rentalName)
 
-    rentalList = db.getRentalList(teamId='', admin=True)
-    return render_template('admin/rental-data.html', user=user, msg=msg, rentalList=rentalList)
+    rentalList = db.getRentalList(session['location'], teamId='', admin=True)
+    sobj=srv.getSessionObj(session, msg=msg)
+
+    return render_template('admin/rental-data.html', user=user, sobj=sobj, rentalList=rentalList)
 
 @admin.route('/add-equipment', methods=['GET', 'POST'])
 def add_equipment():
@@ -322,7 +331,7 @@ def add_equipment():
         
         if request.form.get('addRental'):
             form = {
-                'location': user['location'],
+                'location': session['location'],
                 'name': request.form['name'],
                 'desc': request.form['desc'],
                 'field': request.form['field'],
@@ -333,7 +342,9 @@ def add_equipment():
             msg = admin_db.addRental(user, form)
             if msg is None:
                 return redirect(url_for('admin.rental_data'))
-    return render_template('admin/add-rental.html', user=user, msg=msg)
+    
+    sobj=srv.getSessionObj(session, msg=msg)
+    return render_template('admin/add-rental.html', user=user, sobj=sobj)
 
 @admin.route("/user-data", methods=['GET', 'POST'])
 def user_data():
@@ -364,5 +375,7 @@ def user_data():
         elif request.form.get('manageUser'):
             return redirect(url_for('view_info.user', user_id=request.form['manageUser']))
 
-    userList = db.getUserList(criteria=userFilter, safe=True, active=False)
-    return render_template("admin/user-data.html", user=user, userList=userList, userFilter=userFilter, msg=msg)
+    userList = db.getUserList(session['location'], criteria=userFilter, safe=True, active=False)
+    sobj=srv.getSessionObj(session, msg=msg)
+
+    return render_template("admin/user-data.html", user=user, userList=userList, userFilter=userFilter, sobj=sobj)

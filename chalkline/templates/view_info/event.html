@@ -10,7 +10,7 @@
 <main>
     <center>
         <h1>View Event</h1>
-        <h4 class='error'>{{msg}}</h4>
+        <h4 class='error'>{{sobj.msg}}</h4>
     </center>
 
     {% if 'admin' not in user.role %}
@@ -44,7 +44,7 @@
                 
                 {% if smsg %}
                 <center>
-                    <h3 class="error">{{smsg}}</h3>
+                    <h3 class="error">{{sobj.smsg}}</h3>
                 </center>
                 {% endif %}
 

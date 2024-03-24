@@ -2,8 +2,8 @@ from chalkline.db import directorData
 from chalkline.server import safeUser, todaysDate
 import pymongo, bson, datetime
 
-def getShiftList(userList=[], add_criteria={}, hidePast=True):
-    criteria = [add_criteria]
+def getShiftList(location, userList=[], add_criteria={}, hidePast=True):
+    criteria = [add_criteria, {'location': location}]
     if hidePast:
         criteria.append({'endDateTime': {'$gte': todaysDate()}})
 
@@ -109,9 +109,9 @@ def deleteShift(shiftId):
     directorData.delete_one({'_id': bson.ObjectId(shiftId)})
     return "Deleted one shift"
     
-def addShift(user, form):
+def addShift(location, user, form):
     writable = {
-        'location': user['location'],
+        'location': location,
         'startDateTime': datetime.datetime.strptime(form['startDateTime'], "%Y-%m-%dT%H:%M"),
         'endDateTime': datetime.datetime.strptime(form['endDateTime'], "%Y-%m-%dT%H:%M"),
         'director': None

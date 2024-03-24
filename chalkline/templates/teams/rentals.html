@@ -62,7 +62,7 @@
                 }
             </script>
         </section>
-        {% if msg %}<h3 class="error">{{msg}}</h3>{% endif %}
+        {% if msg %}<h3 class="error">{{sobj.msg}}</h3>{% endif %}
         <section class="schedule-section scrollwrapper">
             {% if eventList|length < 1 %}
             <h3 class="error">No practices found.</h3>
@@ -134,7 +134,7 @@
         </section>
     </form>
     {% else %}
-    <h3 class='error'>Your account is linked to 0 teams in {{user.location}}. Add teams to your <a href="{{url_for('main.profile')}}">Profile</a> to view their unique schedules.</h3>
+    <h3 class='error'>Your account is linked to 0 teams in {{sobj.location}}. Add teams to your <a href="{{url_for('main.profile')}}">Profile</a> to view their unique schedules.</h3>
     {% endif %}
 </main>
 <script>

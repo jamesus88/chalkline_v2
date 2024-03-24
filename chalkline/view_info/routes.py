@@ -13,13 +13,13 @@ def event(eventId):
     
     msg = ''
     smsg = None
-    userList = db.getUserList()
-    teamsList = db.getTeams()
+    userList = db.getUserList(session['location'])
+    teamsList = db.getTeams(session['location'])
     
     if request.method == 'POST':
         this_event = db.getEventInfo(eventId)
         if request.form.get('updateEvent'):
-            msg = db.updateEvent(user, this_event, request.form, userList, editRules=True, editContacts=True)
+            msg = db.updateEvent(session['location'], user, this_event, request.form, userList, editRules=True, editContacts=True)
             
         elif request.form.get('subGame'):
             sub = db.getUser(request.form['sub'])
@@ -34,7 +34,8 @@ def event(eventId):
         
     userList = [srv.safeUser(x) for x in userList]
     
-    return render_template("view_info/event.html", user=user, event=event, teamsList=teamsList, userList=userList, msg=msg, smsg=smsg)
+    sobj=srv.getSessionObj(session, msg=msg, smsg=smsg)
+    return render_template("view_info/event.html", user=user, event=event, teamsList=teamsList, userList=userList, sobj=sobj)
 
 @view_info.route("/user/<user_id>", methods=['GET', 'POST'])
 def user(user_id=None):
@@ -77,4 +78,11 @@ def user(user_id=None):
                 view_user['role'] = user_roles
                 msg = admin_db.updateUser(user, user_id, {'role': user_roles})
 
-    return render_template("view_info/user.html", user=user, view_user=view_user, msg=msg)
+        elif request.form.get('removeLoc'):
+            user_leagues = view_user['locations']
+            user_leagues.remove(session['location'])
+            view_user['locations'] = user_leagues
+            msg = admin_db.updateUser(user, user_id, {'locations': user_leagues})
+
+    sobj=srv.getSessionObj(session, msg=msg)
+    return render_template("view_info/user.html", user=user, view_user=view_user, sobj=sobj)

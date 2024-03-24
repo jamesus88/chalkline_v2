@@ -7,7 +7,8 @@ main = Blueprint('main', __name__)
 @main.route("/home")
 def home():
     user = srv.getUser()
-    return render_template("main/home.html", user=user)
+    sobj=srv.getSessionObj(session)
+    return render_template("main/home.html", user=user, sobj=sobj)
 
 @main.route("/signup", methods=["GET", "POST"])
 def signup():
@@ -31,8 +32,8 @@ def signup():
             send_mail.sendMail(msg)
             print(f"New User: {user['userId']}")
             return redirect(url_for('main.profile'))
-    
-    return render_template("main/create-account.html", user=user, msg=msg)
+    sobj=srv.getSessionObj(session, msg=msg)
+    return render_template("main/create-account.html", user=user, sobj=sobj)
             
 @main.route("/profile", methods=['GET', 'POST'])
 def profile():
@@ -86,14 +87,15 @@ def profile():
                 msg = "Admin features are turned off" 
                 
     teamsList = db.getTeamsFromUser(user['teams'])
-    allTeams = db.getTeams()
+    allTeams = db.getTeams(session['location'])
     
     if session['admin']:
         admin_features = 'admin' in session['user']['role']
     else:
         admin_features = None
 
-    return render_template('main/profile.html', user=user, teamsList=list(teamsList), allTeams=allTeams, msg=msg, admin_features=admin_features)
+    sobj=srv.getSessionObj(session, msg=msg)
+    return render_template('main/profile.html', user=user, teamsList=list(teamsList), allTeams=allTeams, sobj=sobj, admin_features=admin_features)
     
 
 @main.route("/login", methods=['GET', 'POST'])
@@ -106,6 +108,7 @@ def login():
     if request.method == 'POST':
         email = request.form['email'].lower()
         pword = request.form['pword']
+        league = request.form['league'].strip().title()
         user = db.authenticate(email, pword)
         
         if user is None:
@@ -114,6 +117,13 @@ def login():
             session['user'] = user
             
             session['admin'] = 'admin' in user['role']
+
+            if league in user['locations']:
+                session['location'] = league
+            elif len(user['locations']) > 0:
+                session['location'] = user['locations'][0]
+            else:
+                session['location'] = None
             
             if 'next-page' in session:
                 page = session['next-page']
@@ -122,7 +132,8 @@ def login():
             else: page = 'main.home'
             return redirect(url_for(page))
     
-    return render_template("main/login.html",user=user, msg=msg)
+    sobj=srv.getSessionObj(session, msg=msg)
+    return render_template("main/login.html",user=user, sobj=sobj)
 
 @main.route("/send-reset", methods=['GET', 'POST'])
 def send_reset():
@@ -139,7 +150,8 @@ def send_reset():
         else:
             msg = 'Invalid Email. Contact Administrator.'
     
-    return render_template("main/send-reset.html", user=user, msg=msg)
+    sobj=srv.getSessionObj(session, msg=msg)
+    return render_template("main/send-reset.html", user=user, sobj=sobj)
 
 @main.route("/logout")
 def logout():
@@ -149,3 +161,9 @@ def logout():
 @main.route("/about")
 def about():
     return redirect(url_for('main.home', _anchor='about'))
+
+@main.get("/april-fools")
+def april():
+    user = srv.getUser()
+    sobj=srv.getSessionObj(session)
+    return render_template("main/april-fools.html", user=user, sobj=sobj)

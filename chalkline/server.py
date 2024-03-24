@@ -14,6 +14,7 @@ def getUser():
 
 def logout():
     session.pop('user')
+    session.pop('location')
     session.pop('admin', None)
     session.pop('next-page', None)
     session.pop('next-url', None)
@@ -171,10 +172,11 @@ def sendReminders(eventList, userList, shiftList = None):
     
     return "Successfully sent daily reminders", 200
         
-def getPageObject(**kwargs):
+def getSessionObj(session, **kwargs):
     obj = {}
     obj['app'] = 'Chalkline'
     obj['copyright'] = os.environ.get('COPYRIGHT')
     obj['version'] = os.environ.get('VERSION')
+    obj['location'] = session.get('location')
     obj.update(kwargs)
     return obj

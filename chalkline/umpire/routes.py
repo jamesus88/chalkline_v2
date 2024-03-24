@@ -24,10 +24,11 @@ def schedule():
         if request.form.get('addField1'):
             msg = db.addField1(user, request.form['addField1'])
     
-    userList = db.getUserList()
-    eventList = get_events.getEventList(eventFilter, userList=userList, add_criteria={'eventType': 'Game'})
+    userList = db.getUserList(session['location'])
+    eventList = get_events.getEventList(session['location'], eventFilter, userList=userList, add_criteria={'eventType': 'Game'})
     
-    return render_template('umpire/schedule.html', user=srv.safeUser(user), eventList=eventList, eventFilter=eventFilter.asdict(), msg=msg)
+    sobj=srv.getSessionObj(session, msg=msg)
+    return render_template('umpire/schedule.html', user=srv.safeUser(user), eventList=eventList, eventFilter=eventFilter.asdict(), sobj=sobj)
 
 @umpire.route('/assignments', methods=['GET', 'POST'])
 def assignments():
@@ -55,7 +56,8 @@ def assignments():
             game = request.form['subGame']
             return redirect(url_for('view_info.event', eventId=game, _anchor="substitute"))
             
-    userList = db.getUserList()
-    eventList = get_events.getEventList(eventFilter, add_criteria=add_criteria, userList=userList)
+    userList = db.getUserList(session['location'])
+    eventList = get_events.getEventList(session['location'], eventFilter, add_criteria=add_criteria, userList=userList)
     
-    return render_template('umpire/assignments.html', user=srv.safeUser(user), eventList=eventList, eventFilter=eventFilter.asdict(), msg=msg)
+    sobj=srv.getSessionObj(session, msg=msg)
+    return render_template('umpire/assignments.html', user=srv.safeUser(user), eventList=eventList, eventFilter=eventFilter.asdict(), sobj=sobj)

@@ -69,6 +69,12 @@ h3 {
     margin: 10px auto;
     outline: none;
 }
+#login select {
+    padding: 10px;
+    width: 300px;
+    font-size: 15px;
+    margin: 10px auto;
+}
 #login input:focus {
     outline: 3px solid var(--highlight-blue);
 }

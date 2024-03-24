@@ -38,8 +38,8 @@ class EventFilter:
         }
     
     
-def getEventList(filter=EventFilter, add_criteria={}, safe=True, userList=[]):
-    criteria = [add_criteria]
+def getEventList(location, filter=EventFilter, add_criteria={}, safe=True, userList=[]):
+    criteria = [{'eventLocation': location}, add_criteria]
     
     if not filter.admin:
        criteria.append({'editRules.visible': True})

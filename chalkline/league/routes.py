@@ -12,15 +12,17 @@ def master_schedule():
         return redirect(url_for('main.login'))
     
     eventFilter = get_events.EventFilter()
-    allTeams = db.getTeams()
+    allTeams = db.getTeams(session['location'])
     
     if request.method == 'POST':
         if request.form.get('updateFilter'):
             eventFilter.update(request.form)
 
-    eventList = get_events.getEventList(eventFilter)
+    eventList = get_events.getEventList(session['location'], eventFilter)
+
+    sobj=srv.getSessionObj(session)
     
-    return render_template('league/master-schedule.html', user=srv.safeUser(user),eventFilter=eventFilter.asdict(), eventList=eventList, allTeams=allTeams)
+    return render_template('league/master-schedule.html', user=srv.safeUser(user),eventFilter=eventFilter.asdict(), eventList=eventList, allTeams=allTeams, sobj=sobj)
 
 @league.route("/info", methods=['GET', 'POST'])
 def info():
@@ -29,7 +31,8 @@ def info():
         session['next-page'] = 'league.info'
         return redirect(url_for('main.login'))
     
-    return render_template("league/info.html", user=user)
+    sobj=srv.getSessionObj(session)
+    return render_template("league/info.html", user=user, sobj=sobj)
 
 @league.route("/status")
 def status():
@@ -38,7 +41,8 @@ def status():
         session['next-page'] = 'league.status'
         return redirect(url_for('main.login'))
     
-    venues = db.getVenues("Sarasota")
-    userList = db.getUserList()
+    venues = db.getVenues(session['location'])
+    userList = db.getUserList(session['location'])
     currentDirector = director_db.getDirector(userList)
-    return render_template("league/status.html", user=user, venues=venues, currentDirector=currentDirector)
+    sobj=srv.getSessionObj(session)
+    return render_template("league/status.html", user=user, venues=venues, currentDirector=currentDirector, sobj=sobj)

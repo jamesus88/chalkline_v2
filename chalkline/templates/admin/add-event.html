@@ -10,7 +10,7 @@
 <main>
     <center>
         <h1>Add Event</h1>
-        <h4 class='error'>{{msg}}</h4>
+        <h4 class='error'>{{sobj.msg}}</h4>
     </center>
     
     <form method="post" id="addEvent">
@@ -18,7 +18,7 @@
         <section>
             <center>
                 <h2>
-                    <input type="text" name="eventLocation" id="eventLocation" value="{{user.location}}" disabled> - 
+                    <input type="text" name="eventLocation" id="eventLocation" value="{{sobj.location}}" disabled> - 
                     <select name="eventType" id="eventType">
                         <option value="Game">Game</option>
                         <option value="Practice">Practice</option>
