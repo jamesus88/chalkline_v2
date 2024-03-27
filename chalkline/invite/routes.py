@@ -49,19 +49,20 @@ def password_reset(email=None, token=None):
 @invite.route('/daily-reminders', methods=['GET', 'POST'])
 def daily_reminders():
     print('Daily Reminder Job Attempted...')
+    location = 'Sarasota'
     
     if request.args.get('chalkline_auth') == os.environ.get('CHALKLINE_AUTH') and request.method == 'POST':
         today = srv.todaysDate
         nextWeek = today(17 + 24*6) # rest of today (7:00) + 6 days
         eventFilter = get_events.EventFilter()
-        eventList = get_events.getEventList('Sarasota', eventFilter, {'eventDate': {'$gte': today(), '$lte': nextWeek}}, safe=False)
+        eventList = get_events.getEventList(location, eventFilter, {'eventDate': {'$gte': today(), '$lte': nextWeek}}, safe=False)
         
         day = srv.todaysDate().weekday() # [0, 1, ... , 6]
-        userList = db.getUserList('Sarasota')
+        userList = db.getUserList(location)
         
         usersToMail = userList[day::7]
         
-        msg, code = srv.sendReminders(eventList, usersToMail)
+        msg, code = srv.sendReminders(location, eventList, usersToMail)
         
         print('Daily Reminder Job executed.')
         return msg, code

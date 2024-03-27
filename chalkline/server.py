@@ -129,7 +129,7 @@ def alertUsersOfEvent(old, new, userList):
 
     return True
 
-def sendReminders(eventList, userList, shiftList = None):
+def sendReminders(location, eventList, userList, shiftList = None):
     # {
     #     'data': [{event: data, role: str}]
     # }
@@ -158,11 +158,11 @@ def sendReminders(eventList, userList, shiftList = None):
                     
     mailList = []
     for email, events in data.items():
-        
+        sobj = getSessionObj({'location': location})
         mail = send_mail.ChalklineEmail(
             subject='Weekly Reminder: You have events this week!',
             recipients=[email],
-            html=render_template("emails/reminder.html", user=events['user'], events=events['events'])
+            html=render_template("emails/reminder.html", user=events['user'], events=events['events'], sobj=sobj)
         )
         mailList.append(mail)
         
