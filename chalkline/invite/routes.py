@@ -54,10 +54,10 @@ def daily_reminders():
         today = srv.todaysDate
         nextWeek = today(17 + 24*6) # rest of today (7:00) + 6 days
         eventFilter = get_events.EventFilter()
-        eventList = get_events.getEventList(session['location'], eventFilter, {'eventDate': {'$gte': today(), '$lte': nextWeek}}, safe=False)
+        eventList = get_events.getEventList('Sarasota', eventFilter, {'eventDate': {'$gte': today(), '$lte': nextWeek}}, safe=False)
         
         day = srv.todaysDate().weekday() # [0, 1, ... , 6]
-        userList = db.getUserList(session['location'])
+        userList = db.getUserList('Sarasota')
         
         usersToMail = userList[day::7]
         
