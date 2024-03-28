@@ -26,6 +26,7 @@ def signup():
             user = db.saveUser(response['newUser'])
             user = db.appendPermissions(user)
             session['user'] = user
+            session['location'] = user['location'][0]
             
             html = render_template("emails/account-created.html", user=user)
             msg = send_mail.ChalklineEmail(subject="Chalkline Account Created!", html=html, recipients=[user['email']])

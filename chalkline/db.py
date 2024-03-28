@@ -370,9 +370,6 @@ def updateEvent(location, _user, event, form, userList, editRules=False, editCon
     if 'admin' not in _user['role']:
         return "Error: You do not have permission to edit events."
     
-    if event['eventDate'] < server.todaysDate(padding_hrs=-2) and not ignoreDate:
-        return "Error: cannot edit past events."
-    
     writable = {}
 
     if editContacts:
