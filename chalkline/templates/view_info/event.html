@@ -12,6 +12,12 @@
         <h1>View Event</h1>
         <h4 class='error'>{{sobj.msg}}</h4>
     </center>
+    <section>
+        <center>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfudF_82plwfscv_cZvJ0ou64Sk3cTsmskPL7wM1xKUM6e0tQ/viewform?usp=pp_url&entry.1330757817={{event._id}}">Create Report</a>
+            <p>Reports can be made on umpires, sportsmanship, or injuries.</p>
+        </center>
+    </section>
 
     {% if 'admin' not in user.role %}
         <section>
