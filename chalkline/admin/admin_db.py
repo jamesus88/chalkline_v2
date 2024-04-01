@@ -1,5 +1,6 @@
 from chalkline.db import userData, eventData, rentalData
 from bson import ObjectId
+import datetime
 
 def openFreeDrop(criteria={}):
     criteria['eventType'] = 'Game'
@@ -30,7 +31,6 @@ def lockGames(criteria={}):
     return "All games are locked for umpires and coaches."
 
 def updateMisc(criteria={}):
-    userData.update_many({}, {'$unset': {'location': 0}, '$set': {'locations': ['Sarasota']}})
     return "Events have been updated with a predefined method. Contact a developer immediately if this function was accidentally run."
 
 def updateRental(user, rentalName, form):
