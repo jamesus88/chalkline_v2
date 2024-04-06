@@ -161,6 +161,14 @@ def updateProfile(userId, form):
     
     return user
 
+def addCalendarCode(userId):
+    code = str(uuid.uuid4())
+    user = userData.find_one_and_update({'userId': userId}, {'$set': {'cal-code': code}}, return_document=pymongo.ReturnDocument.AFTER)
+    user['_id'] = str(user['_id'])
+    user = appendPermissions(user)
+    print(f'Calendar Created: {userId}')
+    return user
+
 def getTeamsFromUser(teamCodes):
     teams = teamData.find({"teamId": {"$in": teamCodes}})
     teamsList = []

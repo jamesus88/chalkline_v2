@@ -1,7 +1,6 @@
-from flask import redirect, url_for, session, Blueprint, render_template, request
-from chalkline import db, get_events
+from flask import redirect, url_for, session, Blueprint, render_template, request, make_response
+from chalkline import db, get_events, send_mail, calendar_srv
 from chalkline import server as srv
-from chalkline import send_mail
 from werkzeug.security import generate_password_hash
 import os
 invite = Blueprint('invite', __name__)
@@ -138,6 +137,12 @@ def sub_request(eventId=None, code=None):
     return render_template("umpire/substitute.html", user=user, event=srv.safeEvent(event, userList), pos=pos, sobj=sobj)
     
     
-    
-    
-    
+@invite.route("/calendar/<user_id>/<code>")
+def calendar(user_id=None, code=None):
+    assert (user_id and code), "Missing email or code."
+    user = db.getUser(user_id)
+    assert user, "User does not exist."
+    assert user['cal-code'] == code, "Invalid calendar code."
+
+    cal = calendar_srv.serve_calendar(user)
+    return cal

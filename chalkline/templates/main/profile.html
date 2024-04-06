@@ -12,6 +12,38 @@
         <h3>Need Help? Check the <a href="{{url_for('docs.profile')}}">Docs</a>. Or <a href="{{url_for('main.home')}}">Return Home</a>.</h3>
         <h4></h4>
         <h3 class='error'>{{sobj.msg}}</h3>
+        {% if "cal-code" in user %}
+        <section>
+            <h3>Chalkline iCalendar Feed</h3>
+            <p>Copy the link below into the app of your choice to automatically sync events into your calendar.</p>
+            <input id="cal-link" type="text" value="https://chalklinebaseball.com/invite/calendar/{{user._id}}/{{user['cal-code']}}">
+            <button class="action" onclick="copyLink()">Copy Link</button>
+            <script>
+                function copyLink() {
+                    // Get the text field
+                    var copyText = document.getElementById("cal-link");
+                  
+                    // Select the text field
+                    copyText.select();
+                    copyText.setSelectionRange(0, 99999); // For mobile devices
+                  
+                     // Copy the text inside the text field
+                    navigator.clipboard.writeText(copyText.value);
+                  
+                    // Alert the copied text
+                    alert("Link copied! Paste into calendar app to sync events.");
+                  }
+            </script>
+        </section>
+        {% else %}
+        <section>
+            <form method="post">
+                <h3>Get iCalendar Link</h3>
+                <p>Sync all of your events in Chalkline into the calendar app of your choice!</p>
+                <button class="action" type="submit" name="getCalendar" value="getCalendar">Get Link</button>
+            </form>
+        </section>
+        {% endif %}
 
         {% if 'coach' in user.role or 'parent' in user.role %}
         <section>

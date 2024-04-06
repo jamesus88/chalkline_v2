@@ -50,6 +50,11 @@ def profile():
             user = db.updateProfile(user['userId'], request.form)
             session['user'] = user
             msg = 'Profile Updated'
+
+        elif request.form.get('getCalendar'):
+            user = db.addCalendarCode(user['userId'])
+            session['user'] = user
+            msg = 'Calendar Link Created!'
         
         elif request.form.get('logout'):
             srv.logout()
