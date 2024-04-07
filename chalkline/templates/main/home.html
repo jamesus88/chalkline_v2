@@ -87,8 +87,9 @@
         {% endif %}
         <h2>Chalkline News</h2>
         <section>
-            <h3>Chalkline now uses <span class="urgent">machine learning</span> to predict umpire <span class="urgent">eyesight</span> from coach <span class="urgent">complaints!</span></h3>
-            <p><a href="{{url_for('main.april')}}">Read More Here <i class="fa-solid fa-newspaper"></i></a></p>
+            <h3>New: Sync iCalendar or Google Calendar with Chalkline!</h3>
+            <p>See all of your games, practices, and umpire duties on the calendar app of your choice!</p>
+            <p>Go to your <a href="{{url_for('main.profile')}}">Profile</a> to get started.</p>
         </section>
         <section id="supporters">
             <h3>You can support Chalkline <a target='_blank' href="https://buymeacoffee.com/aidanhurwitz">here!</a></h3>
@@ -154,7 +155,7 @@
                     <h3>Always improving.</h3>
                     <p>Updates with new features are pushed out every week.</p>
                     <p>Literally. Every week.</p>
-                    <p>View the <a href="{{url_for('main.about', _anchor="developers-log")}}">Developer's Log</a>.</p>
+                    <p>View the <a href="#developers-log">Developer's Log</a>.</p>
                 </div>
                 <div>
                     <i class="fa-solid fa-wrench large"></i>
@@ -207,6 +208,18 @@
         <h2>Developer's Log</h2>
     </section>
     <section>
+        <div class="split">
+            <div>
+                <p>Added iCalendar syncing.</p>
+                <p>Added iCalendar link in profile.</p>
+                <p>Bug fixes.</p>
+                <p>Updated copyrights.</p>
+            </div>
+            <div>
+                <h3>v4.12.0</h3>
+                <h4>Apr. 7 2024</h4>
+            </div>
+        </div>
         <div class="split">
             <div>
                 <p>Added user page for Admins.</p>

@@ -12,7 +12,7 @@ def add_event(cal: icalendar.Calendar, event, role):
         game_length = datetime.timedelta(hours=1.5)
     cal_event.add('dtend', event['eventDate'] + game_length)
 
-    cal_event.add('summary', f"Game: {role} {event['awayTeam']} @ {event['homeTeam']} - Chalkline")
+    cal_event.add('summary', f"{event['awayTeam']} @ {event['homeTeam']} ({role}) - Chalkline")
     cal_event.add('location', f"{event['eventVenue']} Field {event['eventField']}")
     cal_event.add('description', f"{role} for {event['eventAgeGroup']} game at {event['eventVenue']} Field {event['eventField']}.\n\nCreated by Chalkline Baseball")
     cal_event.add('created', srv.todaysDate())
