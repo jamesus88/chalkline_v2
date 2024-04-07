@@ -5,3 +5,4 @@ flask_mail
 requests
 certifi
 icalendar
+x-wr-timezone
