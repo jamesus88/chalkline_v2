@@ -30,6 +30,7 @@ def authenticate(email, pword):
             user['_id'] = str(user['_id'])
             user = appendPermissions(user)
             print(f"Successful Login: {email}")
+            print(server.todaysDate())
             return user
         else:
             print(f"Failed Login: {email}")

@@ -24,8 +24,9 @@ def todaysDate(padding_hrs=0):
     #### padding_hrs: int x -> adds x hrs to EST
     ex: todaysDate(2) = right now + 2 hours into the future.
     '''
-    est = pytz.timezone('EST')
-    now = est.localize(datetime.datetime.now())
+    est = pytz.timezone('US/Eastern')
+    now = datetime.datetime.now(datetime.UTC)
+    now = now.astimezone(est)
     now += datetime.timedelta(hours=padding_hrs)
     return now.replace(tzinfo=None)
 
