@@ -8,6 +8,7 @@ main = Blueprint('main', __name__)
 def home():
     user = srv.getUser()
     sobj=srv.getSessionObj(session)
+    print(srv.todaysDate())
     return render_template("main/home.html", user=user, sobj=sobj)
 
 @main.route("/signup", methods=["GET", "POST"])

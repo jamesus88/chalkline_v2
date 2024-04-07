@@ -1,16 +1,22 @@
-import icalendar, datetime
-from chalkline import get_events, db, server as srv
+import icalendar, datetime, pytz
+from chalkline import get_events, server as srv
 
 def add_event(cal: icalendar.Calendar, event, role):
     cal_event = icalendar.Event()
     cal_event.add('uid', str(event['_id']))
     cal_event.add('dtstart', event['eventDate'])
 
+    #convert to utc
+    event['eventDate'] = event['eventDate'].replace(tzinfo=pytz.timezone('EST'))
+
     if event['eventAgeGroup'] in ['Majors', '50/70', 'Juniors']:
         game_length = datetime.timedelta(hours=2)
     else:
         game_length = datetime.timedelta(hours=1.5)
     cal_event.add('dtend', event['eventDate'] + game_length)
+    cal_event.add('tzoffsetfrom', datetime.timedelta(hours=-4))
+    cal_event.add('tzoffsetto', datetime.timedelta(hours=-5))
+
 
     cal_event.add('summary', f"{event['awayTeam']} @ {event['homeTeam']} ({role}) - Chalkline")
     cal_event.add('location', f"{event['eventVenue']} Field {event['eventField']}")
