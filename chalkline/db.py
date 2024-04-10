@@ -21,7 +21,7 @@ directorData = db['directorData']
 rentalData = db['rentalData']
 
 def authenticate(email, pword):
-    user = userData.find_one_and_update({'email': email}, {'$set': {'last_attempt': server.todaysDate()}}, return_document=pymongo.ReturnDocument.AFTER)
+    user = userData.find_one_and_update({'email': email}, {'$set': {'last_attempt': server.todaysDate(), 'active': True}}, return_document=pymongo.ReturnDocument.AFTER)
     if user:
         print(f"Attempted Login: {email}")
         correct = check_password_hash(user['pword'], pword)
@@ -88,7 +88,9 @@ def createUser(form):
           "hideEmail": False,
           "hidePhone": False,
           "priority": False,
-          "active": True
+          "active": True, 
+          "last_attempt": server.todaysDate(),
+          "created": server.todaysDate()
         },
         'error': None
     }
