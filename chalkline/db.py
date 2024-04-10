@@ -36,7 +36,7 @@ def authenticate(email, pword):
             print(f"Failed Login: {email}")
     
     return None
-
+#test
 def verifyEmail(email):
     if userData.find_one({'email': email}):
         return True
