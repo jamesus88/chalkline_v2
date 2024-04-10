@@ -37,6 +37,8 @@ def authenticate(email, pword):
     
     return None
 
+# test git
+
 def verifyEmail(email):
     if userData.find_one({'email': email}):
         return True
