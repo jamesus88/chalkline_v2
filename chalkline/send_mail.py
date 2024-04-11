@@ -13,10 +13,10 @@ class ChalklineEmail(Message):
 def sendMail(msg):
     try:
         mail.send(msg)
-        Logger.log(None, 'Mail sent', 'Success!', msg.recipients, None)
+        Logger.log(None, 'Mail sent', 'Success!', msg.recipients[0], None)
 
     except:
-        Logger.log(None, 'Mail sent', 'Failed', msg.recipients, None)
+        Logger.log(None, 'Mail sent', 'Failed', msg.recipients[0], None)
 
 def sendBulkMail(msgList, asynchronous = True):
     @copy_current_request_context
@@ -30,7 +30,7 @@ def sendBulkMail(msgList, asynchronous = True):
                         'location': None,
                         'type': 'Mail sent',
                         'desc': 'Success!',
-                        'userId': msg.recipients,
+                        'userId': msg.recipients[0],
                         'eventId': None
                     })
                 except:
@@ -38,7 +38,7 @@ def sendBulkMail(msgList, asynchronous = True):
                         'location': None,
                         'type': 'Mail sent',
                         'desc': 'Failed',
-                        'userId': msg.recipients,
+                        'userId': msg.recipients[0],
                         'eventId': None
                     })
         Logger.log_docs(logs)
