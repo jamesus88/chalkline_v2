@@ -26,7 +26,7 @@ def week():
     
     sobj=srv.getSessionObj(session, msg=msg)
     
-    return render_template('director/week.html', user=srv.safeUser(user), eventList=eventList, eventFilter=eventFilter.asdict(), sobj=sobj)
+    return render_template('director/week.html', user=user, eventList=eventList, eventFilter=eventFilter.asdict(), sobj=sobj)
 
 @director.route("/schedule", methods=['GET', 'POST'])
 def schedule():

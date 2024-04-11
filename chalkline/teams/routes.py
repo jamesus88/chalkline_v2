@@ -34,7 +34,7 @@ def schedule():
     userList = db.getUserList(session['location'])
     eventList = get_events.getEventList(session['location'], eventFilter, userList=userList)
     sobj=srv.getSessionObj(session, msg=msg)
-    return render_template('teams/schedule.html', user=srv.safeUser(user), eventList=eventList, eventFilter=eventFilter.asdict(), sobj=sobj)
+    return render_template('teams/schedule.html', user=user, eventList=eventList, eventFilter=eventFilter.asdict(), sobj=sobj)
 
 @teams.route("/info", methods=['GET', 'POST'])
 def info():

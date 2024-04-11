@@ -10,7 +10,6 @@ def getUser():
     if 'user' in session:
         user = session['user']
     else: user = None
-
     return user
 
 def logout():

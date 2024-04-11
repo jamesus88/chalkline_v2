@@ -22,7 +22,7 @@ def master_schedule():
 
     sobj=srv.getSessionObj(session)
     
-    return render_template('league/master-schedule.html', user=srv.safeUser(user),eventFilter=eventFilter.asdict(), eventList=eventList, allTeams=allTeams, sobj=sobj)
+    return render_template('league/master-schedule.html', user=user,eventFilter=eventFilter.asdict(), eventList=eventList, allTeams=allTeams, sobj=sobj)
 
 @league.route("/info", methods=['GET', 'POST'])
 def info():

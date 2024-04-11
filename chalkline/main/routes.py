@@ -121,8 +121,8 @@ def login():
             msg = 'Invalid email and/or password.'
         else:
             session['user'] = user
-            
             session['admin'] = 'admin' in user['role']
+            session.permanent = True
 
             if league in user['locations']:
                 session['location'] = league

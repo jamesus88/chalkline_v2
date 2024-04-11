@@ -28,7 +28,7 @@ def schedule():
     eventList = get_events.getEventList(session['location'], eventFilter, userList=userList, add_criteria={'eventType': 'Game'})
     
     sobj=srv.getSessionObj(session, msg=msg)
-    return render_template('umpire/schedule.html', user=srv.safeUser(user), eventList=eventList, eventFilter=eventFilter.asdict(), sobj=sobj)
+    return render_template('umpire/schedule.html', user=user, eventList=eventList, eventFilter=eventFilter.asdict(), sobj=sobj)
 
 @umpire.route('/assignments', methods=['GET', 'POST'])
 def assignments():
@@ -60,4 +60,4 @@ def assignments():
     eventList = get_events.getEventList(session['location'], eventFilter, add_criteria=add_criteria, userList=userList)
     
     sobj=srv.getSessionObj(session, msg=msg)
-    return render_template('umpire/assignments.html', user=srv.safeUser(user), eventList=eventList, eventFilter=eventFilter.asdict(), sobj=sobj)
+    return render_template('umpire/assignments.html', user=user, eventList=eventList, eventFilter=eventFilter.asdict(), sobj=sobj)

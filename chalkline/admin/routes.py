@@ -56,7 +56,7 @@ def event_data():
     eventList = get_events.getEventList(session['location'], eventFilter)
     sobj=srv.getSessionObj(session, msg=msg)
     
-    return render_template('admin/event-data.html', user=srv.safeUser(user),eventFilter=eventFilter.asdict(), eventList=eventList, allTeams=allTeams, sobj=sobj)
+    return render_template('admin/event-data.html', user=user,eventFilter=eventFilter.asdict(), eventList=eventList, allTeams=allTeams, sobj=sobj)
 
 @admin.route("/add-event", methods=['GET', 'POST'])
 def add_event():

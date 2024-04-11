@@ -15,12 +15,7 @@ def authenticate(email, pword, location):
         if correct:
             user['_id'] = str(user['_id'])
             user = appendPermissions(user)
-            Logger.log(location, 'Login Attempt', 'Success!', userId=user['userId'])
             return user
-        else:
-            Logger.log(location, 'Login Attempt', 'Failed', userId=user['userId'])
-            return None
-    Logger.log(location, 'Login Attempt', 'User not found', userId=email)
     return None
 
 def verifyEmail(email):
