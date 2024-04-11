@@ -430,7 +430,7 @@ def updateEvent(location, _user, event, form, userList, editRules=False, editCon
     if any(key in different_keys for key in ['eventDate', 'eventVenue', 'eventField', 'status']):
         server.alertUsersOfEvent(old_game, new_game, getUserList(location))
             
-    Logger.log(old_game['eventLocation'], 'Event updated', 'Changes: '+' '.join(different_keys), user['userId'], event['_id'])
+    Logger.log(old_game['eventLocation'], 'Event updated', 'Changes: '+' '.join(different_keys), _user['userId'], event['_id'])
 
     return 'Successfully updated event.'
 

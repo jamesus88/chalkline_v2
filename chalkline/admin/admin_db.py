@@ -1,10 +1,10 @@
 from chalkline.db import userData, eventData, rentalData
 from bson import ObjectId
-import datetime
+import chalkline.logger as Logger
 
 def openFreeDrop(criteria={}):
     criteria['eventType'] = 'Game'
-    eventData.update_many(criteria, {'$set': {'editRules.removable': True}})   
+    eventData.update_many(criteria, {'$set': {'editRules.removable': True}})
     return "Free Drop is now enabled. Umpires can drop all games without approval."
 
 def closeFreeDrop(criteria={}):
@@ -44,8 +44,7 @@ def updateRental(user, rentalName, form):
         'field': form['field']
     }
     
-    rentalData.update_one({'name': rentalName}, {'$set': new})
-    print(f"Rental Update: {user['userId']} updated {rentalName}")
+    rental = rentalData.find_one_and_update({'name': rentalName}, {'$set': new})
     return f"Successfully updated {rentalName}"
     
 def removeReserve(user, rentalName):
@@ -53,7 +52,6 @@ def removeReserve(user, rentalName):
         return "Error: permission denied."
     
     rentalData.update_one({'name': rentalName}, {'$set': {'rentalDates': []}})
-    print(f"Rental Update: {user['userId']} removed all reservations for {rentalName}")
     return f"Successfully removed reservations for {rentalName}"
 
 def deleteRental(user, rentalName):
@@ -61,7 +59,6 @@ def deleteRental(user, rentalName):
         return "Error: permission denied."
     
     rentalData.delete_one({'name': rentalName})
-    print(f"Rental Deleted: {user['userId']} deleted {rentalName}")
     return f"Successfully deleted {rentalName}"
 
 def addRental(user, form):
@@ -69,7 +66,6 @@ def addRental(user, form):
         return "Error: equipment name must be unique."
     
     rentalData.insert_one(form)
-    print(f"Rental Added: {user['userId']} added {form['name']}")
     return None
 
 def updateUser(user, target_id, update):
@@ -77,5 +73,5 @@ def updateUser(user, target_id, update):
         raise PermissionError('Error: admin credentials required')
     
     target = userData.find_one_and_update({'_id': ObjectId(target_id)}, {'$set': update})
-    print(f'User Updated: {target['userId']} by {user['userId']}')
+    Logger.log(None, 'User edited', f'{target_id} edited', user['userId'])
     return f"Successfully updated {target['firstName'][0]}. {target['lastName']}"
