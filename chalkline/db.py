@@ -301,11 +301,12 @@ def requestField1Umpire(user, gameId):
 def removeRequest(user, gameId):
     game = eventData.find_one({'_id': bson.ObjectId(gameId)})
     msg = ''
-    
-    if 'coach' not in user['role']:
-        msg = 'Error: You do not have permission to remove this umpire request.'
-        
-    if game['field1Umpire'] is not None:
+
+    if game['eventDate'] < server.todaysDate():
+        msg = "Error: Cannot remove a past umpire request."
+    elif 'coach' not in user['role']:
+        msg = 'Error: You do not have permission to remove this umpire request.'    
+    elif game['field1Umpire'] is not None:
         msg = 'Error: Umpire Request already fulfilled.'
     else:
         eventData.update_one({'_id': bson.ObjectId(gameId)}, {'$set': {'fieldRequest': None}})
