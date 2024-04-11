@@ -1,6 +1,7 @@
 from flask import session, render_template
 import datetime, os, pytz
 import chalkline.send_mail as send_mail
+import chalkline.logger as Logger
 
 SHARE_LINK = "https://chalklinebaseball.com/"
 LEAGUE_CODE = "sll2024!"
@@ -169,7 +170,7 @@ def sendReminders(location, eventList, userList, shiftList = None):
         )
         mailList.append(mail)
         
-    print(f'Sending {len(mailList)} daily reminders...')
+    Logger.log(location, 'Reminders sent', f'{len(mailList)} msgs')
     
     send_mail.sendBulkMail(mailList, asynchronous=False)
     

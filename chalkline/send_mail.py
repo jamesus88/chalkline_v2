@@ -2,6 +2,7 @@ from flask_mail import Message
 from chalkline import mail
 from flask import copy_current_request_context
 from threading import Thread
+import chalkline.logger as Logger
 
 MAIL_SENDER = 'Chalkline Baseball'
 
@@ -12,28 +13,42 @@ class ChalklineEmail(Message):
 def sendMail(msg):
     try:
         mail.send(msg)
-        print("Mail sent to", msg.recipients)
+        Logger.log(None, 'Mail sent', 'Success!', msg.recipients, None)
+
     except:
-        print("Unable to send mail to", msg.recipients)
+        Logger.log(None, 'Mail sent', 'Failed', msg.recipients, None)
 
 def sendBulkMail(msgList, asynchronous = True):
     @copy_current_request_context
     def sendAsync(msgList):
+        logs = []
         with mail.connect() as conn:
             for msg in msgList:
                 try:
                     conn.send(msg)
-                    print("Mail sent to", msg.recipients)
+                    logs.append({
+                        'location': None,
+                        'type': 'Mail sent',
+                        'desc': 'Success!',
+                        'userId': msg.recipients,
+                        'eventId': None
+                    })
                 except:
-                    print("Unable to send mail to", msg.recipients)
-                    
-        if asynchronous: print("Finished Mail Thread process.")
+                    logs.append({
+                        'location': None,
+                        'type': 'Mail sent',
+                        'desc': 'Failed',
+                        'userId': msg.recipients,
+                        'eventId': None
+                    })
+        Logger.log_docs(logs)
+        if asynchronous: Logger.log(None, 'Mail thread', 'Terminated', None, None)
         
     if asynchronous: 
-        print("Started Mail Thread...")
+        Logger.log(None, 'Mail thread', 'Started', None, None)
         Thread(target=sendAsync, args=(msgList, )).start()
     else:
-        print("Sending mail synchronously")
+        Logger.log(None, 'Mail thread', 'Starting synchronously', None, None)
         sendAsync(msgList)
     
     

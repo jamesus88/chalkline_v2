@@ -1,42 +1,28 @@
-import pymongo, bson, datetime, os, uuid, re
+import pymongo, bson, datetime, uuid, re
 import chalkline.server as server
 import chalkline.send_mail as send_mail
 from flask import render_template
 from random import randint
 from werkzeug.security import generate_password_hash, check_password_hash
-import certifi
 
-client = pymongo.MongoClient(os.environ.get('PYMONGO_CLIENT'), connect=False,  tlsCAFile=certifi.where())
-db = client['chalkline']
+from chalkline.collections import *
+import chalkline.logger as Logger
 
-eventData = db['eventData']
-userData = db['userData']
-permissions = db['permissions']
-reportData = db['reportData']
-teamData = db['teamData']
-playerData = db['playerData']
-leagueData = db['leagueData']
-venueData = db['venueData']
-directorData = db['directorData']
-rentalData = db['rentalData']
-
-def authenticate(email, pword):
+def authenticate(email, pword, location):
     user = userData.find_one_and_update({'email': email}, {'$set': {'last_attempt': server.todaysDate(), 'active': True}}, return_document=pymongo.ReturnDocument.AFTER)
     if user:
-        print(f"Attempted Login: {email}")
         correct = check_password_hash(user['pword'], pword)
-        print(f"Password Authenticated: {correct}")
         if correct:
             user['_id'] = str(user['_id'])
             user = appendPermissions(user)
-            print(f"Successful Login: {email}")
-            print(server.todaysDate())
+            Logger.log(location, 'Login Attempt', 'Success!', userId=user['userId'])
             return user
         else:
-            print(f"Failed Login: {email}")
-    
+            Logger.log(location, 'Login Attempt', 'Failed', userId=user['userId'])
+            return None
+    Logger.log(location, 'Login Attempt', 'User not found', userId=email)
     return None
-#test
+
 def verifyEmail(email):
     if userData.find_one({'email': email}):
         return True
@@ -134,6 +120,7 @@ def saveUser(user):
     userData.insert_one(user)
     user['_id'] = str(user['_id'])
     user = appendPermissions(user)
+    Logger.log(None, 'Account Created', 'Success!', user['userId'])
     return user
 
 def updateProfile(userId, form):
@@ -161,6 +148,7 @@ def updateProfile(userId, form):
     user['_id'] = str(user['_id'])
     
     user = appendPermissions(user)
+    Logger.log(None, 'Profile updated', 'Success!', user['userId'])
     
     return user
 
@@ -169,7 +157,7 @@ def addCalendarCode(userId):
     user = userData.find_one_and_update({'userId': userId}, {'$set': {'cal-code': code}}, return_document=pymongo.ReturnDocument.AFTER)
     user['_id'] = str(user['_id'])
     user = appendPermissions(user)
-    print(f'Calendar Created: {userId}')
+    Logger.log(None, 'Calendar created', 'Success!', userId)
     return user
 
 def getTeamsFromUser(teamCodes):
@@ -229,7 +217,9 @@ def addPlate(user, gameId, check_empty=True, check_conflicts=True):
 
         eventData.update_one({'_id': game['_id']}, {'$set': {'plateUmpire': user['userId']}})
         msg = f'Successfully added {user["firstName"][0]}. {user["lastName"]} for plate duty.'
-        print(f"Plate added: {user['userId']} for {gameId}")
+        
+        Logger.log(game['eventLocation'], 'Plate added', 'Success!', user['userId'], game['_id'])
+
         if game['fieldRequest'] and game['umpireDuty'] and not game['editRules']['hasField1Umpire']:
             coach = userData.find_one({'userId': game['fieldRequest']})
             
@@ -258,7 +248,9 @@ def addField1(user, gameId, check_empty=True, check_conflicts=True):
         
         eventData.update_one({'_id': game['_id']}, {'$set': {'field1Umpire': user['userId']}})
         msg = f'Successfully added {user["firstName"][0]}. {user["lastName"]} for field duty.'
-        print(f"Field1 added: {user['userId']} for {gameId}")
+        
+        Logger.log(game['eventLocation'], 'Field1 added', 'Success!', user['userId'], game['_id'])
+
         if game['fieldRequest'] and game['umpireDuty']:
             coach = userData.find_one({'userId': game['fieldRequest']})
             
@@ -286,6 +278,7 @@ def removeGame(user, gameId):
         eventData.update_one({'_id': bson.ObjectId(gameId)}, {'$set': setData})
 
         msg = 'Successfully removed 1 game.'
+        Logger.log(game['eventLocation'], 'Game removed', 'Success!', user['userId'], game['_id'])
 
     else:
         msg = "Error: you do not have permission to remove this game. Contact administrator."
@@ -298,8 +291,8 @@ def requestField1Umpire(user, gameId):
     if game['editRules']['fieldRequestAddable'] and 'coach' in user['role'] and game['fieldRequest'] is None:
         eventData.update_one({'_id': bson.ObjectId(gameId)}, {'$set': {'fieldRequest': user['userId']}})
         msg = 'Successfully requested youth umpire.'
-        print(f"Youth Umpire Requested: {gameId} by {user['userId']}")
-    
+        Logger.log(game['eventLocation'], 'Youth requested', 'Success!', user['userId'], game['_id'])
+
     else:
         msg = 'Error: you do not have permission to request a field umpire for this game.'
         
@@ -317,6 +310,7 @@ def removeRequest(user, gameId):
     else:
         eventData.update_one({'_id': bson.ObjectId(gameId)}, {'$set': {'fieldRequest': None}})
         msg = 'Successfully removed request.'
+        Logger.log(game['eventLocation'], 'Field request removed', 'Success!', user['userId'], game['_id'])
     
     return msg
 
@@ -366,7 +360,7 @@ def substituteUmpire(user, event, sub):
     )
     send_mail.sendMail(msg)
 
-    print(f"Sub Request: {pos[0]} {sub['userId']} for {user['userId']} ({str(event['_id'])})")
+    Logger.log(event['eventLocation'], 'Substitute requested', f'{pos[0]} filled by {sub['userId']}', user['userId'], event['_id'])
     
     return f"Successfully requested {sub['firstName'][0]}. {sub['lastName']} to sub-in as {pos[0]}!"
     
@@ -436,7 +430,8 @@ def updateEvent(location, _user, event, form, userList, editRules=False, editCon
     if any(key in different_keys for key in ['eventDate', 'eventVenue', 'eventField', 'status']):
         server.alertUsersOfEvent(old_game, new_game, getUserList(location))
             
-    print(f"Event updated: {event['_id']} by {_user['userId']}")
+    Logger.log(old_game['eventLocation'], 'Event updated', 'Changes: '+' '.join(different_keys), user['userId'], event['_id'])
+
     return 'Successfully updated event.'
 
 def deleteEvent(user, eventId, ignoreDate=False):
@@ -444,7 +439,7 @@ def deleteEvent(user, eventId, ignoreDate=False):
     event = eventData.find_one(criteria)
     if (event['eventDate'] > server.todaysDate() or ignoreDate) and 'admin' in user['role']:
         eventData.delete_one(criteria)
-        print(f"Event Deleted: {eventId} by {user['userId']}")
+        Logger.log(event['eventLocation'], 'Event deleted', f'{event['eventAgeGroup']} on {event['eventDate']}', user['userId'], event['_id'])
         return "Successfully deleted game"
     else:
         return "Error: cannot edit past events"
@@ -492,7 +487,8 @@ def addEvent(location, user, form):
         writable['fieldRequest'] = getUser(_id=form['fieldRequest'])['userId']
 
     eventData.insert_one(writable)
-    print(f"Event Added: {writable} by {user['userId']}")
+    Logger.log(location, 'Event added', f'{writable['eventAgeGroup']} on {writable['eventDate']} ({writable['eventVenue']})', user['userId'], None)
+
     return True
 
 def getTeamInfo(teamId):
@@ -509,12 +505,14 @@ def updateTeam(user, team, form):
         'ties': int(form['ties']),
     }
     teamData.update_one({'teamId': teamId}, {'$set': writable})
-    print(f"Team Updated: {teamId} by {user['userId']}")
+    Logger.log(team['location'], 'Team updated', 'Success!', user['userId'], team['teamId'])
+
     return f"Successfully updated {teamId}"
 
 def deleteTeam(user, teamId):
-    teamData.delete_one({'teamId': teamId})
-    print(f"Team Deleted: {teamId} by {user['userId']}")
+    team = teamData.delete_one({'teamId': teamId})['raw_result']
+    
+    Logger.log(team['location'], 'Team deleted', 'Success!', user['userId'], team['teamId'])
     return f"Successfully deleted {teamId}"
 
 def addTeam(location, user, form):
@@ -533,6 +531,7 @@ def addTeam(location, user, form):
         return f"Error: Team codes must be unique, {writable['teamId']} already exists."
     else:
         teamData.insert_one(writable)
+        Logger.log(location, 'Team added', 'Success!', user['userId'], writable['teamId'])
         return True
 
 def updateFieldStatus(venueId, status, sendAlert=True):
@@ -551,6 +550,7 @@ def updateFieldStatus(venueId, status, sendAlert=True):
             
         send_mail.sendBulkMail(msgList)
 
+    Logger.log(venue['location'], 'Venue status updated', status, user['userId'], venue['venueId'])
     return f"{venue['name']} field status updated."    
 
 def getVenues(league, criteria={}):
@@ -579,7 +579,7 @@ def sendPasswordReset(email):
         recipients=[email],
         html=render_template("emails/password-reset.html", email=email, token=token)
     )
-    print(f"Password Reset Sent: {email}")
+    Logger.log(None, 'Password reset sent', 'Success!', user['userId'], None)
     send_mail.sendMail(message)
     return f"Password Reset email sent to {email}"
 
@@ -629,13 +629,15 @@ def rentEquipment(user, eventId, rentalName, admin=False):
         'returned': False}
     }})
     
-    print(f"Rental: {rentalName} by {user['userId']} for {event['eventDate'].strftime('%m/%d at %H:%M')}")
+    Logger.log(event['eventLocation'], 'Equipment rented', rental['name'], user['userId'], event['_id'])
+
     return f"Successfully rented {rentalName} for {event['eventDate'].strftime('%m/%d at %H:%M')}"
 
 def returnRental(user, eventId):
     rental = rentalData.update_one({'rentalDates.event': eventId}, {'$set': {'rentalDates.$.returned': True}})
     if rental:
-        print(f"Rental Return: {user['userId']} for {eventId}")
+        Logger.log(rental['location'], 'Equipment returned', rental['name'], user['userId'], None)
+
         return f"Successfully returned equipment!"
     else:
         return "Error: No rental found."

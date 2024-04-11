@@ -31,7 +31,7 @@ def signup():
             html = render_template("emails/account-created.html", user=user)
             msg = send_mail.ChalklineEmail(subject="Chalkline Account Created!", html=html, recipients=[user['email']])
             send_mail.sendMail(msg)
-            print(f"New User: {user['userId']}")
+
             return redirect(url_for('main.profile'))
     sobj=srv.getSessionObj(session, msg=msg)
     return render_template("main/create-account.html", user=user, sobj=sobj)
@@ -115,7 +115,7 @@ def login():
         email = request.form['email'].lower()
         pword = request.form['pword']
         league = request.form['league'].strip().title()
-        user = db.authenticate(email, pword)
+        user = db.authenticate(email, pword, league)
         
         if user is None:
             msg = 'Invalid email and/or password.'

@@ -1,6 +1,8 @@
 from flask import render_template, abort, Blueprint, session
 import traceback
 from chalkline import server as srv
+import chalkline.logger as Logger
+
 errors = Blueprint('errors', __name__)
 
 @errors.route("/abort/<i>")
@@ -17,6 +19,7 @@ def _404(error):
 @errors.app_errorhandler(500)
 def _500(error):
     user = srv.getUser()
+    print(traceback.format_exc())
     sobj=srv.getSessionObj(session)
 
     return render_template("errors/500.html", user=user, error=error, sobj=sobj), 500
