@@ -67,7 +67,7 @@ def getEventList(location, filter=EventFilter, add_criteria={}, safe=True, userL
     events = list(db.eventData.find({'$and': criteria}).sort([('eventDate', pymongo.ASCENDING), ('eventField', pymongo.ASCENDING)]))
 
     for i in range(len(events)):
-        if events[i]['umpireDuty'] == filter.teamId:
+        if events[i]['umpireDuty'] == filter.teamId and filter.teamId is not None:
             events[i]['eventType'] = 'Umpire Duty'
     if safe:
         events = [server.safeEvent(event, userList) for event in events]
