@@ -637,3 +637,7 @@ def returnRental(user, eventId):
         return f"Successfully returned equipment!"
     else:
         return "Error: No rental found."
+    
+def clearSubstituteRequests(**criteria):
+    eventData.update_many(criteria, {'$unset': {'sub-code': 1}})
+    return f"Substitute requests removed from games matching {criteria}"

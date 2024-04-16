@@ -49,7 +49,7 @@ def password_reset(email=None, token=None):
 def daily_reminders():
     print('Daily Reminder Job Attempted...')
     location = 'Sarasota'
-    
+
     if request.args.get('chalkline_auth') == os.environ.get('CHALKLINE_AUTH') and request.method == 'POST':
         today = srv.todaysDate
         nextWeek = today(17 + 24*6) # rest of today (7:00) + 6 days
@@ -64,7 +64,13 @@ def daily_reminders():
         msg, code = srv.sendReminders(location, eventList, usersToMail)
         
         print('Daily Reminder Job executed.')
+
+        # delete all substitute requests
+        db.clearSubstituteRequests()
+        print('All sub requests cleared.')
+
         return msg, code
+        
     else:
         raise PermissionError('PermissionError: Resource is Forbidden.')
 
