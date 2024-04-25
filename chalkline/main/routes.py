@@ -40,7 +40,8 @@ def signup():
 def profile():
     user = srv.getUser()
     if user is None:
-        return redirect(url_for('main.home'))
+        session['next-page'] = 'main.profile'
+        return redirect(url_for('main.login'))
     
     msg = ''
     
