@@ -38,6 +38,7 @@ def event(eventId):
     return render_template("view_info/event.html", user=user, event=event, teamsList=teamsList, userList=userList, sobj=sobj)
 
 @view_info.route("/user/<user_id>", methods=['GET', 'POST'])
+@view_info.route("/user")
 def user(user_id=None):
     user = srv.getUser()
     if user is None:

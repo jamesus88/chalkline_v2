@@ -79,8 +79,18 @@
                     <td>{{event.eventField}}</td>
                     <td>{{event.eventAgeGroup}}</td>
                     <td>{{event.status}}</td>
-                    <td>{{event.plateUmpireInfo.fLast}}</td>
-                    <td>{{event.field1UmpireInfo.fLast}}</td>
+                    
+                    {% if event.plateUmpireInfo._id is not none %}
+                    <td><a title="{{event.plateUmpireInfo.firstLast}}" target='_blank' href="{{url_for('view_info.user', user_id=event.plateUmpireInfo._id)}}">{{event.plateUmpireInfo.fLast}}</a></td>
+                    {% else %}
+                    <td>{{event.plateUmpireInfo._id}}</td>
+                    {% endif %}
+
+                    {% if event.field1UmpireInfo._id is not none %}
+                    <td><a title="{{event.field1UmpireInfo.firstLast}}" target='_blank' href="{{url_for('view_info.user', user_id=event.field1UmpireInfo._id)}}">{{event.field1UmpireInfo.fLast}}</a></td>
+                    {% else %}
+                    <td>{{event.field1UmpireInfo._id}}</td>
+                    {% endif %}
 
                 </tr>
                 {% endfor %}

@@ -1,4 +1,4 @@
-import icalendar, datetime, x_wr_timezone, pytz
+import icalendar, datetime, x_wr_timezone
 from chalkline import get_events, server as srv
 
 def add_event(cal: icalendar.Calendar, event, role):
