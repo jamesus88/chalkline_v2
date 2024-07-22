@@ -1,7 +1,7 @@
 from flask import render_template, abort, Blueprint, session
 import traceback
 from chalkline import server as srv
-import chalkline.logger as Logger
+from chalkline.core import server as svr
 
 errors = Blueprint('errors', __name__)
 
@@ -11,31 +11,20 @@ def create_error(i: int = 500):
 
 @errors.app_errorhandler(404)
 def _404(error):
-    user = srv.getUser()
-    sobj=srv.getSessionObj(session)
-
-    return render_template("errors/404.html", user=user, error=error, sobj=sobj), 404
+    res = svr.obj()
+    return render_template("errors/404.html", res=res, error=error), 404
 
 @errors.app_errorhandler(500)
 def _500(error):
-    user = srv.getUser()
-    print(traceback.format_exc())
-    sobj=srv.getSessionObj(session)
-
-    return render_template("errors/500.html", user=user, error=error, sobj=sobj), 500
+    res = svr.obj()
+    return render_template("errors/500.html", res=res, error=error), 500
 
 @errors.app_errorhandler(PermissionError)
 def permission_error(error):
-    user = srv.getUser()
-    print(error)
-    sobj=srv.getSessionObj(session)
-
-    return render_template("errors/generic.html", user=user, error=error, sobj=sobj), 403
+    res = svr.obj()
+    return render_template("errors/generic.html", res=res, error=error), 403
 
 @errors.app_errorhandler(Exception)
 def generic(error):
-    user = srv.getUser()
-    print(traceback.format_exc())
-    sobj=srv.getSessionObj(session)
-
-    return render_template("errors/generic.html", user=user, error=error, sobj=sobj), 400
+    res = svr.obj()
+    return render_template("errors/generic.html", res=res, error=error), 400

@@ -21,7 +21,7 @@
                 <label class="sign-in" for="userId">Password</label>
                 <input type="password" name="pword" id="pword" required>
                 <button class="button-sign-in" type="submit">Sign In</button>
-                <h3 class='error'>{{sobj.msg}}</h3>
+                <h3 class='error'>{{res.msg}}</h3>
                 <a href="{{url_for('main.signup')}}">Create Account</a>
             </center>
         </section>

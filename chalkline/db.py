@@ -46,78 +46,10 @@ def getUser(_id=None, email=None, userId=None):
 
 def checkDuplicateUser(newUser):
     user = userData.find_one({"$or": [{'userId': newUser['userId']}, {'email': newUser['email']}, {'phone': newUser['phone']}]})
-    if user: return True
-    else: return False
+    if user: 
+        raise ValueError('Email, phone, or UserId already exists... try logging in.')
     
-def createUser(form):
-    response = {
-        'newUser': {
-          "locations": [form['location']],
-          "firstName": form['firstName'].title().strip(),
-          "lastName": form['lastName'].title().strip(),
-          "userId": form['email'].strip().lower(),
-          "email": form['email'].strip().lower(),
-          "phone": form['phone'],
-          "sms-gateway": form.get('carrier'),
-          "pword": generate_password_hash(form['pword']),
-          "role": [],
-          "teams": [],
-          "permissionSet": "C0",
-          "canRemoveGame": False,
-          "emailNotifications": True,
-          "phoneNotifications": True,
-          "hideEmail": False,
-          "hidePhone": False,
-          "priority": False,
-          "active": True, 
-          "last_attempt": server.todaysDate(),
-          "created": server.todaysDate()
-        },
-        'error': None
-    }
-    tel = form['phone']
-    tel = tel.removeprefix("+")
-    tel = tel.removeprefix("1")     # remove leading +1 or 1
-    tel = re.sub("[ ()-]", '', tel) # remove space, (), -
-
-    try: tel = f"{tel[:3]}-{tel[3:6]}-{tel[6:]}"
-    except: response['error'] = "Invalid phone number."
     
-    response['newUser']['phone'] = tel
-
-    
-    if form.get('role-coach'):
-        response['newUser']['role'].append('coach')
-    if form.get('role-parent'):
-        response['newUser']['role'].append('parent')
-    if form.get('role-umpire'):
-        response['newUser']['role'].append('umpire')
-        response['newUser']['permissionSet'] = "U0"
-        if form['role-pass'] != server.LEAGUE_CODE:
-            response['error'] = "Incorrect league code. Umpires must enter a valid league code to create an account."
-    if form.get('role-youth'):
-        response['newUser']['role'].append('youth')
-        response['newUser']['permissionSet'] = "Y0"
-    if form.get('role-board'):
-        response['newUser']['role'].append('board')
-        if form['role-pass'] != server.LEAGUE_CODE:
-            response['error'] = "Incorrect league code. Board Members must enter a valid league code to create an account."
-        
-    if len(response['newUser']['role']) < 1:
-        response['error'] = 'Select at least one account role'
-        
-    if checkDuplicateUser(response['newUser']):
-        response['error'] = 'User ID, email, or phone number already exists. Try logging in...'
-
-    return response
-
-def saveUser(user):
-    userData.insert_one(user)
-    user['_id'] = str(user['_id'])
-    user = appendPermissions(user)
-    Logger.log(None, 'Account Created', 'Success!', user['userId'])
-    return user
-
 def updateProfile(userId, form):
     writable = {
         'firstName': form['firstName'],

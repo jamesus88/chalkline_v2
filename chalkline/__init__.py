@@ -4,6 +4,13 @@ import os, datetime
 
 mail = Mail()
 
+PROTOCOL = os.environ.get('PROTOCOL')
+DOMAIN = os.environ.get('DOMAIN')
+APP_NAME = os.environ.get('APP_NAME')
+VERSION = os.environ.get('VERSION')
+COPYRIGHT = os.environ.get('COPYRIGHT')
+
+
 def create_app():
     app = Flask(__name__)
     

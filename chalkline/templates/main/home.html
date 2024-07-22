@@ -7,20 +7,20 @@
 
 <main>
     <center>
-        {% if user is none %}
+        {% if not res.user %}
         <h1>Baseball Ready.</h1>
         <a class="login large-link" href="{{url_for('main.login')}}">Sign In <i class="fa-solid fa-user"></i></a>
         <a href="{{url_for('main.signup')}}">Create Account</a>
         {% else %}
-        <h1>Hello, {{user.firstName}}!</h1>
-            {% if ('coach' in user.role or 'parent' in user.role) and user.teams == [] %}
+        <h1>Hello, {{res.user.firstName}}!</h1>
+            {% if ('coach' in res.user.groups or 'parent' in res.user.groups) and res.user.teams == [] %}
                 <h3 class="error">You have 0 teams linked to your account. Add one to your <a href="{{url_for('main.profile')}}">profile</a>!</h3>
             {% endif %}
         {% endif %}
     <br>
-        {% if user is not none %}
+        {% if res.user %}
         <div class="divide">
-            {% if 'coach' in user.role or 'parent' in user.role %}
+            {% if 'coach' in res.user.groups or 'parent' in res.user.groups %}
             <section class="menu" onclick="toggleOpen('teams-menu')">
                 <h2>Teams</h2>
                 <i class="fa-solid fa-users menu"></i>
@@ -31,7 +31,7 @@
                 </div> 
             </section>
             {% endif %}
-            {% if 'umpire' in user.role or 'youth' in user.role %}
+            {% if 'umpire' in res.user.groups or 'youth' in res.user.groups %}
             <section class="menu" onclick="toggleOpen('umpire-menu')">
                 <h2>Umpire</h2>
                 <i class="fa-solid fa-clipboard-list menu"></i>
@@ -41,7 +41,7 @@
                 </div>
             </section>
             {% endif %}
-            {% if 'board' in user.role %}
+            {% if 'board' in res.user.groups %}
             <section class="menu" onclick="toggleOpen('director-menu')">
                 <h2>Director</h2>
                 <i class="fa-solid fa-street-view menu"></i>
@@ -61,7 +61,7 @@
                     <a href="{{url_for('league.status')}}" class="menu">Field Status</a>
                 </div>
             </section>
-            {% if 'admin' in user.role %}
+            {% if 'admin' in res.user.groups %}
             <section class="menu" onclick="toggleOpen('admin-menu')">
                 <h2>Admin</h2>
                 <i class="fa-solid fa-wrench menu"></i>

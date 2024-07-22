@@ -1,12 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- font awesome -->
     <script src="https://kit.fontawesome.com/9794118ac5.js" crossorigin="anonymous"></script>
+
+    <!-- base dedign files -->
     <link rel="stylesheet" href="{{url_for('static', filename='design.css')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='navbar.css')}}">
+
+    <!-- icon -->
     <link rel="shortcut icon" href="{{url_for('static', filename='chalkline-icon.png')}}" type="image/x-icon">
+
+    <!-- title -->
     <title>Chalkline Baseball | {% block title %}{% endblock title %}</title>
 </head>
 
@@ -14,9 +23,9 @@
     <nav id="main-navbar" class="topnav">
         <a id="menu-title" href="{{url_for('main.home')}}"><b id="title">Chalkline Baseball</b>&trade;</a>
 
-            {% if user is not none %}
+            {% if res.user %}
 
-                {% if 'coach' in user.role %}
+                {% if 'coach' in res.user.groups %}
                 <div class="dropdown dropdown-team">
                     <button class="dropdown-button">Teams <i class="fa-solid fa-caret-down"></i></button>
                     <div class="dropdown-content team">
@@ -27,7 +36,7 @@
                 </div>
                 {% endif %}
                 
-                {% if 'youth' in user.role or 'umpire' in user.role %}
+                {% if 'youth' in res.user.groups or 'umpire' in res.user.groups %}
                 <div class="dropdown dropdown-umpire">
                     <button class="dropdown-button">Umpire <i class="fa-solid fa-caret-down"></i></button>
                     <div class="dropdown-content umpire">
@@ -37,7 +46,7 @@
                 </div>
                 {% endif %}
 
-                {% if 'board' in user.role %}
+                {% if 'board' in res.user.groups %}
                 <div class="dropdown dropdown-board">
                     <button class="dropdown-button">Director <i class="fa-solid fa-caret-down"></i></button>
                     <div class="dropdown-content umpire">
@@ -57,7 +66,7 @@
                     </div>
                 </div>
 
-                {% if 'admin' in user.role %}
+                {% if 'admin' in res.user.groups %}
                 <div class="dropdown dropdown-admin">
                     <button class="dropdown-button">Admin <i class="fa-solid fa-caret-down"></i></button>
                     <div class="dropdown-content admin">
@@ -76,7 +85,7 @@
         <a href="{{url_for('main.home', _anchor='about')}}">About</a>
         
         <div class="nav-right">
-            {% if user is none %}
+            {% if not res.user %}
             <a href="{{url_for('main.signup')}}">Create Account</a>
             <a class="sign-in" href="{{url_for('main.login')}}">Sign In</a>
             {% else %}
@@ -87,19 +96,13 @@
     </nav>
 
     <body>
-        {% if user %}
-            {% if 'msg' in user %}
-                <p class="error">{{user.msg}}</p>
-            {% endif %}
-        {% endif %}
-
         {% block content %}{% endblock content %}
     </body>
     
     <footer>
         <p>Created and Maintained by Aidan Hurwitz</p>
-        <p>Chalkline Baseball&trade; {{sobj.version}}</p>
-        <p>Copyright &copy; {{sobj.copyright}} Aidan Hurwitz</p>
+        <p>Chalkline Baseball&trade; {{res.version}}</p>
+        <p>Copyright &copy; {{res.copyright}} Aidan Hurwitz</p>
     </footer>
 
 </div>
