@@ -11,12 +11,12 @@
         <h1>Profile</h1>
         <h3>Need Help? Check the <a href="{{url_for('docs.profile')}}">Docs</a>. Or <a href="{{url_for('main.home')}}">Return Home</a>.</h3>
         <h4></h4>
-        <h3 class='error'>{{sobj.msg}}</h3>
-        {% if "cal-code" in user %}
+        <h3 class='error'>{{res.msg}}</h3>
+        {% if res.user.auth.calendar %}
         <section>
             <h3>Chalkline iCalendar Feed</h3>
             <p>Copy the link below into the app of your choice to automatically sync events into your calendar.</p>
-            <input id="cal-link" type="text" value="https://chalklinebaseball.com/invite/calendar/{{user._id}}/{{user['cal-code']}}">
+            <input id="cal-link" type="text" value="https://chalklinebaseball.com/invite/calendar/{{user.userId}}/{{user.auth.calendar}}">
             <button class="action" onclick="copyLink()">Copy Link</button>
             <script>
                 function copyLink() {
@@ -58,22 +58,22 @@
         </section>
         {% endif %}
 
-        {% if 'coach' in user.role or 'parent' in user.role %}
+        {% if 'coach' in res.user.groups or 'parent' in res.user.groups %}
         <section>
             <form method="post" id="teams">
                 <h3>My Teams</h3>
                 <table id="teamCodes" class="center">
                     
-                    {% if teamsList|length > 0 %}
+                    {% if res.user.teams|length > 0 %}
                         <tr>
                             <th>Team Code</th>
                             <th>Team Name</th>
                             <th>Remove</th>
                         </tr>
-                        {% for team in teamsList %}
+                        {% for team in res.user.teams %}
                         <tr>
                             <td>{{team['teamId']}}</td>
-                            <td>{{team['teamName']}}</td>
+                            <td>{{team['name']}}</td>
                             <td><button name="removeTeam" value="{{team['teamId']}}" class="action">Remove</button></td>
                         </tr>
                         {% endfor %}
@@ -92,8 +92,8 @@
                         <td><label for="newTeam">Add Team Code</label></td>
                         <td><select name="newTeam" id="newTeam" required>
                             <option value="none" selected>Select</option>
-                            {% for team in allTeams %}
-                                <option value="{{team.teamId}}">{{team.teamId}} ({{team.teamName}})</option>
+                            {% for team in league.teams %}
+                                <option value="{{team.teamId}}">{{team.teamId}} ({{team.name}})</option>
                             {% endfor %}
                         </select></td>
                     </tr>
@@ -109,27 +109,23 @@
                 <table class="center">
                     <tr>
                         <td><label for="firstName">First Name</label></td>
-                        <td><input type="text" name="firstName" id="firstName" value={{user.firstName}} required></td>
+                        <td><input type="text" name="firstName" id="firstName" value={{res.user.firstName}} required></td>
                     </tr>
                     <tr>
                         <td><label for="lastName">Last Name</label></td>
-                        <td><input type="text" name="lastName" id="lastName" value={{user.lastName}} required></td>
+                        <td><input type="text" name="lastName" id="lastName" value={{res.user.lastName}} required></td>
                     </tr>
                     <tr>
                         <td><label for="email">Email</label></td>
-                        <td><input type="email" name="email" id="email" value={{user.email}} required></td>
+                        <td><input type="email" name="email" id="email" value={{res.user.email}} disabled></td>
                     </tr>
                     <tr>
                         <td><label for="phone">Phone</label></td>
-                        <td><input type="tel" name="phone" id="phone" value={{user.phone}} required></td>
+                        <td><input type="tel" name="phone" id="phone" value={{res.user.phone}} required></td>
                     </tr>
                     <tr>
                         <td><label for="emailNotifications">Receive email alerts</label></td>
                         <td><input type="checkbox" name="emailNotifications" id="emailNotifications" checked></td>
-                    </tr>
-                    <tr>
-                        <td><label for="phoneNotifications">Receive text alerts</label></td>
-                        <td><input type="checkbox" name="phoneNotifications" id="phoneNotifications" checked></td>
                     </tr>
                     <tr>
                         <td><label for="hideEmail">Hide my email from other users</label></td>
@@ -140,22 +136,6 @@
                         <td><input type="checkbox" name="hidePhone" id="hidePhone"></td>
                     </tr>
                 </table>
-
-                <script>
-                    let user = {{user | tojson}};
-                    if (!user.emailNotifications) {
-                        document.getElementById('emailNotifications').checked = false;
-                    }
-                    if (!user.phoneNotifications) {
-                        document.getElementById('phoneNotifications').checked = false;
-                    }
-                    if (user.hideEmail) {
-                        document.getElementById('hideEmail').checked = true;
-                    }
-                    if (user.hidePhone) {
-                        document.getElementById('hidePhone').checked = true;
-                    }
-                </script>
                 
 
                 <button class="action" type="submit" name="updateProfile" value="updateProfile">Save</button>
@@ -169,11 +149,11 @@
                             <th>League</th>
                             <th>Remove</th>
                         </tr>
-                        {% for loc in user.locations %}
+                        {% for loc in res.user.leagues %}
                         <tr>
                             <td>{{loc}}</td>
                             <td><button id="removeLoc" name="removeLoc" value="{{loc}}" 
-                                {% if user.locations|length == 1 %}
+                                {% if res.user.leagues|length == 1 %}
                                 class="action disabled"
                                 disabled
                                 {% else %}
@@ -183,7 +163,7 @@
                         </tr>
                         {% endfor %}
                 </table>
-                {% if user.locations|length < 1 %}
+                {% if res.user.leagues|length < 1 %}
                 <p class="error">No leagues found for this account.</p>
                 {% endif %}
             </form>
@@ -203,7 +183,7 @@
         <section>
             <h3>Session</h3>
             <form method="post" id="logout">
-                {% if admin_features is not none %}
+                {% if 'admin' in res.user.groups %}
                     <table class="center">
                         <tr>
                             <td><label for="admin-features">Admin Features: </label></td>
@@ -214,23 +194,21 @@
                         </tr>
                     </table>
                     <script>
-                        document.getElementById('admin-features').value = "{{admin_features}}";
+                        document.getElementById('admin-features').value = "{{res.admin}}";
                     </script>
                 {% endif %}
 
                 <label for="location">Location: </label>
                 <select name="location" id="location" onchange="this.form.submit()">
-                    {% for loc in user.locations %}
+                    {% for loc in res.user.leagues %}
                     <option value="{{loc}}">{{loc}}</option>
                     {% endfor %}
                 </select>
                 <script>
-                    document.getElementById('location').value = "{{sobj.location}}";
+                    document.getElementById('location').value = "{{res.league}}";
                 </script>
 
             </form>
-        </section>
-        <section>
             <form method="post"><button class="action" type="submit" name="logout" value="logout"><b>Sign Out</b></button></form>
         </section>
     </center>

@@ -2,6 +2,7 @@ from flask import render_template, redirect, url_for, session, request, Blueprin
 from chalkline.core import server as svr
 from chalkline.core.user import User
 from chalkline.core.league import League
+from chalkline.core import mailer
 
 main = Blueprint('main', __name__)
 
@@ -34,6 +35,12 @@ def profile():
     mid = svr.authorized_only()
     if mid: return mid
     res = svr.obj()
+
+    if request.method == 'POST':
+        if request.form.get('logout'):
+            svr.logout()
+            return redirect(url_for('main.home'))
+        
 
     return render_template('main/profile.html', res=res)
     
@@ -73,8 +80,48 @@ def send_reset():
     mid = svr.unauthorized_only()
     if mid: return mid
     res = svr.obj()
+
+    if request.method == 'POST':
+        email = request.form['email']
+        user = User.get_user(email=email)
+        if user:
+            try: 
+                token = User.reset_password(user)
+                html = render_template('emails/password-reset.html', res=res, email=user['email'], token=token)
+                msg = mailer.ChalklineEmail(
+                    subject="Password Reset: Chalkline Baseball",
+                    recipients=[user['email']],
+                    html=html
+                )
+                mailer.sendMail(msg)
+            except PermissionError as e:
+                res['msg'] = e
     
     return render_template("main/send-reset.html", res=res)
+
+@main.route("/new-password", methods=['GET', 'POST'])
+@main.route("/new-password/<userId>/<auth>", methods=['GET', 'POST'])
+def new_password(userId=None, auth=None):
+    res = svr.obj()
+    if not res['user']:
+        if not(userId and auth):
+            raise PermissionError('Missing credentials.')
+        else:
+            user = User.get_user(userId=userId)
+            if not user:
+                raise PermissionError('Invalid credentials.')
+            elif user['auth'].get('pword_reset') != auth:
+                raise PermissionError('Invalid credentials.')
+    else:
+        user = res['user']
+
+    if request.method == 'POST':
+        User.set_password(user, request.form['pword'])
+        svr.logout()
+        res['msg'] = "Password reset successfully. Please login again."
+
+    return render_template("main/reset-password.html", res=res, user=user)
+
 
 @main.route("/logout")
 def logout():

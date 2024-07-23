@@ -1,6 +1,7 @@
 from chalkline.collections import userData
 from werkzeug.security import check_password_hash, generate_password_hash
 from chalkline.core import now, check_unique, _safe
+from uuid import uuid4
 
 class User:
     col = userData
@@ -25,11 +26,11 @@ class User:
             return None
     
     @staticmethod
-    def authenticate(email, pword):
-        user = User.get_user(email=email)
+    def authenticate(email_or_userId, pword):
+        user = User.get_user(email=email_or_userId) or User.get_user(userId=email_or_userId)
         if user:
             if check_password_hash(user['pword'], pword):
-                User.col.update_one({'email': email}, {'$set': {'last_login': now()}})
+                User.col.update_one({'email': user['email']}, {'$set': {'last_login': now()}})
                 return user
         return None
     
@@ -37,6 +38,20 @@ class User:
     def create_pword(pword):
         return generate_password_hash(pword)
     
+    @staticmethod
+    def set_password(user, pword):
+        new_pword = User.create_pword(pword)
+        User.col.update_one({'userId': user['userId']}, {'$set': {'pword': new_pword}, '$unset': {'auth.pword_reset': 0}})
+    
+    @staticmethod
+    def reset_password(user):
+        uuid = uuid4()
+        user = User.col.find_one_and_update({'userId': user['userId'], 'auth.pword_reset': None}, {'$set': {'auth.pword_reset': uuid}})
+        if user:
+            return uuid
+        else:
+            raise PermissionError('Password reset has already been sent. Check your email.')
+
     @staticmethod
     def clean_phone(n):
         return format(int(n[:-1]), ",").replace(",", "-") + n[-1]
