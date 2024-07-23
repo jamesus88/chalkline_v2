@@ -1,7 +1,7 @@
 from flask import session, redirect, url_for, request
 from chalkline import PROTOCOL, DOMAIN, APP_NAME, VERSION, COPYRIGHT
 
-def login(user, league=None, next=None):
+def login(user, league=None):
     if not league:
         league = session.get('league')
     
@@ -14,10 +14,6 @@ def login(user, league=None, next=None):
     else:
         session['user'] = user
         session['league'] = league
-        if next:
-            return redirect(url_for(next))
-        else:
-            return redirect(url_for('main.home'))
 
 def logout():
     session.clear()

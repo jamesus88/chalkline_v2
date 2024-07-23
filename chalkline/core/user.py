@@ -1,13 +1,13 @@
 from chalkline.collections import userData
 from werkzeug.security import check_password_hash, generate_password_hash
-from chalkline.core import now, check_unique
+from chalkline.core import now, check_unique, _safe
 
 class User:
     col = userData
 
     @staticmethod
     def safe(user):
-        user['_id'] = str(user['_id'])
+        user = _safe(user)
         return user
 
     @staticmethod
@@ -42,7 +42,7 @@ class User:
         return format(int(n[:-1]), ",").replace(",", "-") + n[-1]
     
     @staticmethod
-    def create(form):
+    def create(form, league):
         user = {
             'userId': check_unique(User, 'userId', form['userId']),
             'email': check_unique(User, 'email', form['email']),
@@ -61,9 +61,32 @@ class User:
                 'email_nots': True
             },
             'active': True,
+            'approved': False,
             'created': now(),
             'last_login': None
         }
+
+        if 'role-coach' in form:
+            assert league['auth']['coach_code'] == form.get('coach_code'), "Error: League Coach Code is invalid."
+            user['groups'].append('coach')
+        if 'role-parent' in form:
+            user['groups'].append('parent')
+        if 'role-umpire' in form:
+            assert league['auth']['umpire_code'] == form.get('umpire_code'), "Error: League Umpire Code is invalid."
+            user['groups'].append('umpire')
+        if 'role-director' in form:
+            assert league['auth']['director_code'] == form.get('director_code'), "Error: League Director Code is invalid."
+            user['groups'].append('director')
+
         _id = User.col.insert_one(user).inserted_id
         user['_id'] = _id
+
         return User.safe(user)
+
+    @staticmethod
+    def set_last_login(user, dt=None):
+        if not dt:
+            dt = now()
+
+        User.col.update_one({'userId': user['userId']}, {'$set': {'last_login': dt}})
+        

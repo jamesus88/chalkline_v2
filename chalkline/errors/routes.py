@@ -17,6 +17,7 @@ def _404(error):
 @errors.app_errorhandler(500)
 def _500(error):
     res = svr.obj()
+    print(traceback.format_exc())
     return render_template("errors/500.html", res=res, error=error), 500
 
 @errors.app_errorhandler(PermissionError)
@@ -27,4 +28,5 @@ def permission_error(error):
 @errors.app_errorhandler(Exception)
 def generic(error):
     res = svr.obj()
+    print(traceback.format_exc())
     return render_template("errors/generic.html", res=res, error=error), 400

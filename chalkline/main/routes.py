@@ -1,8 +1,8 @@
 from flask import render_template, redirect, url_for, session, request, Blueprint
-from chalkline import db, send_mail
-from chalkline import server as srv
 from chalkline.core import server as svr
 from chalkline.core.user import User
+from chalkline.core.league import League
+
 main = Blueprint('main', __name__)
 
 @main.route("/")
@@ -13,29 +13,37 @@ def home():
 
 @main.route("/signup", methods=["GET", "POST"])
 def signup():
-    svr.unauthorized_only()
+    mid = svr.unauthorized_only()
+    if mid: return mid
+
     res = svr.obj()
 
     if request.method == 'POST':
         try:
-            user = User.create(request.form)
+            league = League.get_league(request.form['league'])
+            user = User.create(request.form, league)
             svr.login(user, request.form['league'])
-        except ValueError as e:
+            return redirect(url_for('main.home'))
+        except (ValueError, AssertionError) as e:
             res['msg'] = e
     
     return render_template("main/create-account.html", res=res)
             
 @main.route("/profile", methods=['GET', 'POST'])
 def profile():
-    svr.authorized_only()
+    mid = svr.authorized_only()
+    if mid: return mid
     res = svr.obj()
-                
+
     return render_template('main/profile.html', res=res)
     
 
 @main.route("/login", methods=['GET', 'POST'])
-def login():
-    svr.unauthorized_only()
+@main.route("/login/<next>", methods=['GET', 'POST'])
+def login(next=None):
+    mid = svr.unauthorized_only()
+    if mid: return mid
+
     res = svr.obj()
 
     if request.method == 'POST':
@@ -47,8 +55,14 @@ def login():
         if user:
             try:
                 svr.login(user, league)
+                User.set_last_login(user)
             except ValueError as e:
                 res['msg'] = e
+            else:
+                if next:
+                    return redirect(url_for(next))
+                else:
+                    return redirect(url_for('main.home'))
         else:
             res['msg'] = "Email or password is invalid. Please try again."
     
@@ -56,7 +70,8 @@ def login():
 
 @main.route("/send-reset", methods=['GET', 'POST'])
 def send_reset():
-    svr.unauthorized_only()
+    mid = svr.unauthorized_only()
+    if mid: return mid
     res = svr.obj()
     
     return render_template("main/send-reset.html", res=res)
