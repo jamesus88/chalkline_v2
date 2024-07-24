@@ -45,7 +45,7 @@ class User:
     
     @staticmethod
     def reset_password(user):
-        uuid = uuid4()
+        uuid = str(uuid4())
         user = User.col.find_one_and_update({'userId': user['userId'], 'auth.pword_reset': None}, {'$set': {'auth.pword_reset': uuid}})
         if user:
             return uuid
@@ -53,7 +53,14 @@ class User:
             raise PermissionError('Password reset has already been sent. Check your email.')
 
     @staticmethod
-    def clean_phone(n):
+    def get_calendar(user):
+        uuid = str(uuid4())
+        user = User.col.find_one_and_update({'userId': user['userId']}, {'$set': {'auth.calendar': uuid}}, return_document=True)
+        return User.safe(user)
+
+    @staticmethod
+    def clean_phone(n: str):
+        n = n.replace('-', '').replace('(', '').replace(')', '').replace('+', '')
         return format(int(n[:-1]), ",").replace(",", "-") + n[-1]
     
     @staticmethod
@@ -102,6 +109,40 @@ class User:
     def set_last_login(user, dt=None):
         if not dt:
             dt = now()
-
         User.col.update_one({'userId': user['userId']}, {'$set': {'last_login': dt}})
-        
+
+    @staticmethod
+    def remove_team(user, teamId):
+        user = User.col.find_one_and_update({'userId': user['userId']}, {'$pull': {'teams': teamId}}, return_document=True)
+        return User.safe(user)
+    
+    @staticmethod
+    def add_team(user, teamId):
+        user = User.col.find_one_and_update({'userId': user['userId']}, {'$push': {'teams': teamId}}, return_document=True)
+        return User.safe(user)
+    
+    @staticmethod
+    def update_profile(user, form):
+        user = User.col.find_one_and_update(
+            {'userId': user['userId']}, 
+            {'$set': {
+                'firstName': form['firstName'].strip().title(),
+                'lastName': form['lastName'].strip().title(),
+                'phone': User.clean_phone(form['phone']),
+                'preferences.hide_email': form.get('hide_email', False),
+                'preferences.hide_phone': form.get('hide_phone', False),
+                'preferences.email_nots': form.get('email_nots', False)
+            }}, return_document=True
+        )
+        return User.safe(user)
+    
+    @staticmethod
+    def add_league(user, leagueId):
+        user = User.col.find_one_and_update({'userId': user['userId']}, {'$push': {'leagues': leagueId}}, return_document=True)
+        return User.safe(user)
+    
+    @staticmethod
+    def remove_league(user, leagueId):
+        user = User.col.find_one_and_update({'userId': user['userId']}, {'$pull': {'leagues': leagueId}}, return_document=True)
+        return User.safe(user)
+

@@ -16,7 +16,7 @@
         <section>
             <h3>Chalkline iCalendar Feed</h3>
             <p>Copy the link below into the app of your choice to automatically sync events into your calendar.</p>
-            <input id="cal-link" type="text" value="https://chalklinebaseball.com/invite/calendar/{{user.userId}}/{{user.auth.calendar}}">
+            <input id="cal-link" type="text" value="https://chalklinebaseball.com/invite/calendar/{{res.user.userId}}/{{res.user.auth.calendar}}">
             <button class="action" onclick="copyLink()">Copy Link</button>
             <script>
                 function copyLink() {
@@ -92,7 +92,7 @@
                         <td><label for="newTeam">Add Team Code</label></td>
                         <td><select name="newTeam" id="newTeam" required>
                             <option value="none" selected>Select</option>
-                            {% for team in league.teams %}
+                            {% for team in all_teams %}
                                 <option value="{{team.teamId}}">{{team.teamId}} ({{team.name}})</option>
                             {% endfor %}
                         </select></td>
@@ -168,17 +168,6 @@
                 {% endif %}
             </form>
 
-            <h3>Add League</h3>
-
-            <form method="post">
-                <table class="center">
-                    <tr>
-                        <td><label for="newLoc">Add League Code</label></td>
-                        <td><input type="text" id="newLod" name="newLoc" placeholder="Code" required></td>
-                    </tr>
-                </table>
-                <button class="action" type="submit" name="addLoc" value="addLoc">Add League</button>
-            </form>
         </section>
         <section>
             <h3>Session</h3>

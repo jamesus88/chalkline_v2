@@ -1,9 +1,11 @@
 from flask import session, redirect, url_for, request
 from chalkline import PROTOCOL, DOMAIN, APP_NAME, VERSION, COPYRIGHT
 
-def login(user, league=None):
+def login(user, league=None, admin=None):
     if not league:
         league = session.get('league')
+    if admin is None:
+        admin = session.get('admin', False)
     
     if not (league and user):
         raise RuntimeError('User and League must be present for login!')
@@ -11,9 +13,9 @@ def login(user, league=None):
     if league not in user['leagues']:
         raise TypeError('You are not a member of this league.')
     
-    else:
-        session['user'] = user
-        session['league'] = league
+    session['user'] = user
+    session['league'] = league
+    session['admin'] = admin
 
 def logout():
     session.clear()
@@ -26,7 +28,9 @@ def obj(context={}):
         'version': VERSION,
         'copyright': COPYRIGHT,
         'user': session.get('user'),
-        'league': session.get('league')
+        'league': session.get('league'),
+        'admin': session.get('admin'),
+        'flash': session.get('flash')
     }
     res.update(context)
 

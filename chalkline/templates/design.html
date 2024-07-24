@@ -36,7 +36,7 @@
                 </div>
                 {% endif %}
                 
-                {% if 'youth' in res.user.groups or 'umpire' in res.user.groups %}
+                {% if 'umpire' in res.user.groups %}
                 <div class="dropdown dropdown-umpire">
                     <button class="dropdown-button">Umpire <i class="fa-solid fa-caret-down"></i></button>
                     <div class="dropdown-content umpire">
@@ -46,7 +46,7 @@
                 </div>
                 {% endif %}
 
-                {% if 'board' in res.user.groups %}
+                {% if 'director' in res.user.groups %}
                 <div class="dropdown dropdown-board">
                     <button class="dropdown-button">Director <i class="fa-solid fa-caret-down"></i></button>
                     <div class="dropdown-content umpire">
@@ -66,7 +66,7 @@
                     </div>
                 </div>
 
-                {% if 'admin' in res.user.groups %}
+                {% if res.admin %}
                 <div class="dropdown dropdown-admin">
                     <button class="dropdown-button">Admin <i class="fa-solid fa-caret-down"></i></button>
                     <div class="dropdown-content admin">
@@ -96,6 +96,7 @@
     </nav>
 
     <body>
+        {% if res.flash %}<p class="error">{{res.flash}}</p>{% endif %}
         {% block content %}{% endblock content %}
     </body>
     

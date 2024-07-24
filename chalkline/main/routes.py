@@ -1,6 +1,7 @@
 from flask import render_template, redirect, url_for, session, request, Blueprint
 from chalkline.core import server as svr
 from chalkline.core.user import User
+from chalkline.core.team import Team
 from chalkline.core.league import League
 from chalkline.core import mailer
 
@@ -41,8 +42,46 @@ def profile():
             svr.logout()
             return redirect(url_for('main.home'))
         
+        elif request.form.get('getCalendar'):
+            user = User.get_calendar(res['user'])
+            svr.login(user)
 
-    return render_template('main/profile.html', res=res)
+        elif request.form.get('removeTeam'):
+            user = User.remove_team(res['user'], request.form['removeTeam'])
+            svr.login(user)
+
+        elif request.form.get('addTeam'):
+            teamId = request.form['newTeam']
+            user = User.add_team(res['user'], teamId)
+            svr.login(user)
+
+        elif request.form.get('updateProfile'):
+            user = User.update_profile(res['user'], request.form)
+            svr.login(user)
+
+        elif request.form.get('removeLoc'):
+            league = request.form['removeLoc']
+            user = User.remove_league(res['user'], league)
+            svr.login(user)
+
+        elif request.form.get('admin-features'):
+            assert 'admin' in res['user']['groups'], "You do not have permission to access these features."
+            admin = request.form.get('admin-features') == "True"
+            if not admin:
+                session['flash'] = "Admin features turned OFF."
+            else:
+                session['flash'] = None
+            svr.login(res['user'], admin=admin)
+
+        elif request.form.get('location'):
+            league = request.form.get('location')
+            svr.login(res['user'], league=league)
+
+        res = svr.obj()
+
+    res['user'] = Team.load_teams(res['user'], res['league'])
+    all_teams = Team.get_teams(res['league'])
+    return render_template('main/profile.html', res=res, all_teams=all_teams)
     
 
 @main.route("/login", methods=['GET', 'POST'])
@@ -61,7 +100,7 @@ def login(next=None):
         user = User.authenticate(email, pword)
         if user:
             try:
-                svr.login(user, league)
+                svr.login(user, league, 'admin' in user['groups'])
                 User.set_last_login(user)
             except ValueError as e:
                 res['msg'] = e
