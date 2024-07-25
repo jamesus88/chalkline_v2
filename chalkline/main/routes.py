@@ -22,7 +22,7 @@ def signup():
 
     if request.method == 'POST':
         try:
-            league = League.get_league(request.form['league'])
+            league = League.get(request.form['league'])
             user = User.create(request.form, league)
             svr.login(user, request.form['league'])
             return redirect(url_for('main.home'))
@@ -160,7 +160,6 @@ def new_password(userId=None, auth=None):
         res['msg'] = "Password reset successfully. Please login again."
 
     return render_template("main/reset-password.html", res=res, user=user)
-
 
 @main.route("/logout")
 def logout():

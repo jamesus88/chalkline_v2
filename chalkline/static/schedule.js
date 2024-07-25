@@ -25,10 +25,43 @@ function loadMore(tbl, page, limit) {
 
     while (count > (limit * page)) {
         tbl.rows[count].style.display = "none";
-        count--
+        count--;
     }
 
     return page
 }
 
-console.log('schedule.js loaded')
+let page = 1
+let tbl = document.getElementById('schedule-table');
+colorifySchedule(tbl);
+loadMore(tbl, page, 50);
+
+function load() {
+    page = loadMore(tbl, page + 1, 50);
+    if (page == 0) {
+        let button = document.getElementById('load-more');
+        button.classList.add('disabled');
+        button.disabled = true;
+        button.innerHTML = "All Events Shown";
+    }
+}
+
+function openPopup(id) {
+    let pop = document.getElementById('popup_'+id);
+    pop.showModal();
+}
+
+function closePopup(id) {
+    let pop = document.getElementById('popup_'+id);
+    pop.close();
+}
+
+function toggleFilterSection(section) {
+    let sect = document.getElementById(section);
+    if (sect.style.display == 'block') {
+        sect.style.display = 'none';
+    }
+    else {
+        sect.style.display = 'block';
+    }
+}

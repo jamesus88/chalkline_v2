@@ -3,6 +3,12 @@ main {
     width: 70%;
     margin: 0 auto;
 }
+.title {
+    font-size: 4em;
+    color: transparent;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    background-clip: text;
+}
 .split {
     display: flex;
     flex-direction: row;
@@ -144,6 +150,10 @@ section.menu:hover div.hide {
 }
 .about-page {
     box-shadow: 0px 0px 50px rgb(47, 0, 141);
+    transition: box-shadow 0.3s;
+}
+.about-page:hover {
+    box-shadow: 0 0 50px rgb(85, 0, 255);
 }
 div.pricing {
     background-color: white;

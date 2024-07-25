@@ -36,15 +36,15 @@ def obj(context={}):
 
     return res
 
-def lock_blueprint():
-    authorized_only()
-    if request.blueprint:
-        if request.blueprint not in session['user']['groups']:
-            raise PermissionError('You are not authorized to be here!')
-
-def authorized_only():
-    if not session.get('user'):
+def authorized_only(group=None):
+    user = session.get('user')
+    if not user:
         return redirect(url_for('main.login', next=request.endpoint))
+    elif group:
+        if group not in user['groups']:
+            raise PermissionError('This page is restricted.')
+    else:
+        return None
 
 def unauthorized_only():
     if session.get('user'):

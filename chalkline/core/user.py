@@ -9,6 +9,7 @@ class User:
     @staticmethod
     def safe(user):
         user = _safe(user)
+        user['firstLast'] = user['firstName'][0] + '. ' + user['lastName']
         return user
 
     @staticmethod

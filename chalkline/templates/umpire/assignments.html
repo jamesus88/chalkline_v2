@@ -47,15 +47,7 @@
                 document.getElementById('hidePast').value = filter.hidePast;
                 document.getElementById('ageGroup').value = filter.ageGroup;
 
-                function toggleFilterSection(section) {
-                    let sect = document.getElementById(section);
-                    if (sect.style.display == 'block') {
-                        sect.style.display = 'none';
-                    }
-                    else {
-                        sect.style.display = 'block';
-                    }
-                }
+                
             </script>
         </section>
         <p class="error">{{sobj.msg}}</p>
