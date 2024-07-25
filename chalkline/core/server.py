@@ -17,6 +17,8 @@ def login(user, league=None, admin=None):
     session['league'] = league
     session['admin'] = admin
 
+    session.permanent = True
+
 def logout():
     session.clear()
 
@@ -41,7 +43,10 @@ def authorized_only(group=None):
     if not user:
         return redirect(url_for('main.login', next=request.endpoint))
     elif group:
-        if group not in user['groups']:
+        if type(group) == list:
+            if len(set(group).intersection(user['groups'])) < 1:
+                raise PermissionError('This page is restricted.')
+        elif group not in user['groups']:
             raise PermissionError('This page is restricted.')
     else:
         return None

@@ -57,22 +57,61 @@ class Event:
         return Event.safe(event)
     
     @staticmethod
-    def get(league):
-        events = list(Event.col.find({'leagueId': league}))
-        return [Event.safe(e) for e in events]
+    def user_in_event(event, user) -> bool:
+        # check umpires
+        for ump in event['umpires'].values():
+            if ump['user']:
+                if ump['user']['userId'] == user['userId']:
+                    return True
+            
+        # check teams
+        for team in user['teams']:
+            if event['away'] == team or event['home'] == team:
+                return True
+            
+        return False
+    
+    @staticmethod
+    def team_in_event(event, team) -> bool:
+        if team in (event['away'], event['home']):
+            return True
+        
+        return False
+    
+    @staticmethod
+    def get(league, user=None, team=None, filters=Filter.default()):
+        criteria = [{'leagueId': league}]
+
+        all_events = [Event.safe(e) for e in Event.col.find({'$and': criteria})]
+        events = []
+
+        # filter
+        for e in all_events:
+            if user:
+                if not Event.user_in_event(e, user):
+                    continue
+            if team:
+                if not Event.team_in_event(e, team):
+                    continue
+    
+            events.append(e)
+
+        return events
     
     @staticmethod
     def safe(event):
         event = _safe(event)
+        umpires = [User.safe(u) for u in User.col.find({'leagues': {'$in': [event['leagueId']]}, 'groups': {'$in': ['umpire']}})]
 
         # fill in umpire data
         full = True
         for u in event['umpires'].values():
-            if u['user'] is None and not u['team_duty']:
+            if u['user']:
+                u['user'] = User.filter_for(umpires, userId=u['user'])
+            elif u['team_duty'] and not u['coach_req']:
+                continue
+            else:
                 full = False
-                break
-            elif u['user'] and not u['team_duty']:
-                u['user'] = User.get_user(userId=u['user'])
         
         event['umpire_full'] = full
 
@@ -94,3 +133,7 @@ class Event:
         # ADD
         Event.col.update_one({'_id': ObjectId(eventId)}, {'$set': {f'umpires.{pos}.user': user['userId']}})
         return "Game added!"
+    
+    @staticmethod
+    def remove_umpire(eventId, pos, user):
+        Event.col.update_one({'_id': ObjectId(eventId), f'umpires.{pos}.user': user['userId']}, {'$set': {f'umpires.{pos}.user': None}})

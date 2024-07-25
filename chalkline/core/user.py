@@ -119,7 +119,10 @@ class User:
     
     @staticmethod
     def add_team(user, teamId):
-        user = User.col.find_one_and_update({'userId': user['userId']}, {'$push': {'teams': teamId}}, return_document=True)
+        user = User.col.find_one_and_update({'userId': user['userId'], 'teams': {'$nin': [teamId]}}, {'$push': {'teams': teamId}}, return_document=True)
+        if not user:
+            raise ValueError('Team already added.')
+        
         return User.safe(user)
     
     @staticmethod
@@ -147,3 +150,9 @@ class User:
         user = User.col.find_one_and_update({'userId': user['userId']}, {'$pull': {'leagues': leagueId}}, return_document=True)
         return User.safe(user)
 
+    @staticmethod
+    def filter_for(user_list, userId):
+        for u in user_list:
+            if u['userId'] == userId:
+                return u
+        return None

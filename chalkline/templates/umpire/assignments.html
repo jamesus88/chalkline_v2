@@ -10,13 +10,8 @@
 <main>
     <section class="split">
         <div>
-            <h1>My Games - {{user.firstName[0]}}. {{user.lastName}}</h1>
+            <h1>My Games - {{res.user.firstLast}}</h1>
             <h3>View your schedule and remove games.</h3>
-            {% if user.canRemoveGame %}
-            <p class="urgent">You currently have permission to remove any game.</p>
-            {% else %}
-            <p class="urgent">* Some games require approval to be removed.</p>
-            {% endif %}
         </div>
         <div class="align-right">
             <h3>Go to <a href="{{url_for('umpire.schedule')}}">Umpire Schedule</a></h3>
@@ -25,34 +20,10 @@
     </section>
     <button type="" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
     <form method="post">
-        <section id="filter-section" class="filter-section" style='display: none;'>
-            <select name="updateFilter" id="updateFilter" style="display: none;">
-                <option value="updateFilter" selected>UpdateFilter</option>
-            </select>
-            <select class="filter" name="hidePast" id="hidePast" onchange="this.form.submit()">
-                <option value="true" selected>Future only</option>
-                <option value="false">Past and Future</option>
-            </select>
-            <select class="filter" name="ageGroup" id="ageGroup" onchange="this.form.submit()">
-                <option value="null" selected>All Age Groups</option>
-                <option value="AA">AA only</option>
-                <option value="AAA">AAA only</option>
-                <option value="Majors">Majors only</option>
-                <option value="50/70">50/70 only</option>
-                <option value="Juniors">Juniors only</option>
-            </select>
-
-            <script>
-                let filter = {{ eventFilter | tojson }};
-                document.getElementById('hidePast').value = filter.hidePast;
-                document.getElementById('ageGroup').value = filter.ageGroup;
-
-                
-            </script>
-        </section>
-        <p class="error">{{sobj.msg}}</p>
+        
+        <p class="error">{{res.msg}}</p>
         <section class="schedule-section scrollwrapper">
-            {% if eventList|length < 1 %}
+            {% if events|length < 1 %}
             <h3 class="error">You have no upcoming games. Add games on the <a href="{{url_for('umpire.schedule')}}">Umpire Schedule</a></h3>
             {% else %}
             <table id="schedule-table" class="event-display">
@@ -63,43 +34,43 @@
                     <th>Field</th>
                     <th>Age Group</th>
                     <th>Status</th>
-                    <th>Plate</th>
-                    <th>Field</th>
-                    <th>Substitute&nbsp;<a href="#substituting">?</a></th>
-                    <th>Remove</th>
+                    <th>Umpires</th>
                 </tr>
-                {% for event in eventList %}
+                {% for e in events %}
                 <tr class="event-row">
-                    <td><a class="icon-link" href="{{url_for('view_info.event', eventId=event._id)}}"><i class="fa-solid fa-info"></i></a></td>
-                    <td>{{event.eventDate.strftime('%a %m/%d @ %H:%M')}}</td>
-                    <td>{{event.eventVenue}}</td>
-                    <td>{{event.eventField}}</td>
-                    <td>{{event.eventAgeGroup}}</td>
-                    <td>{{event.status}}</td>
-                    <td>
-                        {% if event.plateUmpireInfo.fLast is not none %}
-                        <a href="{{url_for('view_info.user', user_id=event.plateUmpireInfo._id)}}">{{event.plateUmpireInfo.fLast}}</a>
-                        {% else %}
-                        {{event.plateUmpireInfo.fLast}}
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if event.field1UmpireInfo.fLast is not none %}
-                        <a href="{{url_for('view_info.user', user_id=event.field1UmpireInfo._id)}}">{{event.field1UmpireInfo.fLast}}</a>
-                        {% else %}
-                        {{event.field1UmpireInfo.fLast}}
-                        {% endif %}
-                    </td>
-                    <td>
-                        <button class="schedule-action" type="submit" name="subGame" value="{{event._id}}">Substitute</button>
-                    </td>
-                    <td>
-                        {% if event.editRules.removable %}
-                        <button class="schedule-action" type="submit" name="removeGame" value="{{event._id}}" onclick="return confirm('Remove game?')">Remove</button>
-                        {% else %}
-                        <button class="schedule-action" type="submit" name="removeGame" value="{{event._id}}" onclick="return confirm('Remove from game? This game REQUIRES permission before being removed.')">Remove*</button>
-                        {% endif %}
-                    </td>
+                    <td><a class="icon-link" href="{{url_for('view_info.event', eventId=e._id)}}"><i class="fa-solid fa-info"></i></a></td>
+                    <td>{{e.date.strftime('%a %m/%d @ %H:%M')}}</td>
+                    <td>{{e.venueId}}</td>
+                    <td>{{e.field}}</td>
+                    <td>{{e.age}}</td>
+                    <td>{{e.status}}</td>
+                    <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action">view/edit</button></td>
+
+
+                    <dialog class="popup" id="popup_{{e._id}}">
+                        <a onclick="closePopup('{{e._id}}')" class="error"><i class="fa-solid fa-xmark"></i> Close</a>
+                        <h3>{{e.age}}: {{e.venueId}}, {{e.leagueId}}</h3>
+                        <h4>Field {{e.field}} @ {{e.date.strftime('%a %m/%d %H:%M')}}</h4>
+                        {% for pos, u in e.umpires.items() %}
+                        <label for="{{pos}}">{{pos}}: </label>
+                            {% if u.coach_req or not u.team_duty %}
+                                {% if u.user %}
+                                    {% if u.user.userId == res.user.userId %}
+                                    <a>{{u.user.firstLast}}</a>
+                                    <button type="submit" name="substitute" value="{{pos}}_{{e._id}}" class="schedule-action">Substitute</button>
+                                    <button type="submit" name="remove" value="{{pos}}_{{e._id}}" class="schedule-action danger">Remove</button>
+                                    {% else %}
+                                    <a>{{u.user.firstLast}}</a>
+                                    {% endif %}
+                                {% else %}
+                                None
+                                {% endif %}
+                            {% else %}
+                                {{u.team_duty}}
+                            {% endif %}
+                            <br><br>
+                        {% endfor %}
+                    </dialog>
                 </tr>
                 {% endfor %}
             </table>

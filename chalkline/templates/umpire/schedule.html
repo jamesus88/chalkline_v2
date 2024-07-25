@@ -46,12 +46,12 @@
                     <th>Field</th>
                     <th>Age Group</th>
                     <th>Status</th>
-                    <th>Add</th>
+                    <th>Umpires</th>
                 </tr>
                 {% for e in events %}
                     <tr>
                         <td><a class="icon-link"><i class="fa-solid fa-info"></i></a></td>
-                        <td>{{e.date.strftime('%a %m/%d %H:%M')}}</td>
+                        <td>{{e.date.strftime('%a %m/%d @ %H:%M')}}</td>
                         <td>{{e.venueId}}</td>
                         <td>{{e.field}}</td>
                         <td>{{e.age}}</td>
@@ -65,16 +65,16 @@
 
                     <dialog class="popup" id="popup_{{e._id}}">
                         <a onclick="closePopup('{{e._id}}')" class="error"><i class="fa-solid fa-xmark"></i> Close</a>
-                        <h3>{{e.age}} @ {{e.venueId}}, {{e.leagueId}}</h3>
-                        <h4>Field {{e.field}}, {{e.date.strftime('%a %m/%d %H:%M')}}</h4>
+                        <h3>{{e.age}}: {{e.venueId}}, {{e.leagueId}}</h3>
+                        <h4>Field {{e.field}} @ {{e.date.strftime('%a %m/%d %H:%M')}}</h4>
                         {% for pos, u in e.umpires.items() %}
                         <label for="{{pos}}">{{pos}}: </label>
-                            {% if u.user is none and not pos.team_duty %}
-                            <button class="schedule-action" name="add_game" value="{{e._id}}_{{pos}}">+ {{pos}}</button>
-                            {% elif pos.team_duty %}
-                            <p>Team Duty ({{u.user}})</p>
+                            {% if u.user %}
+                                <a>{{u.user.firstLast}}</a>
+                            {% elif u.team_duty and not u.coach_req %}
+                                Team Duty ({{u.team_duty}})
                             {% else %}
-                            <a>{{u.user.firstLast}}</a>
+                                <button class="schedule-action" name="add_game" value="{{e._id}}_{{pos}}">+ {{pos}}</button>
                             {% endif %}
                             <br><br>
                         {% endfor %}

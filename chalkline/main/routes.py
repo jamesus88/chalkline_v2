@@ -38,6 +38,7 @@ def profile():
     res = svr.obj()
 
     if request.method == 'POST':
+        msg = ''
         if request.form.get('logout'):
             svr.logout()
             return redirect(url_for('main.home'))
@@ -52,8 +53,10 @@ def profile():
 
         elif request.form.get('addTeam'):
             teamId = request.form['newTeam']
-            user = User.add_team(res['user'], teamId)
-            svr.login(user)
+            try: user = User.add_team(res['user'], teamId)
+            except ValueError as e: msg = e
+            else:
+                svr.login(user)
 
         elif request.form.get('updateProfile'):
             user = User.update_profile(res['user'], request.form)
@@ -78,6 +81,7 @@ def profile():
             svr.login(res['user'], league=league)
 
         res = svr.obj()
+        res['msg'] = msg
 
     res['user'] = Team.load_teams(res['user'], res['league'])
     all_teams = Team.get_teams(res['league'])

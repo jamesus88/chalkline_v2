@@ -70,7 +70,7 @@
                             <th>Team Name</th>
                             <th>Remove</th>
                         </tr>
-                        {% for team in res.user.teams %}
+                        {% for team in res.user.team_info %}
                         <tr>
                             <td>{{team['teamId']}}</td>
                             <td>{{team['name']}}</td>

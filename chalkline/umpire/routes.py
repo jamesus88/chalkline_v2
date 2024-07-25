@@ -16,7 +16,7 @@ def schedule():
         if request.form.get('add_game'):
             eventId, pos = request.form['add_game'].split('_')
             try:
-                Event.add_umpire(eventId, res['user'], pos)
+                res['msg'] = Event.add_umpire(eventId, res['user'], pos)
             except (ValueError, PermissionError) as e:
                 res['msg'] = e
 
@@ -26,4 +26,25 @@ def schedule():
 
 @umpire.route('/assignments', methods=['GET', 'POST'])
 def assignments():
-    pass
+    mw = svr.authorized_only('umpire')
+    if mw: return mw
+
+    res = svr.obj()
+
+    if request.method == 'POST':
+        if request.form.get('substitute'):
+            pos, eventId = request.form['substitute'].split('_')
+
+        elif request.form.get('remove'):
+            pos, eventId = request.form['remove'].split('_')
+            try: 
+                Event.remove_umpire(eventId, pos, res['user'])
+            except ValueError as e:
+                res['msg'] = e
+            else:
+                res['msg'] = "Game successfully removed!"
+
+
+    events = Event.get(res['league'], res['user'])
+    league = League.get(res['league'])
+    return render_template("umpire/assignments.html", res=res, events=events, league=league)

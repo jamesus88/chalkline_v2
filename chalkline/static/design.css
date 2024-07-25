@@ -93,6 +93,15 @@ button.action:hover {
     color: var(--secondary);
     background-color: white;
 }
+button.danger {
+    background-color: white;
+    color: var(--error);
+    border: 2px solid var(--error);
+}
+button.danger:hover {
+    background-color: var(--error);
+    color: white;
+}
 .flex-col {
     display: flex;
     flex-direction: column;
