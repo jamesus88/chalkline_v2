@@ -21,11 +21,11 @@
     <form method="post">
         <button type="button" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
         <section id="filter-section" class="filter-section" style='display: none;'>
-            <select class="filter" name="hidePast" id="hidePast" onchange="this.form.submit()">
+            <select class="filter" name="hide_past" id="hide_past" onchange="this.form.submit()">
                 <option value="True" selected>Future only</option>
                 <option value="False">Past and Future</option>
             </select>
-            <select class="filter" name="ageGroup" id="ageGroup" onchange="this.form.submit()">
+            <select class="filter" name="age" id="age" onchange="this.form.submit()">
                 <option value="None" selected>All Age Groups</option>
                 {% for age in league.age_groups %}
                     <option value="{{ag}}">{{ag}} only</option>
@@ -71,6 +71,8 @@
                         <label for="{{pos}}">{{pos}}: </label>
                             {% if u.user is none and not pos.team_duty %}
                             <button class="schedule-action" name="add_game" value="{{e._id}}_{{pos}}">+ {{pos}}</button>
+                            {% elif pos.team_duty %}
+                            <p>Team Duty ({{u.user}})</p>
                             {% else %}
                             <a>{{u.user.firstLast}}</a>
                             {% endif %}

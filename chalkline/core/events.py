@@ -3,6 +3,24 @@ from datetime import datetime
 from chalkline.core import now, _safe, ObjectId
 from chalkline.core.user import User
 
+class Filter:
+    @staticmethod
+    def default():
+        return {
+            'hide_past': True,
+            'age': None
+        }
+
+    @staticmethod
+    def parse(form) -> dict:
+        filters = {
+            'hide_past': form.get('hide_past', 'True') == 'True',
+        }
+        if form.get('age', 'None') != 'None':
+            filters['age'] = form['age']
+
+        return filters
+
 class Event:
     col = eventData
 
@@ -47,13 +65,13 @@ class Event:
     def safe(event):
         event = _safe(event)
 
-        # check for full umpires
+        # fill in umpire data
         full = True
         for u in event['umpires'].values():
             if u['user'] is None and not u['team_duty']:
                 full = False
                 break
-            elif u['user']:
+            elif u['user'] and not u['team_duty']:
                 u['user'] = User.get_user(userId=u['user'])
         
         event['umpire_full'] = full
