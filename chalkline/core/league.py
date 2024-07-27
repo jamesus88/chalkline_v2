@@ -1,4 +1,4 @@
-from chalkline.collections import leagueData
+from chalkline.collections import leagueData, teamData
 from chalkline.core import now
 from chalkline import SEASON
 
@@ -7,7 +7,9 @@ class League:
 
     @staticmethod
     def get(leagueId):
-        return League.col.find_one({'leagueId': leagueId})
+        league = League.col.find_one({'leagueId': leagueId})
+        league['teams'] = list(teamData.find({'league': league['leagueId']}))
+        return league
     
     @staticmethod
     def create(form):

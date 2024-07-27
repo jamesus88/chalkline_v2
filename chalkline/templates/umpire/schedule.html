@@ -57,7 +57,7 @@
                         <td>{{e.age}}</td>
                         <td>{{e.status}}</td>
                         {% if e.umpire_full %}
-                        <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action">view</button></td>
+                        <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action"><i class="fa-solid fa-magnifying-glass"></i> view</button></td>
                         {% else %}
                         <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action">+ add</button></td>
                         {% endif %}

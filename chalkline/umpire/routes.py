@@ -45,6 +45,6 @@ def assignments():
                 res['msg'] = "Game successfully removed!"
 
 
-    events = Event.get(res['league'], res['user'])
+    events = Event.get(res['league'], res['user'], check_user_teams=False)
     league = League.get(res['league'])
     return render_template("umpire/assignments.html", res=res, events=events, league=league)

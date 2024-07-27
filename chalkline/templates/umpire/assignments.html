@@ -1,6 +1,6 @@
 <head>
     <link rel="stylesheet" href="{{url_for('static', filename='schedule.css')}}">
-    <script src="{{url_for('static', filename='schedule.js')}}"></script>
+    <script src="{{url_for('static', filename='schedule.js')}}" defer></script>
 </head>
 
 {% extends "design.html" %}
@@ -44,7 +44,7 @@
                     <td>{{e.field}}</td>
                     <td>{{e.age}}</td>
                     <td>{{e.status}}</td>
-                    <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action">view/edit</button></td>
+                    <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action"><i class="fa-solid fa-magnifying-glass"></i> view</button></td>
 
 
                     <dialog class="popup" id="popup_{{e._id}}">
@@ -63,7 +63,7 @@
                                     <a>{{u.user.firstLast}}</a>
                                     {% endif %}
                                 {% else %}
-                                None
+                                Open
                                 {% endif %}
                             {% else %}
                                 {{u.team_duty}}
@@ -86,8 +86,4 @@
     </section>
 </main>
 
-<script>
-    let tbl = document.getElementById('schedule-table');
-    colorifySchedule(tbl);
-</script>
 {% endblock content %}

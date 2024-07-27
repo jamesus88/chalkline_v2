@@ -8,14 +8,18 @@
 
 {% block content %}
 <main>
+    <form method="post">
     <div>
         <h1>Team Schedule</h1>
         <h3>Your teams: {{res.user.teams|join(', ')}}</h3>
+        <h3>Currently viewing: <select class="filter" name="team" id="team" onchange="this.form.submit()">
+            {% for t in res.user.teams %}
+                <option value="{{t}}" {% if t == team %}selected{% endif %}>{{t}}</option>
+            {% endfor %}
+        </select></h3>
     </div>
 
-    <button type="" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
-    <form method="post">
-        
+    <button type="" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>        
         <h3 class="error">{{res.msg}}</h3>
         <section class="schedule-section scrollwrapper">
             {% if events|length < 1 %}
@@ -44,7 +48,9 @@
                     <td>{{e.status}}</td>
                     <td>{{e.away}}</td>
                     <td>{{e.home}}</td>
-                    <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action">view</button></td>
+                    <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action">
+                        <i class="fa-solid fa-magnifying-glass"></i> {{e.team_umps|join(', ')}}</button>
+                    </td>
 
                     <dialog class="popup" id="popup_{{e._id}}">
                         <a onclick="closePopup('{{e._id}}')" class="error"><i class="fa-solid fa-xmark"></i> Close</a>
@@ -55,16 +61,16 @@
                             {% if u.user %}
                                 <a>{{u.user.firstLast}}</a>
                             {% elif not u.team_duty %}
-                                None
+                                Open
                             {% else %}
                                 {% if not u.coach_req %}
                                     {{u.team_duty}}
-                                    {% if 'coach' in res.user.groups %}
+                                    {% if 'coach' in res.user.groups and u.team_duty in res.user.teams %}
                                         <button type="submit" name="request" value="{{pos}}_{{e._id}}" class="schedule-action">Request Umpire</button>
                                     {% endif %}
                                 {% else %}
-                                    {% if 'coach' in res.user.groups %}
-                                        <button type="submit" name="request" value="{{pos}}_{{e._id}}" class="schedule-action danger">Remove Request</button>
+                                    {% if 'coach' in res.user.groups and u.team_duty in res.user.teams %}
+                                        <b>Pending</b> <button type="submit" name="remove" value="{{pos}}_{{e._id}}" class="schedule-action danger">Remove Request</button>
                                     {% endif %}
                                 {% endif %}
 
@@ -74,10 +80,9 @@
                     </dialog>
                 </tr>
                 {% endfor %}
-                
             </table>
-            
         </section>
+        <button id="load-more" type="button" class="action" onclick="load()">Load More</button>
     </form>
 </main>
 {% endblock content %}

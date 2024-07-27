@@ -1,5 +1,5 @@
 from chalkline.collections import eventData
-from datetime import datetime
+from datetime import datetime, timedelta
 from chalkline.core import now, _safe, ObjectId
 from chalkline.core.user import User
 
@@ -8,13 +8,17 @@ class Filter:
     def default():
         return {
             'hide_past': True,
-            'age': None
+            'age': None,
+            'start': now() - timedelta(hours=2),
+            'end': None,
+            'umpires_only': False
         }
 
     @staticmethod
     def parse(form) -> dict:
         filters = {
             'hide_past': form.get('hide_past', 'True') == 'True',
+            'umpires_only': form.get('umpires_only', 'True') == 'True',
         }
         if form.get('age', 'None') != 'None':
             filters['age'] = form['age']
@@ -57,7 +61,7 @@ class Event:
         return Event.safe(event)
     
     @staticmethod
-    def user_in_event(event, user) -> bool:
+    def user_in_event(event, user, check_user_teams) -> bool:
         # check umpires
         for ump in event['umpires'].values():
             if ump['user']:
@@ -65,9 +69,10 @@ class Event:
                     return True
             
         # check teams
-        for team in user['teams']:
-            if event['away'] == team or event['home'] == team:
-                return True
+        if check_user_teams:
+            for team in user['teams']:
+                if event['away'] == team or event['home'] == team:
+                    return True
             
         return False
     
@@ -79,7 +84,7 @@ class Event:
         return False
     
     @staticmethod
-    def get(league, user=None, team=None, filters=Filter.default()):
+    def get(league, user=None, team=None, check_user_teams=True, filters=Filter.default()):
         criteria = [{'leagueId': league}]
 
         all_events = [Event.safe(e) for e in Event.col.find({'$and': criteria})]
@@ -88,7 +93,7 @@ class Event:
         # filter
         for e in all_events:
             if user:
-                if not Event.user_in_event(e, user):
+                if not Event.user_in_event(e, user, check_user_teams):
                     continue
             if team:
                 if not Event.team_in_event(e, team):
@@ -103,9 +108,13 @@ class Event:
         event = _safe(event)
         umpires = [User.safe(u) for u in User.col.find({'leagues': {'$in': [event['leagueId']]}, 'groups': {'$in': ['umpire']}})]
 
-        # fill in umpire data
+        # fill in umpire data and add team hints
         full = True
+        team_umps = []
         for u in event['umpires'].values():
+            if u['team_duty']:
+                team_umps.append(u['team_duty'])
+
             if u['user']:
                 u['user'] = User.filter_for(umpires, userId=u['user'])
             elif u['team_duty'] and not u['coach_req']:
@@ -114,6 +123,7 @@ class Event:
                 full = False
         
         event['umpire_full'] = full
+        event['team_umps'] = team_umps
 
         return event
     
@@ -137,3 +147,28 @@ class Event:
     @staticmethod
     def remove_umpire(eventId, pos, user):
         Event.col.update_one({'_id': ObjectId(eventId), f'umpires.{pos}.user': user['userId']}, {'$set': {f'umpires.{pos}.user': None}})
+
+    @staticmethod
+    def request_umpire(eventId, pos, coach):
+        Event.col.update_one({'_id': ObjectId(eventId)}, {'$set': {f'umpires.{pos}.coach_req': coach['userId']}})
+
+    @staticmethod
+    def remove_request(eventId, pos):
+        event = Event.col.find_one_and_update(
+            {
+                '_id': ObjectId(eventId),
+                f'umpires.{pos}.user': None
+            }, 
+            {'$set': {f'umpires.{pos}.coach_req': None}})
+        
+        if event is None:
+            raise ValueError('An umpire has already accepted this game!')
+        
+    @staticmethod
+    def label_umpire_duties(events, team):
+        for e in events:
+            for ump in e['umpires'].values():
+                if ump['team_duty'] == team:
+                    e['type'] = 'Umpire Duty'
+
+    
