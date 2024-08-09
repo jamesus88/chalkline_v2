@@ -41,7 +41,7 @@ def create_app():
     app.register_blueprint(league, url_prefix="/league")
     
     from chalkline.view_info.routes import view_info
-    app.register_blueprint(view_info, url_prefix="/view-info")
+    app.register_blueprint(view_info, url_prefix="/view")
     
     from chalkline.invite.routes import invite
     app.register_blueprint(invite, url_prefix="/invite")

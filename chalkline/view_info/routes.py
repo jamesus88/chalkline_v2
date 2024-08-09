@@ -1,89 +1,45 @@
 from flask import render_template, redirect, url_for, session, request, Blueprint
-from chalkline import db
-from chalkline.admin import admin_db
-from chalkline import server as srv
+from chalkline.core import server as svr
+from chalkline.core.events import Event
+from chalkline.core.user import User
+from chalkline.core.league import League
+
 view_info = Blueprint('view_info', __name__)
 
 @view_info.route("/event/<eventId>", methods=['GET', 'POST'])
 def event(eventId):
-    user = srv.getUser()
-    if user is None:
-        session['next-url'] = request.path
-        return redirect(url_for('main.login'))
-    
-    msg = ''
-    smsg = None
-    userList = db.getUserList(session['location'])
-    teamsList = db.getTeams(session['location'])
-    
+    mw = svr.authorized_only()
+    if mw: return mw
+
+    res = svr.obj()
+    e = Event.find(eventId)
+    e['league_info'] = League.get(e['leagueId'])
+    all_umpires = User.find_groups(res['league'], ['umpire'])
+    edit_view = False
+
     if request.method == 'POST':
-        this_event = db.getEventInfo(eventId)
-        if request.form.get('updateEvent'):
-            msg = db.updateEvent(session['location'], user, this_event, request.form, userList, editRules=True, editContacts=True)
-            
-        elif request.form.get('subGame'):
-            sub = db.getUser(request.form['sub'])
-            smsg = db.substituteUmpire(user, this_event, sub)
-    
-    event = db.getEventInfo(eventId)
-    
-    if not event:
-        return redirect(url_for('league.master_schedule'))
-    else:
-        event = srv.safeEvent(event, userList)
+        if request.form.get('edit'):
+            edit_view = True
+        elif request.form.get('cancel'):
+            pass
+        elif request.form.get('save'):
+            Event.update(e, request.form)
+            edit_view = False
+            res['msg'] = "Saved!"
+        elif request.form.get('delete_umpire'):
+            Event.delete_ump_pos(e, request.form['delete_umpire'])
+            res['msg'] = f"{request.form['delete_umpire']} position deleted."
+        elif request.form.get('add_umpire'):
+            Event.add_ump_pos(e, request.form['pos'])
+            res['msg'] = f"{request.form['pos']} position added."
         
-    userList = [srv.safeUser(x) for x in userList]
-    
-    sobj=srv.getSessionObj(session, msg=msg, smsg=smsg)
-    return render_template("view_info/event.html", user=user, event=event, teamsList=teamsList, userList=userList, sobj=sobj)
+        # reload event
+        e = Event.find(eventId)
+        e['league_info'] = League.get(e['leagueId'])
+
+    return render_template("view_info/event.html", res=res, edit_view=edit_view, event=e, all_umpires=all_umpires)
 
 @view_info.route("/user/<user_id>", methods=['GET', 'POST'])
 @view_info.route("/user")
 def user(user_id=None):
-    user = srv.getUser()
-    if user is None:
-        session['next-url'] = request.path
-        return redirect(url_for('main.login'))
-    elif user_id is None:
-        return redirect(url_for('main.home'))
-    
-    view_user = srv.safeUser(db.getUser(_id=user_id))
-    msg = ''
-
-    if request.method == 'POST':
-        if 'admin' not in user['role']:
-            raise PermissionError('Error: admin credentials required.')
-
-        if request.form.get('permissionSet'):
-            ps = request.form['permissionSet']
-            view_user['permissionSet'] = ps
-            msg = admin_db.updateUser(user, user_id, {'permissionSet': ps})
-
-        elif request.form.get('addRole'):
-            role = request.form['addRole']
-            if role in view_user['role']:
-                msg = 'Error: user already has that role.'
-            else:
-                user_roles = view_user['role']
-                user_roles.append(role)
-                view_user['role'] = user_roles
-                msg = admin_db.updateUser(user, user_id, {'role': user_roles})
-
-        elif request.form.get('removeRole'):
-            role = request.form['removeRole']
-            if role not in view_user['role']:
-                msg = 'Error: user does not have that role.'
-            else:
-                user_roles = view_user['role']
-                user_roles.remove(role)
-                view_user['role'] = user_roles
-                msg = admin_db.updateUser(user, user_id, {'role': user_roles})
-
-        elif request.form.get('removeLoc'):
-            user_leagues = view_user['locations']
-            user_leagues.remove(session['location'])
-            view_user['locations'] = user_leagues
-            msg = admin_db.updateUser(user, user_id, {'locations': user_leagues})
-
-    sobj=srv.getSessionObj(session, msg=msg)
-    return render_template("view_info/user.html", user=user, view_user=view_user, sobj=sobj)
+    pass

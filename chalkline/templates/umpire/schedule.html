@@ -50,7 +50,7 @@
                 </tr>
                 {% for e in events %}
                     <tr>
-                        <td><a class="icon-link"><i class="fa-solid fa-info"></i></a></td>
+                        <td><a href="{{url_for('view_info.event', eventId=e._id)}}" class="icon-link"><i class="fa-solid fa-info"></i></a></td>
                         <td>{{e.date.strftime('%a %m/%d @ %H:%M')}}</td>
                         <td>{{e.venueId}}</td>
                         <td>{{e.field}}</td>
@@ -67,6 +67,7 @@
                         <a onclick="closePopup('{{e._id}}')" class="error"><i class="fa-solid fa-xmark"></i> Close</a>
                         <h3>{{e.age}}: {{e.venueId}}, {{e.leagueId}}</h3>
                         <h4>Field {{e.field}} @ {{e.date.strftime('%a %m/%d %H:%M')}}</h4>
+                        <p><b>Umpires</b></p>
                         {% for pos, u in e.umpires.items() %}
                         <label for="{{pos}}">{{pos}}: </label>
                             {% if u.user %}

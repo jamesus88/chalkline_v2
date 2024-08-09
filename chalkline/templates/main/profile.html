@@ -124,16 +124,19 @@
                         <td><input type="tel" name="phone" id="phone" value={{res.user.phone}} required></td>
                     </tr>
                     <tr>
-                        <td><label for="emailNotifications">Receive email alerts</label></td>
-                        <td><input type="checkbox" name="emailNotifications" id="emailNotifications" checked></td>
+                        <td><label for="email_nots">Receive email alerts</label></td>
+                        <td><input type="checkbox" name="email_nots" id="email_nots" checked></td>
+                        <script>document.getElementById('email_nots').checked = "{{res.user.preferences.email_nots}}" == 'True';</script>
                     </tr>
                     <tr>
-                        <td><label for="hideEmail">Hide my email from other users</label></td>
-                        <td><input type="checkbox" name="hideEmail" id="hideEmail"></td>
+                        <td><label for="hide_email">Hide my email from other users</label></td>
+                        <td><input type="checkbox" name="hide_email" id="hide_email"></td>
+                        <script>document.getElementById('hide_email').checked = "{{res.user.preferences.hide_email}}" == 'True';</script>
                     </tr>
                     <tr>
-                        <td><label for="hidePhone">Hide my phone number from other users</label></td>
-                        <td><input type="checkbox" name="hidePhone" id="hidePhone"></td>
+                        <td><label for="hide_phone">Hide my phone number from other users</label></td>
+                        <td><input type="checkbox" name="hide_phone" id="hide_phone"></td>
+                        <script>document.getElementById('hide_phone').checked = "{{res.user.preferences.hide_phone}}" == 'True';</script>
                     </tr>
                 </table>
                 

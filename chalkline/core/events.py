@@ -42,6 +42,7 @@ class Event:
             'home': form.get('home'),
             'score': form.get('score', [0,0]),
             'status': form.get('status'),
+            'visible': True,
             'umpires': {
                 'Plate': {
                     'user': None,
@@ -104,9 +105,17 @@ class Event:
         return events
     
     @staticmethod
+    def find(eventId):
+        e = Event.col.find_one({"_id": ObjectId(eventId)})
+        if e:
+            return Event.safe(e)
+        else:
+            return None
+    
+    @staticmethod
     def safe(event):
         event = _safe(event)
-        umpires = [User.safe(u) for u in User.col.find({'leagues': {'$in': [event['leagueId']]}, 'groups': {'$in': ['umpire']}})]
+        umpires = [User.view(u) for u in User.col.find({'leagues': {'$in': [event['leagueId']]}, 'groups': {'$in': ['umpire']}})]
 
         # fill in umpire data and add team hints
         full = True
@@ -153,6 +162,25 @@ class Event:
         Event.col.update_one({'_id': ObjectId(eventId)}, {'$set': {f'umpires.{pos}.coach_req': coach['userId']}})
 
     @staticmethod
+    def delete_ump_pos(event, pos):
+        Event.col.update_one({'_id': ObjectId(event['_id'])}, {'$unset': {f'umpires.{pos}': 0}})
+
+    @staticmethod
+    def generate_ump_pos(event, pos):
+        blank = {
+            'user': None,
+            'team_duty': None,
+            'permissions': [],
+            'coach_req': None
+        }
+        return blank
+
+    @staticmethod
+    def add_ump_pos(event, pos):
+        blank = Event.generate_ump_pos(event, pos)
+        Event.col.update_one({'_id': ObjectId(event['_id'])}, {'$set': {f'umpires.{pos}': blank}})
+
+    @staticmethod
     def remove_request(eventId, pos):
         event = Event.col.find_one_and_update(
             {
@@ -171,4 +199,23 @@ class Event:
                 if ump['team_duty'] == team:
                     e['type'] = 'Umpire Duty'
 
+    @staticmethod
+    def update(event, form):
+        event['date'] = datetime.strptime(form['date'], "%Y-%m-%dT%H:%M")
+        event['venueId'] = form['venueId']
+        event['field'] = int(form['field'])
+        event['age'] = form['age']
+        event['away'] = form.get('away')
+        event['home'] = form['home']
+        event['status'] = form['status']
+        event['visible'] = form.get('visible') == 'on'
+        for pos in event['umpires']:
+            event['umpires'][pos]['user'] = form.get(f'{pos}_user')
+            if form[f'{pos}_team'] == 'None':
+                event['umpires'][pos]['team_duty'] = None
+            else:
+                event['umpires'][pos]['team_duty'] = form[f'{pos}_team']
+        _id = event['_id']
+        del event['_id']
+        Event.col.replace_one({'_id': ObjectId(_id)}, event)
     

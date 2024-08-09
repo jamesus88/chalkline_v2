@@ -1,4 +1,4 @@
-from chalkline.collections import leagueData, teamData
+from chalkline.collections import leagueData, teamData, venueData
 from chalkline.core import now
 from chalkline import SEASON
 

@@ -11,6 +11,16 @@ class User:
         user = _safe(user)
         user['firstLast'] = user['firstName'][0] + '. ' + user['lastName']
         return user
+    
+    @staticmethod
+    def view(user):
+        user = User.safe(user)
+        if user['preferences']['hide_email']:
+            user['email'] = None
+        if user['preferences']['hide_phone']:
+            user['phone'] = None
+
+        return user
 
     @staticmethod
     def get_user(userId=None, email=None):
@@ -133,9 +143,9 @@ class User:
                 'firstName': form['firstName'].strip().title(),
                 'lastName': form['lastName'].strip().title(),
                 'phone': User.clean_phone(form['phone']),
-                'preferences.hide_email': form.get('hide_email', False),
-                'preferences.hide_phone': form.get('hide_phone', False),
-                'preferences.email_nots': form.get('email_nots', False)
+                'preferences.hide_email': form.get('hide_email', False) == 'on',
+                'preferences.hide_phone': form.get('hide_phone', False) == 'on',
+                'preferences.email_nots': form.get('email_nots', False) == 'on'
             }}, return_document=True
         )
         return User.safe(user)
@@ -156,3 +166,8 @@ class User:
             if u['userId'] == userId:
                 return u
         return None
+    
+    @staticmethod
+    def find_groups(leagueId, groups):
+        users = User.col.find({'leagues': {'$in': [leagueId]}, 'groups': {'$in': groups}, 'active': True})
+        return [User.safe(u) for u in users]
