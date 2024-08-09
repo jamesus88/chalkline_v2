@@ -14,22 +14,19 @@
         <section>
             <form method="post">
                 <h3>Team: <select class="filter" name="teamId" id="teamId" onchange="this.form.submit()">
-                    {% for team in user.teams %}
+                    {% for team in res.user.teams %}
                     <option value="{{team}}">{{team}}</option>
                     {% endfor %}
                 </select></h3>
-                <script>
-                    let team = {{ team | tojson }};
-                    document.getElementById('teamId').value = team.teamId;
-                </script>
+                <script>document.getElementById('teamId').value = "{{team.teamId}}"</script>
             </form>
         </section>
         <section>
-            <h2>{{team.teamId}} - {{team.teamName}}</h2>
+            <h2>{{team.teamId}} - {{team.name}}</h2>
         </section>
         <section>
-            <h2>Standings</h2>
-            <h3>Current Seed: </h3>
+            <h2>Standings: {{league.current_season}}</h2>
+            <h3>Current Seed: Not Placed</h3>
             <table class="center">
                 <tr>
                     <th>Wins</th>
@@ -37,19 +34,19 @@
                     <th>Ties</th>
                 </tr>
                 <tr>
-                    <td>{{team.wins}}</td>
-                    <td>{{team.losses}}</td>
-                    <td>{{team.ties}}</td>
+                    <td>{{team.seasons.get(league.current_season).record[0]}}</td>
+                    <td>{{team.seasons.get(league.current_season).record[1]}}</td>
+                    <td>{{team.seasons.get(league.current_season).record[2]}}</td>
                 </tr>
             </table>
         </section>
         <section>
             <h2>Contacts</h2>
             <p>Other users with this team</p>
-            {% if user.hideEmail %}
+            {% if res.user.preferences.hide_email %}
             <p class='urgent'>Your email is hidden to other users</p>
             {% endif %}
-            {% if user.hidePhone %}
+            {% if res.user.preferences.hide_phone %}
             <p class='urgent'>Your phone number is hidden to other users</p>
             {% endif %}
             <a href="{{url_for('main.profile')}}">Change contact sharing preferences</a></p>
@@ -60,10 +57,10 @@
                     <th>Phone</th>
                     <th>Email</th>
                 </tr>
-                {% for user in teamContacts %}
+                {% for user in team.contacts %}
                 <tr>
                     <td>{{user.firstName}} {{user.lastName}}</td>
-                    {% if 'coach' in user.role %}
+                    {% if user.userId in team.seasons.get(league.current_season).coaches %}
                     <td>Coach</td>
                     {% else %}
                     <td>Parent</td>
@@ -72,6 +69,7 @@
                     <td>{{user.email}}</td>
                 </tr>
                 {% endfor %}
+
             </table>
             <button class='action' onclick="copy('{{link}}')">Share Team <i class="fa-solid fa-share-from-square"></i></button>
         </section>

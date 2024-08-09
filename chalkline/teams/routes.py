@@ -2,6 +2,8 @@ from flask import render_template, redirect, url_for, session, request, Blueprin
 from chalkline.core import server as svr
 from chalkline.core.team import Team
 from chalkline.core.events import Event
+from chalkline.core.league import League
+
 
 teams = Blueprint('teams', __name__)
 
@@ -44,7 +46,23 @@ def schedule():
 
 @teams.route("/info", methods=['GET', 'POST'])
 def info():
-    pass
+    mw = svr.authorized_only(['coach', 'parent'])
+    if mw: return mw
+
+    res = svr.obj()
+
+    try: teamId = res['user']['teams'][0]
+    except IndexError: return redirect(url_for('main.profile'))
+
+    if request.method == 'POST':
+        teamId = request.form['teamId']
+
+    team = Team.get(teamId)
+    league = League.get(res['league'])
+    link = f"{res['protocol']}://{res['domain']}/invite/add-team/{teamId}"
+    Team.load_contacts(team)
+
+    return render_template("teams/info.html", res=res, team=team, league=league, link=link)
     
 @teams.route("/rentals", methods=['GET', 'POST'])
 def rentals():

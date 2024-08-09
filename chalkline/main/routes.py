@@ -84,7 +84,7 @@ def profile():
         res['msg'] = msg
 
     res['user'] = Team.load_teams(res['user'], res['league'])
-    all_teams = Team.get_teams(res['league'])
+    all_teams = Team.get_league_teams(res['league'])
     return render_template('main/profile.html', res=res, all_teams=all_teams)
     
 

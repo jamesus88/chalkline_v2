@@ -20,30 +20,6 @@ def add_team(teamId=None):
             session['user'] = user
         
     return redirect(url_for('main.profile'))
-
-@invite.route("/reset/<email>/<token>", methods=['GET', 'POST'])
-def password_reset(email=None, token=None):
-    if email is None or token is None:
-        return redirect(url_for('main.home'))
-    
-    user = db.userData.find_one({'email': email})
-    if user is None:
-        return redirect(url_for('main.home'))
-    elif 'reset_token' not in user:
-        return redirect(url_for('main.home'))
-    elif token != user['reset_token']:
-        return redirect(url_for('main.home'))
-    
-    msg = ''
-    
-    if request.method == 'POST':
-        pword = generate_password_hash(request.form['pword'])
-        db.userData.update_one({'email': email}, {'$set': {'pword': pword}, '$unset': {'reset_token': ''}})
-        msg = "Your password has been updated."
-    
-    sobj=srv.getSessionObj(session, msg=msg)
-
-    return render_template("main/reset-password.html", email=user['email'], sobj=sobj, user=None)
     
 @invite.route('/daily-reminders', methods=['GET', 'POST'])
 def daily_reminders():

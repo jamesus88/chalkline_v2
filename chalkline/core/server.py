@@ -38,7 +38,7 @@ def obj(context={}):
 
     return res
 
-def authorized_only(group=None):
+def authorized_only(group: str | list = None):
     user = session.get('user')
     if not user:
         return redirect(url_for('main.login', next=request.endpoint))
