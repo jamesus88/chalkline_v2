@@ -21,6 +21,11 @@ class User:
             user['phone'] = None
 
         return user
+    
+    @staticmethod
+    def get(criteria):
+        users = User.col.find(criteria)
+        return [User.safe(u) for u in users]
 
     @staticmethod
     def get_user(userId=None, email=None):
@@ -171,3 +176,28 @@ class User:
     def find_groups(leagueId, groups):
         users = User.col.find({'leagues': {'$in': [leagueId]}, 'groups': {'$in': groups}, 'active': True})
         return [User.safe(u) for u in users]
+    
+    @staticmethod
+    def generate_permissions(league, positions):
+        perms = [
+            'umpire_add',
+            'umpire_remove',
+            'coach_add',
+            'coach_remove',
+        ]
+
+        for age in league['age_groups']:
+            perms.append(f"umpire_Plate_{age}")
+            perms.append(f"umpire_Field_{age}")
+
+        return perms
+    
+    @staticmethod
+    def get_all_groups():
+        return [
+            'umpire',
+            'coach',
+            'parent',
+            'director',
+            'admin'
+        ]

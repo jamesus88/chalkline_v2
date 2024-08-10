@@ -47,12 +47,12 @@ class Event:
                 'Plate': {
                     'user': None,
                     'team_duty': False,
-                    'permissions': ['plate']
+                    'permissions': []
                 },
                 '1B': {
                     'user': None,
                     'team_duty': False,
-                    'permissions': ['field']
+                    'permissions': []
                 }
             },
             'created': now()
@@ -166,7 +166,7 @@ class Event:
         Event.col.update_one({'_id': ObjectId(event['_id'])}, {'$unset': {f'umpires.{pos}': 0}})
 
     @staticmethod
-    def generate_ump_pos(event, pos):
+    def generate_blank_ump_pos(event, pos):
         blank = {
             'user': None,
             'team_duty': None,
@@ -177,7 +177,7 @@ class Event:
 
     @staticmethod
     def add_ump_pos(event, pos):
-        blank = Event.generate_ump_pos(event, pos)
+        blank = Event.generate_blank_ump_pos(event, pos)
         Event.col.update_one({'_id': ObjectId(event['_id'])}, {'$set': {f'umpires.{pos}': blank}})
 
     @staticmethod
@@ -217,5 +217,20 @@ class Event:
                 event['umpires'][pos]['team_duty'] = form[f'{pos}_team']
         _id = event['_id']
         del event['_id']
+        event.pop('league_info')
+        event.pop('team_umps')
+        event.pop('umpire_full')
+
         Event.col.replace_one({'_id': ObjectId(_id)}, event)
     
+    @staticmethod
+    def get_all_ump_positions():
+        return [
+            'Plate',
+            '1B',
+            '2B',
+            '3B',
+            'LF',
+            'RF',
+            'Misc'
+        ]

@@ -1,6 +1,6 @@
 <head>
     <link rel="stylesheet" href="{{url_for('static', filename='schedule.css')}}">
-    <script src="{{url_for('static', filename='schedule.js')}}"></script>
+    <script src="{{url_for('static', filename='schedule.js')}}" defer></script>
     <style>
         @media screen and (max-width: 2000px) {
             main {
@@ -11,117 +11,92 @@
 </head>
 
 {% extends "design.html" %}
-{% block title %}User Data{% endblock title %}
+{% block title %}Admin{% endblock title %}
 
 {% block content %}
 <main>
     <section class="split">
         <div>
-            <h1>User Data</h1>
-            <p class="error">{{sobj.msg}}</p>
+            <h1>Users</h1>
+            <p class="subtle">Hold ctrl on PC or cmd on Mac to select multiple groups/permissions</p>
+            <p class="error">{{res.msg}}</p>
         </div>
     </section>
     <button type="" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
     <form method="post">
         <section id="filter-section" class="filter-section">
-            <select name="updateFilter" id="updateFilter" style="display: none;">
-                <option value="updateFilter" selected>UpdateFilter</option>
-            </select>
-            <select class="filter" name="active" id="active" onchange="this.form.submit()">
-                <option value="true" selected>Active only</option>
-                <option value="undefined">Active/Inactive</option>
-            </select>
-            <select class="filter" name="role" id="role" onchange="this.form.submit()">
-                <option value="undefined" selected>All roles</option>
-                <option value="umpire">Umpires only</option>
-                <option value="youth">Youth umpires only</option>
-                <option value="coach">Coaches only</option>
-                <option value="parent">Parents only</option>
-                <option value="board">Directors only</option>
-                <option value="admin">Admins only</option>
-            </select>
-        
-            <script>
-                let filter = {{ userFilter | tojson }};
-                document.getElementById('active').value = filter.active;
-                document.getElementById('role').value = filter.role;
-
-                function toggleFilterSection(section) {
-                    let sect = document.getElementById(section);
-                    if (sect.style.display == 'none') {
-                        sect.style.display = 'block';
-                    }
-                    else {
-                        sect.style.display = 'none';
-                    }
-                }
-            </script>
         </section>
 
         <section class="schedule-section scrollwrapper">
-            {% if userList|length < 1 %}
+            {% if users|length < 1 %}
             <h3 class="error">No users found.</h3>
             {% endif %}
+
+            <section class="split">
+                <div>
+                </div>
+                <div class="align-right">
+                    <button onclick="return confirm('Are you sure you want to edit these users?')" type="submit" class="action" name="save" value="save"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+                </div>
+            </section>
+
             <table id="schedule-table" class="event-display admin">
                 <tr>
+                    <th></th>
                     <th>Last</th>
                     <th>First</th>
                     <th>Email</th>
                     <th>Phone</th>
-                    <th>Priority Regist.</th>
-                    <th>Can&nbsp;Remove Games</th>
-                    <th>Active</th>
-                    <th>Update</th>
-                    <th>Manage</th>
+                    <th>Groups</th>
+                    <th>Permissions</th>
                 </tr>
-                {% for u in userList %}
+                {% for u in users %}
                 <tr class="event-row">
+                    <td><a class="icon-link" href="{{url_for('view_info.user', userId=u.userId)}}"><i class="fa-solid fa-info"></i></a></td>
                     <td class="event-type">{{u.lastName}}</td>
                     <td class="event-type">{{u.firstName}}</td>
                     <td class="event-type">{{u.email}}</td>
                     <td class="event-type">{{u.phone}}</td>
-                    <td><select class="admin" name="priority_{{u._id}}" id="priority_{{u._id}}">
-                        <option value="True">Yes</option> 
-                        <option value="False">No</option>
+                    <td><select name="{{u._id}}_groups" id="{{u._id}}_groups" multiple>
+                        {% for g in groups %}
+                        <option value="{{g}}">{{g}}</option>
+                        {% endfor %}
                     </select></td>
-                    <td><select class="admin" name="canRemoveGame_{{u._id}}" id="canRemoveGame_{{u._id}}">
-                        <option value="True">Yes</option> 
-                        <option value="False">No</option>
+                    <td><select name="{{u._id}}_permissions" id="{{u._id}}_permissions" multiple>
+                        <option value="blank">None</option>
+                        {% for p in league.permissions %}
+                        <option value="{{p}}">{{p}}</option>
+                        {% endfor %}
                     </select></td>
-                    <td><select class="admin" name="active_{{u._id}}" id="active_{{u._id}}">
-                        <option value="True">Yes</option> 
-                        <option value="False">No</option>
-                    </select></td>
-                    <td><button class="schedule-action" type="submit" name="updateUser" value="{{u._id}}">Update</button></td>
-                    <td><button class="schedule-action" type="submit" name="manageUser" value="{{u._id}}">Manage</button></td>
+
+                    <script>
+                        groups = JSON.parse('{{u.groups|tojson}}')
+                        permissions = JSON.parse('{{u.permissions|tojson}}')
+                        groups_select = document.getElementById('{{u._id}}_groups')
+                        permissions_select = document.getElementById('{{u._id}}_permissions')
+                        for (g of groups) {
+                            for (o of groups_select.options) {
+                                if (o.value == g) {
+                                    o.selected = true
+                                }
+                            }
+                        }
+                        for (p of permissions) {
+                            for (o of permissions_select.options) {
+                                if (o.value == p) {
+                                    o.selected = true
+                                }
+                            }
+                        }
+                    </script>
+                    
+                    
                 </tr>
-                <script>
-                    document.getElementById('priority'+"_{{u._id}}").value = "{{u.priority}}";
-                    document.getElementById('canRemoveGame'+"_{{u._id}}").value = "{{u.canRemoveGame}}";
-                    document.getElementById('active'+"_{{u._id}}").value = "{{u.active}}";
-                </script>
+
                 {% endfor %}
             </table>
         </section>
         <button id="load-more" type="button" class="action" onclick="load()">Load More</button>
     </form>
 </main>
-
-<script>
-    let page = 1
-    let tbl = document.getElementById('schedule-table');
-    colorifySchedule(tbl);
-    loadMore(tbl, page, 50);
-
-    function load() {
-        page = loadMore(tbl, page + 1, 50);
-        if (page == 0) {
-            let button = document.getElementById('load-more');
-            button.classList.add('disabled');
-            button.disabled = true;
-            button.innerHTML = "All Users Shown";
-        }
-    }
-    
-</script>
 {% endblock content %}

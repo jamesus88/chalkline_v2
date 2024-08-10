@@ -39,7 +39,7 @@ def event(eventId):
 
     return render_template("view_info/event.html", res=res, edit_view=edit_view, event=e, all_umpires=all_umpires)
 
-@view_info.route("/user/<user_id>", methods=['GET', 'POST'])
+@view_info.route("/user/<userId>", methods=['GET', 'POST'])
 @view_info.route("/user")
-def user(user_id=None):
+def user(userId=None):
     pass

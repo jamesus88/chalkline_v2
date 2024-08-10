@@ -1,6 +1,6 @@
 <head>
     <link rel="stylesheet" href="{{url_for('static', filename='schedule.css')}}">
-    <script src="{{url_for('static', filename='schedule.js')}}"></script>
+    <script src="{{url_for('static', filename='schedule.js')}}" defer></script>
     <style>
         @media screen and (max-width: 2000px) {
             main {
@@ -11,88 +11,35 @@
 </head>
 
 {% extends "design.html" %}
-{% block title %}Event Data{% endblock title %}
+{% block title %}Admin{% endblock title %}
 
 {% block content %}
 <main>
     <section class="split">
         <div>
-            <h1>Event Data (2024)</h1>
-            <p class="error">{{sobj.msg}}</p>
+            <h1>Events ({{league.current_season}})</h1>
+            <p class="error">{{res.msg}}</p>
         </div>
         <div class="align-right">
             <h3><a href="{{url_for('admin.add_event')}}">Add Event</a></h3>
-        
-            <details>
-                <summary><b>Other Options</b></summary>
-                <form method="post">
-                <div class="stack">
-                    <button type="submit" class="action" name="freeDrop" value="open">Open <i>Free Drop</i></button>
-                    <button type="submit" class="action" name="freeDrop" value="close">Close <i>Free Drop</i></button>
-                    <button type="submit" class="action" name="lockGames" value="open">Unlock All Games</button>
-                    <button type="submit" class="action" name="lockGames" value="close">Lock All Games</button>
-                    <br>
-                    <button type="submit" class="action" name="updateMisc" value="update" onclick="return confirm('Run Miscellaneous Function? This should only be used by developers!')">Run Misc. Func.</button>
-                </div>
-                </form>
-            </details>
-            
-            
         </div>
     </section>
+
     <button type="" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
     <form method="post">
         <section id="filter-section" class="filter-section">
-            <select name="updateFilter" id="updateFilter" style="display: none;">
-                <option value="updateFilter" selected>UpdateFilter</option>
-            </select>
-            <select class="filter" name="hidePast" id="hidePast" onchange="this.form.submit()">
-                <option value="true" selected>Future only</option>
-                <option value="false">Past and Future</option>
-            </select>
-            <select class="filter" name="ageGroup" id="ageGroup" onchange="this.form.submit()">
-                <option value="null" selected>All Age Groups</option>
-                <option value="T-Ball">T-Ball only</option>
-                <option value="Coach Pitch">Coach Pitch only</option>
-                <option value="AA">AA only</option>
-                <option value="AAA">AAA only</option>
-                <option value="Majors">Majors only</option>
-                <option value="50/70">50/70 only</option>
-                <option value="Juniors">Juniors only</option>
-            </select>
-            <select class="filter" name="teamId" id="teamId" onchange="this.form.submit()">
-                <option value="null" selected>All Teams</option>
-                {% for team in allTeams %}
-                <option value="{{team['teamId']}}">{{team['teamId']}}</option>
-                {% endfor %}
-            </select>
-            <select class="filter" name="eventTypeFilter" id="eventTypeFilter" onchange="this.form.submit()">
-                <option value="null" selected>All events</option>
-                <option value="Game">Games only</option>
-                <option value="Practice">Practices only</option>
-            </select>
-        
-            <script>
-                let filter = {{ eventFilter | tojson }};
-                document.getElementById('hidePast').value = filter.hidePast;
-                document.getElementById('teamId').value = filter.teamId;
-                document.getElementById('eventTypeFilter').value = filter.eventTypeFilter;
-                document.getElementById('ageGroup').value = filter.ageGroup;
+        </section>
 
-                function toggleFilterSection(section) {
-                    let sect = document.getElementById(section);
-                    if (sect.style.display == 'none') {
-                        sect.style.display = 'block';
-                    }
-                    else {
-                        sect.style.display = 'none';
-                    }
-                }
-            </script>
+        <section class="split">
+            <div>
+            </div>
+            <div class="align-right">
+                <button type="submit" class="action" name="save" value="save"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+            </div>
         </section>
 
         <section class="schedule-section scrollwrapper">
-            {% if eventList|length < 1 %}
+            {% if events|length < 1 %}
             <h3 class="error">No events found.</h3>
             {% endif %}
             <table id="schedule-table" class="event-display admin">
@@ -102,46 +49,48 @@
                     <th>Date/Time</th>
                     <th>Venue</th>
                     <th>Field</th>
+                    <th>Age Group</th>
                     <th>Status</th>
                     <th>Away</th>
                     <th>Home</th>
-                    <th>Umpire Duty</th>
-                    <th>Update</th>
                     <th>Delete</th>
                 </tr>
-                {% for event in eventList %}
+                {% for e in events %}
                 <tr class="event-row">
-                    <td><a class="icon-link" href="{{url_for('view_info.event', eventId=event._id)}}"><i class="fa-solid fa-info"></i></a></td>
-                    <td class="event-type">{{event.eventType}}</td>
-                    <td><input class="admin" type="datetime-local" name="eventDate_{{event._id}}" id="eventDate" value="{{event.eventDate}}"></td>
-                    <td><input class="admin" type="text" name="eventVenue_{{event._id}}" id="eventVenue" value="{{event.eventVenue}}"></td>
-                    <td><input class="admin" type="number" name="eventField_{{event._id}}" id="eventField" value="{{event.eventField}}"></td>
-                    <td><input class="admin" type="text" name="status_{{event._id}}" id="status" value="{{event.status}}"></td>
-                    <td><select class="admin" name="awayTeam_{{event._id}}" id="awayTeam_{{event._id}}">
+                    <td><a class="icon-link" href="{{url_for('view_info.event', eventId=e._id)}}"><i class="fa-solid fa-info"></i></a></td>
+                    <td class="event-type">{{e.type}}</td>
+                    <td><input class="admin" type="datetime-local" name="{{e._id}}_date" id="date" value="{{e.date.isoformat()}}"></td>
+                    <td><select class="admin" name="{{e._id}}_venueId" id="{{e._id}}_venueId">
+                        {% for v in league.venues %}
+                            <option value="{{v}}">{{v}}</option>
+                        {% endfor %}
+                    </select></td>
+                    <td><input class="admin" type="number" name="{{e._id}}_field" id="field" value="{{e.field}}"></td>
+                    <td><select class="admin" name="{{e._id}}_age" id="{{e._id}}_age">
+                        {% for a in league.age_groups %}
+                            <option value="{{a}}">{{a}}</option>
+                        {% endfor %}
+                    </select></td>
+                    <td><input class="admin" type="text" name="{{e._id}}_status" id="status" value="{{e.status}}"></td>
+                    <td><select class="admin" name="{{e._id}}_away" id="{{e._id}}_away">
                         <option value="None">None</option> 
-                        {% for team in allTeams %}
-                            <option value="{{team.teamId}}">{{team.teamId}}</option>
+                        {% for t in league.teams %}
+                            <option value="{{t.teamId}}">{{t.teamId}}</option>
                         {% endfor %}
                     </select></td>
-                    <td><select class="admin" name="homeTeam_{{event._id}}" id="homeTeam_{{event._id}}">
+                    <td><select class="admin" name="{{e._id}}_home" id="{{e._id}}_home">
                         <option value="None">None</option> 
-                        {% for team in allTeams %}
-                            <option value="{{team.teamId}}">{{team.teamId}}</option>
+                        {% for t in league.teams %}
+                            <option value="{{t.teamId}}">{{t.teamId}}</option>
                         {% endfor %}
                     </select></td>
-                    <td><select class="admin" name="umpireDuty_{{event._id}}" id="umpireDuty_{{event._id}}">
-                        <option value="None">None</option>
-                        {% for team in allTeams %}
-                        <option value="{{team.teamId}}">{{team.teamId}}</option>
-                        {% endfor %}
-                    </select></td>
-                    <td><button class="schedule-action" type="submit" name="updateEvent" value="{{event._id}}">Update</button></td>
-                    <td><button class="schedule-action" type="submit" name="deleteEvent" value="{{event._id}}" onclick="return confirm('Delete event?')">Delete</button></td>
+                    <td><button class="schedule-action danger" type="submit" name="delete" value="{{e._id}}" onclick="return confirm('Delete event?')">Delete</button></td>
                 </tr>
                 <script>
-                    document.getElementById('awayTeam'+"_{{event._id}}").value = "{{event.awayTeam}}";
-                    document.getElementById('homeTeam'+"_{{event._id}}").value = "{{event.homeTeam}}";
-                    document.getElementById('umpireDuty'+"_{{event._id}}").value = "{{event.umpireDuty}}";
+                    document.getElementById("{{e._id}}"+"_away").value = "{{e.away}}";
+                    document.getElementById("{{e._id}}"+"_home").value = "{{e.home}}";
+                    document.getElementById("{{e._id}}"+"_venueId").value = "{{e.venueId}}";
+                    document.getElementById("{{e._id}}"+"_age").value = "{{e.age}}";
                 </script>
                 {% endfor %}
             </table>
@@ -150,21 +99,4 @@
     </form>
 </main>
 
-<script>
-    let page = 1
-    let tbl = document.getElementById('schedule-table');
-    colorifySchedule(tbl);
-    loadMore(tbl, page, 50);
-
-    function load() {
-        page = loadMore(tbl, page + 1, 50);
-        if (page == 0) {
-            let button = document.getElementById('load-more');
-            button.classList.add('disabled');
-            button.disabled = true;
-            button.innerHTML = "All Events Shown";
-        }
-    }
-    
-</script>
 {% endblock content %}

@@ -23,9 +23,6 @@ class Team:
         users = [User.view(u) for u in users]
         team['contacts'] = users
 
-
-
-
     @staticmethod
     def load_teams(user, leagueId):
         teams = list(Team.col.find({'league': leagueId, 'teamId': {'$in': user['teams']}}))
