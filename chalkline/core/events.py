@@ -31,35 +31,55 @@ class Event:
     @staticmethod
     def create(league, form):
         event = {
-            'date': datetime.strptime(form.get('date'), 'format'),
-            'season': form.get('season'),
-            'leagueId': league,
-            'venueId': form.get('venue'),
-            'field': form.get('field'),
+            'date': datetime.strptime(form.get('date'), '%Y-%m-%dT%H:%M'),
+            'season': league['current_season'],
+            'leagueId': league['leagueId'],
+            'venueId': form.get('venueId'),
+            'field': int(form.get('field')),
             'type': form.get('type', 'Game'),
             'age': form.get('age'),
             'away': form.get('away'),
             'home': form.get('home'),
-            'score': form.get('score', [0,0]),
+            'score': [0,0],
             'status': form.get('status'),
             'visible': True,
-            'umpires': {
-                'Plate': {
-                    'user': None,
-                    'team_duty': False,
-                    'permissions': []
-                },
-                '1B': {
-                    'user': None,
-                    'team_duty': False,
-                    'permissions': []
-                }
-            },
+            'umpires': {},
             'created': now()
         }
+
+        umps = {}
+        for key in form:
+            if '_' not in key:
+                continue
+            
+            ump, attr = key.split('_')
+            if ump in umps:
+                umps[ump][attr] = form[key]
+            else:
+                umps[ump] = {attr: form[key]}
+
+        for ump in umps:
+            umps[ump]['user'] = None
+            umps[ump]['team_duty'] = None if umps[ump]['team'] == 'None' else umps[ump]['team']
+            umps[ump]['coach_req'] = None
+            umps[ump]['permissions'] = Event.generate_ump_permissions(event['age'], umps[ump]['pos'])
+            
+            pos = umps[ump]['pos']
+            del umps[ump]['pos']
+            del umps[ump]['team']
+
+            event['umpires'].update({pos: umps[ump]})
+
         _id = Event.col.insert_one(event).inserted_id
         event['_id'] = _id
         return Event.safe(event)
+
+    @staticmethod
+    def generate_ump_permissions(age, pos):
+        if pos == 'Plate':
+            return [f'umpire_Plate_{age}']
+        else:
+            return [f'umpire_Field_{age}']
     
     @staticmethod
     def user_in_event(event, user, check_user_teams) -> bool:
@@ -210,7 +230,10 @@ class Event:
         event['status'] = form['status']
         event['visible'] = form.get('visible') == 'on'
         for pos in event['umpires']:
-            event['umpires'][pos]['user'] = form.get(f'{pos}_user')
+            if form[f"{pos}_user"] == '':
+                event['umpires'][pos]['user'] = None
+            else:
+                event['umpires'][pos]['user'] = form[f'{pos}_user']
             if form[f'{pos}_team'] == 'None':
                 event['umpires'][pos]['team_duty'] = None
             else:

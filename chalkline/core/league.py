@@ -8,7 +8,7 @@ class League:
     @staticmethod
     def get(leagueId):
         league = League.col.find_one({'leagueId': leagueId})
-        league['teams'] = list(teamData.find({'league': league['leagueId']}))
+        league['teams'] = list(teamData.find({'leagueId': league['leagueId']}))
         return league
     
     @staticmethod

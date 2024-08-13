@@ -173,7 +173,7 @@ class User:
         return None
     
     @staticmethod
-    def find_groups(leagueId, groups):
+    def find_groups(leagueId, groups: list):
         users = User.col.find({'leagues': {'$in': [leagueId]}, 'groups': {'$in': groups}, 'active': True})
         return [User.safe(u) for u in users]
     

@@ -4,61 +4,58 @@
 
 {% extends "design.html" %}
 
-{% block title %}Add Event{% endblock title %}
+{% block title %}Admin{% endblock title %}
 
 {% block content %}
 <main>
     <center>
         <h1>Add Event</h1>
-        <h4 class='error'>{{sobj.msg}}</h4>
+        <h4 class='error'>{{res.msg}}</h4>
     </center>
     
     <form method="post" id="addEvent">
-        <div class="split"><button class="action" name="addEvent" value="addEvent" type="submit">Add Event</button></div>
+        <div class="split"><button class="action" name="add" value="add" type="submit">Add Event</button></div>
         <section>
             <center>
                 <h2>
-                    <input type="text" name="eventLocation" id="eventLocation" value="{{sobj.location}}" disabled> - 
-                    <select name="eventType" id="eventType">
+                    <p>{{league.name}}</p> 
+                    <select name="type" id="type">
                         <option value="Game">Game</option>
                         <option value="Practice">Practice</option>
                     </select>
                 </h2>
-                <h3><input type="datetime-local" name="eventDate" id="eventDate" required></h3>
-                <h3>Age Group: <select name="eventAgeGroup" id="eventAgeGroup">
-                    <option value="T-Ball">T-Ball</option>
-                    <option value="Coach Pitch">Coach Pitch</option>
-                    <option value="AA">AA</option>
-                    <option value="AAA">AAA</option>
-                    <option value="Majors">Majors</option>
-                    <option value="50/70">50/70</option>
-                    <option value="Juniors">Juniors</option>
+                <h3><input type="datetime-local" name="date" id="date" required></h3>
+                <h3>Age Group: <select name="age" id="age" required>
+                    <option value="" selected disabled>Select</option>
+                    {% for a in league.age_groups %}
+                        <option value="{{a}}">{{a}}</option>
+                    {% endfor %}
                 </select></h3>
-                <h3><input type="text" name="eventVenue" id="eventVenue" placeholder="Venue (ex. Twin Lakes)" required> Field <input type="number" name="eventField" id="eventField" required></h3>
+                <h3>Venue: <select name="venueId" id="venueId" required>
+                    <option value="" selected disabled>Select</option>
+                    {% for v in league.venues %}
+                        <option value="{{v}}">{{v}}</option>
+                    {% endfor %}
+                </select></h3>
+
+                <h3>Field <input type="number" name="field" id="field" required></h3>
 
                 <h3>(away) 
-                    <select name="awayTeam" id="awayTeam" required>
-                        <option value="None">None</option>
-                        {% for team in teamsList %}
-                            <option value="{{team.teamId}}">{{team.teamId}}</option>
+                    <select name="away" id="away" required>
+                        <option value="None" selected>None</option>
+                        {% for t in league.teams %}
+                            <option value="{{t.teamId}}">{{t.teamId}}</option>
                         {% endfor %}
                     </select> vs. 
-                    <select name="homeTeam" id="homeTeam" required>
-                        <option value="None">None</option>
-                        {% for team in teamsList %}
-                            <option value="{{team.teamId}}">{{team.teamId}}</option>
+                    <select name="home" id="home" required>
+                        <option value="None" selected>None</option>
+                        {% for t in league.teams %}
+                            <option value="{{t.teamId}}">{{t.teamId}}</option>
                         {% endfor %}
                     </select> (home)
                 </h3>
-                <h3>Umpire Duty: 
-                    <select name="umpireDuty" id="umpireDuty" required>
-                        <option value="None">None</option>
-                        {% for team in teamsList %}
-                            <option value="{{team.teamId}}">{{team.teamId}}</option>
-                        {% endfor %}
-                    </select>
-                </h3>
-                <p class="urgent">Note: for practices, only select team as home and away</p>
+                
+                <p class="urgent">Note: for practices, the "home" team will be displayed</p>
 
             </center>
         </section>
@@ -67,81 +64,52 @@
                 <h2>Status: <input type="text" name="status" id="status" value="On Time" required></h2>
             </center>
         </section>
-
         <section>
             <center>
-                <h2>Plate Umpire: <select name="plateUmpire" id="plateUmpire">
-                    <option value="None">None</option>
-                    {% for user in userList if 'umpire' in user.role or 'youth' in user.role %}
-                        <option value="{{user._id}}">{{user.lastName}}, {{user.firstName}}</option>
-                    {% endfor %}
-                </select></h2>
-            </center>
-        </section>
-        <section>
-            <center>
-                <h2>Field Umpire: <select name="field1Umpire" id="field1Umpire">
-                    <option value="None">None</option>
-                    {% for user in userList if 'umpire' in user.role or 'youth' in user.role %}
-                        <option value="{{user._id}}">{{user.lastName}}, {{user.firstName}}</option>
-                    {% endfor %}
-                </select></h2>
-            </center>
-        </section>
-        <section>
-            <center>
-                <h2>Coach Request: <select name="fieldRequest" id="fieldRequest">
-                    <option value="None">None</option>
-                    {% for user in userList if 'coach' in user.role %}
-                        <option value="{{user._id}}">{{user.lastName}}, {{user.firstName}}</option>
-                    {% endfor %}
-                </select></h2>
+                <h2>Umpires <button onclick="addUmpire()" class="action secondary" type="button">Add Umpire</button></h2>
             </center>
         </section>
 
-        <section>
-            <center>
-                <table class="center">
-                    <h2>Edit Rules</h2>
-                    <p>These rules govern how users interact with this event.</p>
-                    <tr>
-                        <td>Visible: </td>
-                        <td><input type="checkbox" name="visible" id="visible" checked></td>
-                    </tr>
-                    <tr>
-                        <td>Has plate umpire: </td>
-                        <td><input type="checkbox" name="hasPlateUmpire" id="hasPlateUmpire" checked></td>
-                    </tr>
-                    <tr>
-                        <td>Users can add plate duty: </td>
-                        <td><input type="checkbox" name="plateUmpireAddable" id="plateUmpireAddable" checked></td>
-                    </tr>
-                    <tr>
-                        <td>Has field umpire: </td>
-                        <td><input type="checkbox" name="hasField1Umpire" id="hasField1Umpire" checked></td>
-                    </tr>
-                    <tr>
-                        <td>Users can add field duty: </td>
-                        <td><input type="checkbox" name="field1UmpireAddable" id="field1UmpireAddable" checked></td>
-                    </tr>
-                    <tr>
-                        <td>Has coach duty: </td>
-                        <td><input type="checkbox" name="hasFieldRequest" id="hasFieldRequest" checked></td>
-                    </tr>
-                    <tr>
-                        <td>Coaches can add field request: </td>
-                        <td><input type="checkbox" name="fieldRequestAddable" id="fieldRequestAddable" checked></td>
-                    </tr>
-                    <tr>
-                        <td>Umpires can remove game: </td>
-                        <td><input type="checkbox" name="removable" id="removable"></td>
-                    </tr>
-                </table>
-            </center>
-        </section>
-        <div class="split"><button class="action" name="updateEvent" value="updateEvent" type="submit">Add Event</button></div>
+        <div id="umpire-container">
+
+        </div>
+        
+        <div class="split"><button class="action" name="add" value="add" type="submit">Add Event</button></div>
     </form>
     
 </main>
+
+<script>
+    let ump_count = 0
+    function addUmpire() {
+        let container = document.getElementById('umpire-container');
+        ump_count++;
+        let ump_html = `
+            <section id="ump_${ump_count}">
+                <button type="button" class="action danger" onclick="removeUmp('${ump_count}')">Cancel</button>
+                <center>
+                    <h3>Position: <select name="ump${ump_count}_pos" required>
+                        <option value="" selected disabled>Select</option>
+                        {% for pos in league.ump_positions %}
+                            <option value="{{pos}}">{{pos}}</option>
+                        {% endfor %}
+                    </select></h3>
+                    <h3>Team Duty: <select name="ump${ump_count}_team" required>
+                        <option value="None" selected>None</option>
+                        {% for t in league.teams %}
+                            <option value="{{t.teamId}}">{{t.teamId}}</option>
+                        {% endfor %}
+                    </select></h3>
+                </center>
+            </section>
+        `;
+        container.insertAdjacentHTML('beforeend', ump_html);
+    }
+
+    function removeUmp(num) {
+        let e = document.getElementById(`ump_${num}`);
+        e.remove();
+    }
+</script>
 
 {% endblock content %}

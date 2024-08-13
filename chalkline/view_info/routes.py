@@ -3,6 +3,8 @@ from chalkline.core import server as svr
 from chalkline.core.events import Event
 from chalkline.core.user import User
 from chalkline.core.league import League
+from chalkline.core.team import Team
+
 
 view_info = Blueprint('view_info', __name__)
 
@@ -42,4 +44,8 @@ def event(eventId):
 @view_info.route("/user/<userId>", methods=['GET', 'POST'])
 @view_info.route("/user")
 def user(userId=None):
+    pass
+
+@view_info.route("/team/<teamId>", methods=['GET', 'POST'])
+def team(teamId=None):
     pass

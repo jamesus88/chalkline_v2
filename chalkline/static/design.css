@@ -102,6 +102,14 @@ button.danger:hover {
     background-color: var(--error);
     color: white;
 }
+button.secondary {
+    background-color: white;
+    color: var(--primary);
+}
+button.secondary:hover {
+    background-color: var(--primary);
+    color: white;
+}
 .flex-col {
     display: flex;
     flex-direction: column;

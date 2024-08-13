@@ -29,7 +29,21 @@ def event_data():
 
 @admin.route("/add-event", methods=['GET', 'POST'])
 def add_event():
-    pass
+    mw = svr.authorized_only('admin')
+    if mw: return mw
+
+    res = svr.obj()
+    league = League.get(res['league'])
+    league['ump_positions'] = Event.get_all_ump_positions()
+
+    if request.method == 'POST':
+        try:
+            Event.create(league, request.form)
+            res['msg'] = 'Event Added!'
+        except ValueError as e:
+            res['msg'] = e
+
+    return render_template("admin/add-event.html", res=res, league=league)
 
 @admin.route("/user-data", methods=['GET', 'POST'])
 def user_data():
@@ -52,11 +66,42 @@ def user_data():
 
 @admin.route("/team-data", methods=['GET', 'POST'])
 def team_data():
-    pass
+    mw = svr.authorized_only('admin')
+    if mw: return mw
+
+    res = svr.obj()
+
+    if request.method == 'POST':
+        if request.form.get('delete'):
+            teamId = request.form['delete']
+            Team.delete(res['league'], teamId)
+            res['msg'] = f"{teamId} deleted."
+        elif request.form.get('save'):
+            Admin.update_all(request.form, Team)
+            res['msg'] = "Teams updated."
+
+
+    teams = Team.get_league_teams(res['league'])
+    league = League.get(res['league'])
+    return render_template("admin/team-data.html", res=res, teams=teams, league=league)
     
 @admin.route("/add-team", methods=['GET', 'POST'])
 def add_team():
-    pass
+    mw = svr.authorized_only('admin')
+    if mw: return mw
+
+    res = svr.obj()
+    league = League.get(res['league'])
+    coaches = User.find_groups(res['league'], ['coach'])
+
+    if request.method == 'POST':
+        try:
+            t = Team.create(league, request.form)
+            res['msg'] = f"{t['teamId']} created and saved!"
+        except ValueError as e:
+            res['msg'] = e
+
+    return render_template("admin/add-team.html", res=res, league=league, coaches=coaches)
 
 @admin.route("/announcement", methods=['GET', 'POST'])
 def announcement():

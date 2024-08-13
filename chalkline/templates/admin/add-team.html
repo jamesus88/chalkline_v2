@@ -4,46 +4,47 @@
 
 {% extends "design.html" %}
 
-{% block title %}Add Team{% endblock title %}
+{% block title %}Admin{% endblock title %}
 
 {% block content %}
 <main>
     <center>
         <h1>Add Team</h1>
-        <h4 class='error'>{{sobj.msg}}</h4>
+        <h4 class='error'>{{res.msg}}</h4>
     </center>
     
     <form method="post" id="addTeam">
-        <div class="split"><button class="action" name="addTeam" value="addTeam" type="submit">Add Team</button></div>
+        <div class="split"><button class="action" name="add" value="add" type="submit">Add Team</button></div>
         <section>
             <center>
-                <h3>Age Group: <select name="teamAgeGroup" id="teamAgeGroup">
-                    <option value="None" disabled selected>Select</option>
-                    <option value="T-Ball">T-Ball</option>
-                    <option value="Coach Pitch">Coach Pitch</option>
-                    <option value="AA">AA</option>
-                    <option value="AAA">AAA</option>
-                    <option value="Majors">Majors</option>
-                    <option value="50/70">50/70</option>
-                    <option value="Juniors">Juniors</option>
+                <h3>Season: {{league.current_season}}</h3>
+                <h3>Age Group: <select name="age" id="age" onchange="loadCodePrefix()" required>
+                    <option value="" disabled selected>Select</option>
+                    {% for a in league.age_groups %}
+                        <option value="{{a}}">{{a}}</option>
+                    {% endfor %}
                 </select></h3>
-                <h3>Team Code: <select name="codePrefix" id="codePrefix" required>
-                    <option value="None" disabled selected>Select</option>
-                    <option value="TB">TB</option>
-                    <option value="CP">CP</option>
-                    <option value="AA">AA</option>
-                    <option value="AAA">AAA</option>
-                    <option value="MAJ">MAJ</option>
-                    <option value="5070">5070</option>
-                    <option value="JUN">JUN</option>
-
-                </select> <input type="number" name="codeNum" id="codeNum" placeholder="#" required style="width: 60px;"></h3>
-                <h3>Team name: <input type="text" name="teamName" id="teamName" required></h3>
+                <h3>Team Code: <span id="codePrefix"></span> <input type="number" name="teamId" id="teamId" placeholder="#" required style="width: 60px;"></h3>
+                <h3>Team Name: <input type="text" name="name" id="name" required></h3>
+                <p class="subtle">Hold ctrl on PC or cmd on Mac to select multiple coaches</p>
+                <h3>Coaches: <select multiple name="coaches" id="coaches">
+                    {% for coach in coaches %}
+                        <option value="{{coach.userId}}">{{coach.firstLast}}</option>
+                    {% endfor %}
+                </select></h3>
+                
             </center>
         </section>
-        <div class="split"><button class="action" name="addTeam" value="addTeam" type="submit">Add Team</button></div>
+        <div class="split"><button class="action" name="add" value="add" type="submit">Add Team</button></div>
     </form>
     
 </main>
 
+<script>
+    function loadCodePrefix() {
+        age = document.getElementById('age').value;
+        prefix = age.toUpperCase().slice(0, 3)
+        document.getElementById('codePrefix').innerHTML = prefix;
+    }
+</script>
 {% endblock content %}

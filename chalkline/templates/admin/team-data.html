@@ -1,16 +1,16 @@
 <head>
     <link rel="stylesheet" href="{{url_for('static', filename='schedule.css')}}">
-    <script src="{{url_for('static', filename='schedule.js')}}"></script>
+    <script src="{{url_for('static', filename='schedule.js')}}" defer></script>
 </head>
 
 {% extends "design.html" %}
-{% block title %}Team Data{% endblock title %}
+{% block title %}Admin{% endblock title %}
 
 {% block content %}
 <main>
     <section class="split">
         <div>
-            <h1>Team Data</h1>
+            <h1>Teams</h1>
         </div>
         <div class="align-right">
             <h3><a href="{{url_for('admin.add_team')}}">Add Team</a></h3>
@@ -19,67 +19,42 @@
     <button type="" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
     <form method="post">
         <section id="filter-section" class="filter-section">
-            <select class="filter" name="ageGroupFilter" id="ageGroupFilter" onchange="this.form.submit()">
-                <option value="None">All Age Groups</option>
-                <option value="T-Ball">T-Ball only</option>
-                <option value="Coach Pitch">Coach Pitch only</option>
-                <option value="AA">AA only</option>
-                <option value="AAA">AAA only</option>
-                <option value="Majors">Majors only</option>
-                <option value="50/70">50/70 only</option>
-                <option value="Juniors">Juniors only</option>
-            </select>
-            <script>
-                document.getElementById('ageGroupFilter').value = "{{ageGroupFilter}}";
-                
-                function toggleFilterSection(section) {
-                    let sect = document.getElementById(section);
-                    if (sect.style.display == 'none') {
-                        sect.style.display = 'block';
-                    }
-                    else {
-                        sect.style.display = 'none';
-                    }
-                }
-            </script>
         </section>
 
         <section class="schedule-section scrollwrapper">
-            {% if teamsList|length < 1 %}
+            <section class="split">
+                <div>
+                    <p class="error">{{res.msg}}</p>
+                </div>
+                <div>
+                    <button type="submit" class="action" name="save" value="save"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+                </div>
+            </section>
+            {% if teams|length < 1 %}
             <h3 class="error">No teams found.</h3>
             {% endif %}
             <table id="schedule-table" class="event-display admin">
                 <tr>
-                    <th>Team Code</th>
+                    <th></th>
+                    <th>Id</th>
                     <th>Name</th>
                     <th>Age Group</th>
-                    <th>Wins</th>
-                    <th>Losses</th>
-                    <th>Ties</th>
-                    <th>Update</th>
                     <th>Delete</th>
                 </tr>
-                {% for team in teamsList %}
+                {% for t in teams %}
                 <tr class="event-row">
-                    <td>{{team.teamId}}</td>
-                    <td><input class="admin" type="text" name="teamName_{{team.teamId}}" id="teamName_{{team.teamId}}" value="{{team.teamName}}"></td>
-                    <td><select class="admin" name="teamAgeGroup_{{team.teamId}}" id="teamAgeGroup_{{team.teamId}}">
-                        <option value="T-Ball">T-Ball</option>
-                        <option value="Coach Pitch">Coach Pitch</option>
-                        <option value="AA">AA</option>
-                        <option value="AAA">AAA</option>
-                        <option value="Majors">Majors</option>
-                        <option value="50/70">50/70</option>
-                        <option value="Juniors">Juniors</option>
+                    <td><a class="icon-link" href="{{url_for('view_info.team', teamId=t.teamId)}}"><i class="fa-solid fa-info"></i></a></td>
+                    <td>{{t.teamId}}</td>
+                    <td><input class="admin" type="text" name="{{t._id}}_name" id="{{t._id}}_name" value="{{t.name}}"></td>
+                    <td><select class="admin" name="{{t._id}}_age" id="{{t._id}}_age">
+                        {% for a in league.age_groups %}
+                            <option value="{{a}}">{{a}}</option>
+                        {% endfor %}
                     </select></td>
-                    <td><input class="admin" type="number" name="wins_{{team.teamId}}" id="wins_{{team.teamId}}" value="{{team.wins}}"></td>
-                    <td><input class="admin" type="number" name="losses_{{team.teamId}}" id="losses_{{team.teamId}}" value="{{team.losses}}"></td>
-                    <td><input class="admin" type="number" name="ties_{{team.teamId}}" id="ties_{{team.teamId}}" value="{{team.ties}}"></td>
-                    <td><button class="schedule-action" type="submit" name="updateTeam" value="{{team.teamId}}">Update</button></td>
-                    <td><button class="schedule-action" type="submit" name="deleteTeam" value="{{team.teamId}}" onclick="return confirm('Delete team?')">Delete</button></td>
+                    <td><button class="schedule-action danger" type="submit" name="delete" value="{{t.teamId}}" onclick="return confirm('Delete team?')">Delete</button></td>
                 </tr>
                 <script>
-                    document.getElementById('teamAgeGroup_'+'{{team.teamId}}').value = "{{team.teamAgeGroup}}";
+                    document.getElementById('{{t._id}}'+'_age').value = "{{t.age}}";
                 </script>
                 {% endfor %}
             </table>
@@ -87,8 +62,4 @@
     </form>
 </main>
 
-<script>
-    let tbl = document.getElementById('schedule-table');
-    colorifySchedule(tbl);
-</script>
 {% endblock content %}

@@ -25,23 +25,33 @@ class Team:
 
     @staticmethod
     def load_teams(user, leagueId):
-        teams = list(Team.col.find({'league': leagueId, 'teamId': {'$in': user['teams']}}))
+        teams = list(Team.col.find({'leagueId': leagueId, 'teamId': {'$in': user['teams']}}))
         user['team_info'] = [Team.safe(t) for t in teams]
         return user
     
     @staticmethod
     def get_league_teams(leagueId):
-        return [Team.safe(t) for t in Team.col.find({'league': leagueId})]
+        return [Team.safe(t) for t in Team.col.find({'leagueId': leagueId})]
     
     @staticmethod
-    def create(form):
+    def create(league, form):
         team = {
-            'league': form.get('league'),
-            'teamId': form.get('teamId'),
+            'leagueId': league['leagueId'],
+            'teamId': form.get('age').upper()[:3] + form.get('teamId'),
             'name': form.get('name'),
             'seasons': {
-                'Fall 2024': {'record': [0,0,0], 'coaches': ['ahurwitz']}
+                league['current_season']: {'record': [0,0,0], 'coaches': form.getlist('coaches')}
             },
             'age': form.get('age'),
             'active': True
         }
+
+        if Team.col.count_documents({'leagueId': league['leagueId'], 'teamId': team['teamId']}) > 0:
+            raise ValueError(f'A team with this code ({team['teamId']}) already exists. Choose a different number.')
+        else:
+            Team.col.insert_one(team)
+            return team
+        
+    @staticmethod
+    def delete(leagueId, teamId):
+        Team.col.delete_one({'leagueId': leagueId, 'teamId': teamId})
