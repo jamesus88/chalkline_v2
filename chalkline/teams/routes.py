@@ -1,12 +1,10 @@
-from flask import render_template, redirect, url_for, session, request, Blueprint
+from flask import render_template, redirect, url_for, request, Blueprint
 from chalkline.core import server as svr
 from chalkline.core.team import Team
-from chalkline.core.events import Event
+from chalkline.core.events import Event, Filter
 from chalkline.core.league import League
 
-
 teams = Blueprint('teams', __name__)
-
 
 @teams.route('/schedule', methods=['GET', 'POST'])
 def schedule():
@@ -15,6 +13,7 @@ def schedule():
 
     res = svr.obj()
     Team.load_teams(res['user'], res['league'])
+    filters = Filter.default()
 
     if len(res['user']['teams']) < 1:
         return redirect(url_for('main.profile'))
@@ -22,6 +21,8 @@ def schedule():
     team = res['user']['teams'][0]
     
     if request.method == 'POST':
+        filters = Filter.parse(request.form)
+
         if request.form.get('request'):
             pos, eventId = request.form['request'].split('_')
             Event.request_umpire(eventId, pos, res['user'])
@@ -39,10 +40,10 @@ def schedule():
         elif request.form.get('team'):
             team = request.form['team']
 
-    events = Event.get(res['league'], team=team)
+    events = Event.get(res['league'], team=team, filters=filters)
     Event.label_umpire_duties(events, team)
 
-    return render_template("teams/schedule.html", res=res, events=events, team=team)
+    return render_template("teams/schedule.html", res=res, events=events, team=team, filters=filters)
 
 @teams.route("/info", methods=['GET', 'POST'])
 def info():

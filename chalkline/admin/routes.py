@@ -1,6 +1,6 @@
 from flask import render_template, redirect, url_for, session, request, Blueprint
 from chalkline.core import server as svr
-from chalkline.core.events import Event
+from chalkline.core.events import Event, Filter
 from chalkline.core.league import League
 from chalkline.core.team import Team
 from chalkline.core.user import User
@@ -15,17 +15,24 @@ def event_data():
     if mw: return mw
 
     res = svr.obj()
+    filters = Filter.default()
 
     if request.method == 'POST':
+        filters = Filter.parse(request.form)
+
         if request.form.get('save'):
             Admin.update_all(request.form, Event)
             res['msg'] = 'Events updated!'
+        
+        elif request.form.get('delete'):
+            Admin.delete(Event, request.form['delete'])
+            res['msg'] = 'Event deleted.'
 
-    events = Event.get(res['league'])
+    events = Event.get(res['league'], filters=filters)
     league = League.get(res['league'])
     league['teams'] = Team.get_league_teams(res['league'])
 
-    return render_template("admin/event-data.html", res=res, events=events, league=league)
+    return render_template("admin/event-data.html", res=res, events=events, league=league, filters=filters)
 
 @admin.route("/add-event", methods=['GET', 'POST'])
 def add_event():
@@ -114,3 +121,24 @@ def dod_data():
 @admin.route("/add-shift", methods=['GET', 'POST'])
 def add_shift():
     pass
+
+@admin.route("/manage-league", methods=['GET', 'POST'])
+def manage_league():
+    mw = svr.authorized_only('admin')
+    if mw: return mw
+
+    res = svr.obj()
+
+    if request.method == 'POST':
+        if request.form.get('deleteAge'):
+            League.delete_age(res['league'], request.form['deleteAge'])
+        elif request.form.get('addAge'):
+            League.add_age(res['league'], request.form['new_age'])
+        elif request.form.get('updateSeason'):
+            League.update_season(res['league'], request.form['current_season'])
+        
+
+
+    league = League.get(res['league'])
+
+    return render_template("admin/league.html", res=res, league=league)

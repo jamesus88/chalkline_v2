@@ -7,6 +7,7 @@
     --primary: #061c4a;
     --secondary: rgb(0, 48, 224);
     --text: #061c4a;
+    --subtle: rgb(68, 98, 146);
     --bg: white;
     --error: red;
     --success: green;
@@ -160,4 +161,7 @@ button.disabled {
 button.disabled:hover {
     color: grey;
     background-color: inherit;
+}
+.subtle {
+    color: var(--subtle);
 }

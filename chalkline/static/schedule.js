@@ -46,16 +46,6 @@ function load() {
     }
 }
 
-function openPopup(id) {
-    let pop = document.getElementById('popup_'+id);
-    pop.showModal();
-}
-
-function closePopup(id) {
-    let pop = document.getElementById('popup_'+id);
-    pop.close();
-}
-
 function toggleFilterSection(section) {
     let sect = document.getElementById(section);
     if (sect.style.display == 'block') {

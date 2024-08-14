@@ -15,10 +15,11 @@
         <div class="align-right">
         </div>
     </section>
-    <button type="" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
-    <form method="post">
 
+    <form method="post">
         <section class="schedule-section scrollwrapper">
+            {% include "filters.html" %}
+
             {% if events|length < 1 %}
             <h3 class="error">No events found.</h3>
             {% endif %}

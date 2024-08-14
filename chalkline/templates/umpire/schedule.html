@@ -19,19 +19,7 @@
         </div>
     </section>
     <form method="post">
-        <button type="button" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
-        <section id="filter-section" class="filter-section" style='display: none;'>
-            <select class="filter" name="hide_past" id="hide_past" onchange="this.form.submit()">
-                <option value="True" selected>Future only</option>
-                <option value="False">Past and Future</option>
-            </select>
-            <select class="filter" name="age" id="age" onchange="this.form.submit()">
-                <option value="None" selected>All Age Groups</option>
-                {% for age in league.age_groups %}
-                    <option value="{{ag}}">{{ag}} only</option>
-                {% endfor %}
-            </select>
-        </section>
+        {% include "filters.html" %}
 
         <p class="error">{{res.msg}}</p>
         <section class="schedule-section scrollwrapper">
@@ -74,8 +62,10 @@
                                 <a>{{u.user.firstLast}}</a>
                             {% elif u.team_duty and not u.coach_req %}
                                 Team Duty ({{u.team_duty}})
-                            {% else %}
+                            {% elif 'umpire_add' in res.user.permissions and e.date > res.date %}
                                 <button class="schedule-action" name="add_game" value="{{e._id}}_{{pos}}">+ {{pos}}</button>
+                            {% else %}
+                                Closed
                             {% endif %}
                             <br><br>
                         {% endfor %}

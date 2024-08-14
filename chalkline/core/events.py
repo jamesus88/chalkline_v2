@@ -1,28 +1,41 @@
 from chalkline.collections import eventData
 from datetime import datetime, timedelta
-from chalkline.core import now, _safe, ObjectId
+from chalkline.core import now, _safe, ObjectId, localize
 from chalkline.core.user import User
+from chalkline import SEASON
 
 class Filter:
     @staticmethod
     def default():
         return {
-            'hide_past': True,
             'age': None,
             'start': now() - timedelta(hours=2),
-            'end': None,
-            'umpires_only': False
+            'end': now() + timedelta(days=200),
+            'umpires_only': False,
+            'team': None,
+            'season': SEASON
         }
 
     @staticmethod
     def parse(form) -> dict:
-        filters = {
-            'hide_past': form.get('hide_past', 'True') == 'True',
-            'umpires_only': form.get('umpires_only', 'True') == 'True',
-        }
-        if form.get('age', 'None') != 'None':
-            filters['age'] = form['age']
+        filters = Filter.default()
 
+        if form.get('filter_reset'):
+            return filters
+
+        filters['umpires_only'] = form.get('filter_umpires_only') == 'True'
+
+        if form.get('filter_age', 'None') != 'None':
+            filters['age'] = form['filter_age']
+        if form.get('filter_start'):
+            filters['start'] = datetime.strptime(form['filter_start'], "%Y-%m-%dT%H:%M")
+        if form.get('filter_end'):
+            filters['end'] = datetime.strptime(form['filter_end'], "%Y-%m-%dT%H:%M")
+        if form.get('filter_team', 'None') != 'None':
+            filters['team'] = form['filter_team']
+
+        filters['season'] = form.get('filter_season')
+        
         return filters
 
 class Event:
@@ -105,10 +118,21 @@ class Event:
         return False
     
     @staticmethod
-    def get(league, user=None, team=None, check_user_teams=True, filters=Filter.default()):
-        criteria = [{'leagueId': league}]
+    def get(leagueId, user=None, team=None, check_user_teams=True, filters=Filter.default(), add_criteria = {}):
+        criteria = [{'leagueId': leagueId}, add_criteria]
 
-        all_events = [Event.safe(e) for e in Event.col.find({'$and': criteria})]
+        if filters.get('season'):
+            criteria.append({'season': filters['season']})
+        if filters.get('umpires_only'):
+            criteria.append({'umpires': {'$ne': {}}})
+        if filters.get('age'):
+            criteria.append({'age': filters['age']})
+        if filters.get('start'):
+            criteria.append({'date': {'$gte': filters['start']}})
+        if filters.get('end'):
+            criteria.append({'date': {'$lte': filters['end']}})
+
+        all_events = [Event.safe(e) for e in Event.col.find({'$and': criteria}).sort(['date', 'field'])]
         events = []
 
         # filter
@@ -119,7 +143,10 @@ class Event:
             if team:
                 if not Event.team_in_event(e, team):
                     continue
-    
+            elif filters.get('team'):
+                if not Event.team_in_event(e, filters['team']):
+                    continue
+
             events.append(e)
 
         return events
@@ -137,6 +164,8 @@ class Event:
         event = _safe(event)
         umpires = [User.view(u) for u in User.col.find({'leagues': {'$in': [event['leagueId']]}, 'groups': {'$in': ['umpire']}})]
 
+        event['date'] = localize(event['date'])
+
         # fill in umpire data and add team hints
         full = True
         team_umps = []
@@ -152,7 +181,11 @@ class Event:
                 full = False
         
         event['umpire_full'] = full
-        event['team_umps'] = team_umps
+
+        if len(team_umps) > 0:
+            event['team_umps'] = team_umps
+        else:
+            event['team_umps'] = ['None']
 
         return event
     

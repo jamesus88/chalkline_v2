@@ -94,7 +94,7 @@
             <section>
                 <center>
                     <h2>{{event.leagueId}} - {{event.type}}</h2>
-                    <h3><input type="datetime-local" name="date" id="date" value="{{event.date.isoformat()}}"></h3>
+                    <h3><input type="datetime-local" name="date" id="date" value="{{event.date.isoformat()[0:16]}}"></h3>
                     <h3><select name="venueId" id="venueId">
                         {% for v in event.league_info.venues %}
                         <option value="{{v}}">{{v}}</option>

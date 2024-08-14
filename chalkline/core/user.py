@@ -10,6 +10,7 @@ class User:
     def safe(user):
         user = _safe(user)
         user['firstLast'] = user['firstName'][0] + '. ' + user['lastName']
+        user['fullName'] = user['firstName'] + ' ' + user['lastName']
         return user
     
     @staticmethod
@@ -49,6 +50,10 @@ class User:
                 User.col.update_one({'email': user['email']}, {'$set': {'last_login': now()}})
                 return user
         return None
+    
+    @staticmethod
+    def mark_active(user):
+        User.col.update_one({'userId': user['userId']}, {'$set': {'active': True}})
     
     @staticmethod
     def create_pword(pword):

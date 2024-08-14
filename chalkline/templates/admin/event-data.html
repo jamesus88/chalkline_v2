@@ -25,11 +25,8 @@
         </div>
     </section>
 
-    <button type="" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
     <form method="post">
-        <section id="filter-section" class="filter-section">
-        </section>
-
+        {% include "filters.html" %}
         <section class="split">
             <div>
             </div>
@@ -59,7 +56,7 @@
                 <tr class="event-row">
                     <td><a class="icon-link" href="{{url_for('view_info.event', eventId=e._id)}}"><i class="fa-solid fa-info"></i></a></td>
                     <td class="event-type">{{e.type}}</td>
-                    <td><input class="admin" type="datetime-local" name="{{e._id}}_date" id="date" value="{{e.date.isoformat()}}"></td>
+                    <td><input class="admin" type="datetime-local" name="{{e._id}}_date" id="date" value="{{e.date.isoformat()[0:16]}}"></td>
                     <td><select class="admin" name="{{e._id}}_venueId" id="{{e._id}}_venueId">
                         {% for v in league.venues %}
                             <option value="{{v}}">{{v}}</option>

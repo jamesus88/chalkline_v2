@@ -8,9 +8,11 @@
     <!-- font awesome -->
     <script src="https://kit.fontawesome.com/9794118ac5.js" crossorigin="anonymous"></script>
 
-    <!-- base dedign files -->
+    <!-- base design files -->
     <link rel="stylesheet" href="{{url_for('static', filename='design.css')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='navbar.css')}}">
+    <script src="{{url_for('static', filename='main.js')}}" defer></script>
+
 
     <!-- icon -->
     <link rel="shortcut icon" href="{{url_for('static', filename='chalkline-icon.png')}}" type="image/x-icon">
@@ -71,7 +73,7 @@
                         <a href="{{url_for('admin.event_data')}}">Events</a>
                         <a href="{{url_for('admin.user_data')}}">Users</a>
                         <a href="{{url_for('admin.team_data')}}">Teams</a>
-                        <a href="{{url_for('admin.dod_data')}}">League</a>
+                        <a href="{{url_for('admin.manage_league')}}">League</a>
                         <a href="{{url_for('admin.announcement')}}">Announcements</a>
                     </div>
                 </div>
@@ -94,6 +96,16 @@
 
     <body>
         {% if res.flash %}<p class="error">{{res.flash}}</p>{% endif %}
+
+        {% if res.popup %}
+        <dialog class="popup" id="popup_design" openModal>
+            <a onclick="closePopup('design')" class="error"><i class="fa-solid fa-xmark"></i> Close</a>
+            <center>
+                <h3>{{res.popup}}</h3>
+            </center>
+        </dialog>
+        {% endif %}
+
         {% block content %}{% endblock content %}
     </body>
     

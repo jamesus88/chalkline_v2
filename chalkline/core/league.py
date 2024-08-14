@@ -1,5 +1,5 @@
 from chalkline.collections import leagueData, teamData, venueData
-from chalkline.core import now
+from chalkline.core import now, _safe
 from chalkline import SEASON
 
 class League:
@@ -31,3 +31,38 @@ class League:
         _id = League.col.insert_one(league).inserted_id
         league['_id'] = _id
         return league
+    
+    @staticmethod
+    def delete_age(leagueId, age):
+        League.col.update_one({'leagueId': leagueId}, {'$pull': {'age_groups': age}})
+
+    @staticmethod
+    def add_age(leagueId, age):
+        League.col.update_one({'leagueId': leagueId, 'age_groups': {'$nin': [age]}}, {'$push': {'age_groups': age}})
+
+    @staticmethod
+    def update_season(leagueId, s):
+        League.col.update_one({'leagueId': leagueId}, {'$set': {'current_season': s}})
+
+    
+class Venue:
+    col = venueData
+
+    @staticmethod
+    def safe(venue):
+        return _safe(venue)
+
+    @staticmethod
+    def create(form):
+        venue = {
+            'venueId': form['venueId'],
+            'name': form['name'],
+            'street': form['street'],
+            'city': form['city'],
+            'zipcode': form['zipcode'],
+            'state': form['state'],
+            'field_count': int(form['field_count'])
+        }
+        _id = Venue.col.insert_one(venue).inserted_id
+        venue['_id'] = _id
+        return Venue.safe(venue)

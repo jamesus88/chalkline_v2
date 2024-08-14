@@ -1,0 +1,71 @@
+<button type="button" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
+<section id="filter-section" class="filter-section" style='display: none;'>
+    <br>
+    {% if league %}
+        <select class="filter" name="filter_age" id="filter_age">
+            <option value="None" selected>All Age Groups</option>
+            {% for a in league.age_groups %}
+                <option value="{{a}}">{{a}} only</option>
+            {% endfor %}
+        </select>
+
+        <script>
+            document.getElementById('filter_age').value = "{{filters.age}}";
+        </script>
+    {% endif %}
+
+    <select class="filter" name="filter_season" id="filter_season">
+        <option value="Spring {{res.date.year}}">Spring {{res.date.year}}</option>
+        <option value="Summer {{res.date.year}}">Summer {{res.date.year}}</option>
+        <option value="Fall {{res.date.year}}">Fall {{res.date.year}}</option>
+        <option value="Spring {{res.date.year + 1}}">Spring {{res.date.year + 1}}</option>
+    </select>
+
+    <script>
+        document.getElementById('filter_season').value = "{{filters.season}}";
+    </script>
+
+    {% if request.blueprint != "umpire" and league %}
+        <select class="filter" name="filter_team" id="filter_team">
+            <option value="None" selected>All teams</option>
+            {% for t in league.teams %}
+                <option value="{{t.teamId}}">{{t.teamId}} only</option>
+            {% endfor %}
+        </select>
+
+        <script>
+            document.getElementById('filter_team').value = "{{filters.team}}";
+        </script>
+    {% endif %}
+    
+    {% if request.blueprint in ['league', 'director', 'admin'] %}
+        <select name="filter_umpires_only" id="filter_umpires_only">
+            <option value="False">Need not have umpires</option>
+            <option value="True">Has umpires</option>
+        </select>
+
+        <script>
+            document.getElementById('filter_umpires_only').value = "{{filters.umpires_only}}";
+        </script>
+    {% endif %}
+
+    <br><b>Date --</b>
+
+    <label for="filter_start">From </label>
+    <input type="datetime-local" name="filter_start" id="filter_start">
+
+    <label for="filter_end">To </label>
+    <input type="datetime-local" name="filter_end" id="filter_end">
+
+    <script>
+        document.getElementById('filter_start').value = "{{filters.start.isoformat()[0:16]}}";
+        document.getElementById('filter_end').value = "{{filters.end.isoformat()[0:16]}}";
+    </script>
+
+    <br><br>
+    <button class="action secondary"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+    <button class="action secondary" name="filter_reset" value="0"><i class="fa-solid fa-arrow-rotate-left"></i> Reset</button>
+
+
+
+</section>

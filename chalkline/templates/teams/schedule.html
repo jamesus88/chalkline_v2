@@ -18,71 +18,73 @@
             {% endfor %}
         </select></h3>
     </div>
+       
+    <h3 class="error">{{res.msg}}</h3>
+    <section class="schedule-section scrollwrapper">
+        {% include "filters.html" %}
 
-    <button type="" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>        
-        <h3 class="error">{{res.msg}}</h3>
-        <section class="schedule-section scrollwrapper">
-            {% if events|length < 1 %}
-            <h3 class="error">No events found. Try the <a href="{{url_for('league.master_schedule')}}">Master Schedule</a></h3>
-            {% endif %}
-            <table id="schedule-table" class="event-display">
-                <tr>
-                    <th></th>
-                    <th>Event</th>
-                    <th>Date</th>
-                    <th>Venue</th>
-                    <th>Field</th>
-                    <th>Status</th>
-                    <th>Away</th>
-                    <th>Home</th>
-                    <th>Umpire Duty</th>
-                    
-                </tr>
-                {% for e in events %}
-                <tr class="event-row">
-                    <td><a class="icon-link" href="{{url_for('view_info.event', eventId=e._id)}}"><i class="fa-solid fa-info"></i></a></td>
-                    <td class="event-type">{{e.type}}</td>
-                    <td>{{e.date.strftime('%a %m/%d @ %H:%M')}}</td>
-                    <td>{{e.venueId}}</td>
-                    <td>{{e.field}}</td>
-                    <td>{{e.status}}</td>
-                    <td>{{e.away}}</td>
-                    <td>{{e.home}}</td>
-                    <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action">
-                        <i class="fa-solid fa-magnifying-glass"></i> {{e.team_umps|join(', ')}}</button>
-                    </td>
+        {% if events|length < 1 %}
+        <h3 class="error">No events found. Try the <a href="{{url_for('league.master_schedule')}}">Master Schedule</a></h3>
+        {% endif %}
+        <table id="schedule-table" class="event-display">
+            <tr>
+                <th></th>
+                <th>Event</th>
+                <th>Date</th>
+                <th>Venue</th>
+                <th>Field</th>
+                <th>Status</th>
+                <th>Away</th>
+                <th>Home</th>
+                <th>Umpire Duty</th>
+                
+            </tr>
+            {% for e in events %}
+            <tr class="event-row">
+                <td><a class="icon-link" href="{{url_for('view_info.event', eventId=e._id)}}"><i class="fa-solid fa-info"></i></a></td>
+                <td class="event-type">{{e.type}}</td>
+                <td>{{e.date.strftime('%a %m/%d @ %H:%M')}}</td>
+                <td>{{e.venueId}}</td>
+                <td>{{e.field}}</td>
+                <td>{{e.status}}</td>
+                <td>{{e.away}}</td>
+                <td>{{e.home}}</td>
+                <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action">
+                    <i class="fa-solid fa-magnifying-glass"></i> {{e.team_umps|join(', ')}}</button>
+                </td>
 
-                    <dialog class="popup" id="popup_{{e._id}}">
-                        <a onclick="closePopup('{{e._id}}')" class="error"><i class="fa-solid fa-xmark"></i> Close</a>
-                        <h3>{{e.age}}: {{e.venueId}}, {{e.leagueId}}</h3>
-                        <h4>Field {{e.field}} @ {{e.date.strftime('%a %m/%d %H:%M')}}</h4>
-                        {% for pos, u in e.umpires.items() %}
-                        <label for="{{pos}}">{{pos}}: </label>
-                            {% if u.user %}
-                                <a>{{u.user.firstLast}}</a>
-                            {% elif not u.team_duty %}
-                                Open
-                            {% else %}
-                                {% if not u.coach_req %}
-                                    {{u.team_duty}}
-                                    {% if 'coach' in res.user.groups and u.team_duty in res.user.teams %}
-                                        <button type="submit" name="request" value="{{pos}}_{{e._id}}" class="schedule-action">Request Umpire</button>
-                                    {% endif %}
-                                {% else %}
-                                    {% if 'coach' in res.user.groups and u.team_duty in res.user.teams %}
-                                        <b>Pending</b> <button type="submit" name="remove" value="{{pos}}_{{e._id}}" class="schedule-action danger">Remove Request</button>
-                                    {% endif %}
+                <dialog class="popup" id="popup_{{e._id}}">
+                    <a onclick="closePopup('{{e._id}}')" class="error"><i class="fa-solid fa-xmark"></i> Close</a>
+                    <h3>{{e.age}}: {{e.venueId}}, {{e.leagueId}}</h3>
+                    <h4>Field {{e.field}} @ {{e.date.strftime('%a %m/%d %H:%M')}}</h4>
+                    {% for pos, u in e.umpires.items() %}
+                    <label for="{{pos}}">{{pos}}: </label>
+                        {% if u.user %}
+                            <a>{{u.user.firstLast}}</a>
+                        {% elif not u.team_duty %}
+                            Open
+                        {% else %}
+                            {% if not u.coach_req %}
+                                {{u.team_duty}}
+                                {% if 'coach' in res.user.groups and u.team_duty in res.user.teams and 'coach_add' in res.user.permissions %}
+                                    <button type="submit" name="request" value="{{pos}}_{{e._id}}" class="schedule-action">Request Umpire</button>
                                 {% endif %}
-
+                            {% else %}
+                                <b>Pending</b> 
+                                {% if 'coach' in res.user.groups and u.team_duty in res.user.teams and 'coach_remove' in res.user.permissions %}
+                                    <button type="submit" name="remove" value="{{pos}}_{{e._id}}" class="schedule-action danger">Remove Request</button>
+                                {% endif %}
                             {% endif %}
-                            <br><br>
-                        {% endfor %}
-                    </dialog>
-                </tr>
-                {% endfor %}
-            </table>
-        </section>
-        <button id="load-more" type="button" class="action" onclick="load()">Load More</button>
-    </form>
+
+                        {% endif %}
+                        <br><br>
+                    {% endfor %}
+                </dialog>
+            </tr>
+            {% endfor %}
+        </table>
+    </section>
+    <button id="load-more" type="button" class="action" onclick="load()">Load More</button>
+</form>
 </main>
 {% endblock content %}

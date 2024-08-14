@@ -18,8 +18,8 @@
             <p>To view all games for umpires.</p>
         </div>
     </section>
-    <button type="" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
     <form method="post">
+        {% include "filters.html" %}
         
         <p class="error">{{res.msg}}</p>
         <section class="schedule-section scrollwrapper">
@@ -57,8 +57,10 @@
                                 {% if u.user %}
                                     {% if u.user.userId == res.user.userId %}
                                     <a>{{u.user.firstLast}}</a>
-                                    <button type="submit" name="substitute" value="{{pos}}_{{e._id}}" class="schedule-action">Substitute</button>
-                                    <button type="submit" name="remove" value="{{pos}}_{{e._id}}" class="schedule-action danger">Remove</button>
+                                    <button type="submit" name="substitute" value="{{e._id}}" class="schedule-action">Substitute</button>
+                                        {% if 'umpire_remove' in res.user.permissions %}
+                                            <button type="submit" name="remove" value="{{pos}}_{{e._id}}" class="schedule-action danger">Remove</button>
+                                        {% endif %}
                                     {% else %}
                                     <a>{{u.user.firstLast}}</a>
                                     {% endif %}

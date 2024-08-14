@@ -1,5 +1,6 @@
 from flask import session, redirect, url_for, request
 from chalkline import PROTOCOL, DOMAIN, APP_NAME, VERSION, COPYRIGHT
+from chalkline.core import now
 
 def login(user, league=None, admin=None):
     if not league:
@@ -29,6 +30,7 @@ def obj(context={}):
         'app_name': APP_NAME,
         'version': VERSION,
         'copyright': COPYRIGHT,
+        'date': now(),
         'user': session.get('user'),
         'league': session.get('league'),
         'admin': session.get('admin'),

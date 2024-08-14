@@ -1,4 +1,3 @@
-from chalkline.collections import userData, eventData, teamData, leagueData
 from chalkline.core import mailer, ObjectId
 from pymongo import UpdateOne
 from datetime import datetime
@@ -39,5 +38,8 @@ class Admin:
             writes.append(UpdateOne({'_id': ObjectId(key)}, {'$set': map}))
 
         cls.col.bulk_write(writes)
+
+    def delete(cls, id):
+        cls.col.delete_one({'_id': ObjectId(id)})
 
             

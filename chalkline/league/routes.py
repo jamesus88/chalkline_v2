@@ -12,10 +12,14 @@ def master_schedule():
     if mw: return mw
 
     res = svr.obj()
+    filters = Filter.default()
 
-    events = Event.get(res['league'])
+    if request.method == 'POST':
+        filters = Filter.parse(request.form)
+
+    events = Event.get(res['league'], filters=filters)
     league = League.get(res['league'])
-    return render_template("league/master-schedule.html", res=res, events=events, league=league)
+    return render_template("league/master-schedule.html", res=res, events=events, league=league, filters=filters)
 
 @league.route("/info", methods=['GET', 'POST'])
 def info():
