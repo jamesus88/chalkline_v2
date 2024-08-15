@@ -64,10 +64,10 @@ def user_data():
             Admin.update_all(request.form, User)
             res['msg'] = "Users updated!"
 
-    users = User.get({'leagues': {'$in': [res['league']]}})
+    users = User.get({'leagues': {'$in': [res['league']]}}, autopick_gps=False)
     league = League.get(res['league'])
     league['permissions'] = User.generate_permissions(league, Event.get_all_ump_positions())
-    groups = User.get_all_groups()
+    groups = User.get_all_groups(league)
 
     return render_template("admin/user-data.html", res=res, users=users, league=league, groups=groups)
 
@@ -136,6 +136,8 @@ def manage_league():
             League.add_age(res['league'], request.form['new_age'])
         elif request.form.get('updateSeason'):
             League.update_season(res['league'], request.form['current_season'])
+        elif request.form.get('updateCodes'):
+            League.update_codes(res['league'], request.form)
         
 
 

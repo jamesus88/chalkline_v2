@@ -166,9 +166,21 @@
                         </tr>
                         {% endfor %}
                 </table>
+            </form>
                 {% if res.user.leagues|length < 1 %}
                 <p class="error">No leagues found for this account.</p>
                 {% endif %}
+            
+            <form method="post">
+                <h3><select name="new_league" id="new_league" required>
+                    <option value="" selected disabled>Add League</option>
+                    {% for l in all_leagues %}
+                    <option value="{{l.leagueId}}">{{l.name}}</option>
+                    {% endfor %}
+                </select>
+                <input type="text" name="add_code" id="add_code" placeholder="Group Code" required>
+                </h3>
+                <button class="action" name="addLeague" value="1">Add League</button>
             </form>
 
         </section>

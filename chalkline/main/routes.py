@@ -75,6 +75,11 @@ def profile():
             user = User.remove_league(res['user'], league)
             svr.login(user)
 
+        elif request.form.get('addLeague'):
+            leagueId = request.form['new_league']
+            code = request.form['add_code']
+            User.add_league
+
         elif request.form.get('admin-features'):
             assert 'admin' in res['user']['groups'], "You do not have permission to access these features."
             admin = request.form.get('admin-features') == "True"
@@ -93,7 +98,8 @@ def profile():
 
     res['user'] = Team.load_teams(res['user'], res['league'])
     all_teams = Team.get_league_teams(res['league'])
-    return render_template('main/profile.html', res=res, all_teams=all_teams)
+    all_leagues = League.get_all()
+    return render_template('main/profile.html', res=res, all_teams=all_teams, all_leagues=all_leagues)
     
 
 @main.route("/login", methods=['GET', 'POST'])
@@ -109,6 +115,7 @@ def login(next=None):
         pword = request.form['pword']
         league = request.form['league']
 
+        session['league'] = league
         user = User.authenticate(email, pword)
         if user:
             try:
@@ -123,6 +130,7 @@ def login(next=None):
                     return redirect(url_for('main.home'))
         else:
             res['msg'] = "Email or password is invalid. Please try again."
+            del session['league']
     
     return render_template("main/login.html", res=res)
 

@@ -1,16 +1,23 @@
-from chalkline.collections import userData
+from chalkline.collections import userData, leagueData
 from werkzeug.security import check_password_hash, generate_password_hash
 from chalkline.core import now, check_unique, _safe
 from uuid import uuid4
+from flask import session
 
 class User:
     col = userData
 
     @staticmethod
-    def safe(user):
+    def safe(user, autopick_gps=True):
         user = _safe(user)
         user['firstLast'] = user['firstName'][0] + '. ' + user['lastName']
         user['fullName'] = user['firstName'] + ' ' + user['lastName']
+
+        if session.get('league') and autopick_gps:
+            abbr = leagueData.find_one({'leagueId': session['league']})['abbr']
+            user['groups'] = [g.split('.')[1] for g in user['groups'] if abbr == g.split('.')[0]]
+            user['permissions'] = [p.split('.')[1] for p in user['permissions'] if abbr == p.split('.')[0]]
+
         return user
     
     @staticmethod
@@ -24,9 +31,9 @@ class User:
         return user
     
     @staticmethod
-    def get(criteria):
+    def get(criteria, autopick_gps=True):
         users = User.col.find(criteria)
-        return [User.safe(u) for u in users]
+        return [User.safe(u, autopick_gps) for u in users]
 
     @staticmethod
     def get_user(userId=None, email=None):
@@ -108,18 +115,18 @@ class User:
             'created': now(),
             'last_login': None
         }
-
+        abbr = league['abbr']
         if 'role-coach' in form:
             assert league['auth']['coach_code'] == form.get('coach_code'), "Error: League Coach Code is invalid."
-            user['groups'].append('coach')
+            user['groups'].append(f'{abbr}.coach')
         if 'role-parent' in form:
-            user['groups'].append('parent')
+            user['groups'].append(f'{abbr}.parent')
         if 'role-umpire' in form:
             assert league['auth']['umpire_code'] == form.get('umpire_code'), "Error: League Umpire Code is invalid."
-            user['groups'].append('umpire')
+            user['groups'].append(f'{abbr}.umpire')
         if 'role-director' in form:
             assert league['auth']['director_code'] == form.get('director_code'), "Error: League Director Code is invalid."
-            user['groups'].append('director')
+            user['groups'].append(f'{abbr}.director')
 
         _id = User.col.insert_one(user).inserted_id
         user['_id'] = _id
@@ -161,8 +168,12 @@ class User:
         return User.safe(user)
     
     @staticmethod
-    def add_league(user, leagueId):
-        user = User.col.find_one_and_update({'userId': user['userId']}, {'$push': {'leagues': leagueId}}, return_document=True)
+    def add_league(user, league, code):
+        if 'director' in user['groups']:
+            if code != league['auth']['director_code']:
+                raise PermissionError('You are a director, so you must enter the director code for the new league.')
+
+        user = User.col.find_one_and_update({'userId': user['userId']}, {'$push': {'leagues': league['leagueId']}}, return_document=True)
         return User.safe(user)
     
     @staticmethod
@@ -184,25 +195,27 @@ class User:
     
     @staticmethod
     def generate_permissions(league, positions):
+        abbr = league['abbr']
         perms = [
-            'umpire_add',
-            'umpire_remove',
-            'coach_add',
-            'coach_remove',
+            f'{abbr}.umpire_add',
+            f'{abbr}.umpire_remove',
+            f'{abbr}.coach_add',
+            f'{abbr}.coach_remove',
         ]
 
         for age in league['age_groups']:
-            perms.append(f"umpire_Plate_{age}")
-            perms.append(f"umpire_Field_{age}")
+            perms.append(f"{abbr}.umpire_Plate_{age}")
+            perms.append(f"{abbr}.umpire_Field_{age}")
 
         return perms
     
     @staticmethod
-    def get_all_groups():
+    def get_all_groups(league):
+        abbr = league['abbr']
         return [
-            'umpire',
-            'coach',
-            'parent',
-            'director',
-            'admin'
+            f'{abbr}.umpire',
+            f'{abbr}.coach',
+            f'{abbr}.parent',
+            f'{abbr}.director',
+            f'{abbr}.admin'
         ]

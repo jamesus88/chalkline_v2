@@ -6,10 +6,18 @@ class League:
     col = leagueData
 
     @staticmethod
+    def safe(league):
+        league['teams'] = list(teamData.find({'leagueId': league['leagueId']}))
+        return _safe(league)
+
+    @staticmethod
     def get(leagueId):
         league = League.col.find_one({'leagueId': leagueId})
-        league['teams'] = list(teamData.find({'leagueId': league['leagueId']}))
-        return league
+        return League.safe(league)
+    
+    @staticmethod
+    def get_all():
+        return [League.safe(l) for l in League.col.find()]
     
     @staticmethod
     def create(form):
@@ -44,7 +52,15 @@ class League:
     def update_season(leagueId, s):
         League.col.update_one({'leagueId': leagueId}, {'$set': {'current_season': s}})
 
-    
+    @staticmethod
+    def update_codes(leagueId, form):
+        codes = {
+            'umpire_code': form['umpire_code'],
+            'coach_code': form['coach_code'],
+            'director_code': form['director_code']
+        }
+        League.col.update_one({'leagueId': leagueId}, {'$set': {'auth': codes}})
+
 class Venue:
     col = venueData
 

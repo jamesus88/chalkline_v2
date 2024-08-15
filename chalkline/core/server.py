@@ -13,9 +13,9 @@ def login(user, league=None, admin=None):
     
     if league not in user['leagues']:
         raise TypeError('You are not a member of this league.')
-    
-    session['user'] = user
+
     session['league'] = league
+    session['user'] = user
     session['admin'] = admin
 
     session.permanent = True
