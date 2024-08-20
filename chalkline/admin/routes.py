@@ -58,14 +58,35 @@ def user_data():
     if mw: return mw
 
     res = svr.obj()
+    league = League.get(res['league'])
 
     if request.method == 'POST':
         if request.form.get('save'):
             Admin.update_all(request.form, User)
             res['msg'] = "Users updated!"
+        elif request.form.get('remove'):
+            u = User.remove_league(request.form['remove'], res['league'])
+            res['msg'] = f"{u['firstLast']} removed from your league."
+        elif request.form.get('umpire_add_all'):
+            Admin.umpire_add_all(league)
+            res['msg'] = "Umpire add opened."
+        elif request.form.get('umpire_add_none'):
+            Admin.umpire_add_none(league)
+            res['msg'] = "Umpire add closed."
+        elif request.form.get('umpire_remove_all'):
+            Admin.umpire_remove_all(league)
+            res['msg'] = "Umpire drop opened."
+        elif request.form.get('umpire_remove_none'):
+            Admin.umpire_remove_none(league)
+            res['msg'] = "Umpire drop closed."
+        elif request.form.get('coach_add_all'):
+            Admin.coach_add_all(league)
+            res['msg'] = "Coach add opened."
+        elif request.form.get('coach_add_none'):
+            Admin.coach_add_none(league)
+            res['msg'] = "Coach add closed."
 
     users = User.get({'leagues': {'$in': [res['league']]}}, autopick_gps=False)
-    league = League.get(res['league'])
     league['permissions'] = User.generate_permissions(league, Event.get_all_ump_positions())
     groups = User.get_all_groups(league)
 

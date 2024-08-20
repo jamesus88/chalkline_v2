@@ -1,10 +1,9 @@
-from flask import render_template, redirect, url_for, session, request, Blueprint
+from flask import render_template, redirect, url_for, abort, request, Blueprint
 from chalkline.core import server as svr
 from chalkline.core.events import Event
 from chalkline.core.user import User
 from chalkline.core.league import League
 from chalkline.core.team import Team
-
 
 view_info = Blueprint('view_info', __name__)
 
@@ -44,8 +43,45 @@ def event(eventId):
 @view_info.route("/user/<userId>", methods=['GET', 'POST'])
 @view_info.route("/user")
 def user(userId=None):
-    pass
+    mw = svr.authorized_only()
+    if mw: return mw
+
+    res = svr.obj()
+
+    if userId:
+        u = User.get_user(userId=userId)
+        if not u:
+            abort(404)
+    else:
+        return redirect(url_for('main.home'))
+
+    u = User.view(u)
+    return render_template("view_info/user.html", res=res, user=u)
 
 @view_info.route("/team/<teamId>", methods=['GET', 'POST'])
+@view_info.route("/team")
 def team(teamId=None):
-    pass
+    mw = svr.authorized_only()
+    if mw: return mw
+
+    if not teamId:
+        return redirect(url_for('main.home'))
+
+    res = svr.obj()
+    league = League.get(res['league'])
+    all_coaches = User.find_groups(res['league'], ['coach'])
+
+    if request.method == 'POST':
+        if not res['admin']:
+            raise PermissionError('This action is restricted to Admins only.')
+        if request.form.get('removeCoach'):
+            Team.remove_coach(teamId, league['current_season'], request.form['removeCoach'])
+        elif request.form.get('add'):
+            Team.add_coach(teamId, league['current_season'], request.form['addCoach'])
+    
+    team = Team.get(teamId)
+    if not team:
+        abort(404)
+    Team.load_contacts(team)
+
+    return render_template("view_info/team.html", res=res, team=team, league=league, all_coaches=all_coaches)

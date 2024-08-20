@@ -1,6 +1,7 @@
 from chalkline.core import mailer, ObjectId
 from pymongo import UpdateOne
 from datetime import datetime
+from chalkline.core.user import User
 
 class Admin:
 
@@ -39,7 +40,51 @@ class Admin:
 
         cls.col.bulk_write(writes)
 
+    @staticmethod
     def delete(cls, id):
         cls.col.delete_one({'_id': ObjectId(id)})
+
+    @staticmethod
+    def umpire_add_all(league):
+        User.col.update_many(
+            {'active': True, 'leagues': {'$in': [league['leagueId']]}, 'groups': {'$in': [f"{league['abbr']}.umpire"]}}, 
+            {'$push': {'permissions': f"{league['abbr']}.umpire_add"}}
+        )
+
+    @staticmethod
+    def umpire_add_none(league):
+        User.col.update_many(
+            {'active': True, 'leagues': {'$in': [league['leagueId']]}, 'groups': {'$in': [f"{league['abbr']}.umpire"]}}, 
+            {'$pull': {'permissions': f"{league['abbr']}.umpire_add"}}
+        )
+
+    @staticmethod
+    def umpire_remove_all(league):
+        User.col.update_many(
+            {'active': True, 'leagues': {'$in': [league['leagueId']]}, 'groups': {'$in': [f"{league['abbr']}.umpire"]}}, 
+            {'$push': {'permissions': f"{league['abbr']}.umpire_remove"}}
+        )
+
+    @staticmethod
+    def umpire_remove_none(league):
+        User.col.update_many(
+            {'active': True, 'leagues': {'$in': [league['leagueId']]}, 'groups': {'$in': [f"{league['abbr']}.umpire"]}}, 
+            {'$pull': {'permissions': f"{league['abbr']}.umpire_remove"}}
+        )
+    
+    @staticmethod
+    def coach_add_all(league):
+        User.col.update_many(
+            {'active': True, 'leagues': {'$in': [league['leagueId']]}, 'groups': {'$in': [f"{league['abbr']}.coach"]}}, 
+            {'$push': {'permissions': f"{league['abbr']}.coach_add"}}
+        )
+
+    @staticmethod
+    def coach_add_none(league):
+        User.col.update_many(
+            {'active': True, 'leagues': {'$in': [league['leagueId']]}, 'groups': {'$in': [f"{league['abbr']}.coach"]}}, 
+            {'$pull': {'permissions': f"{league['abbr']}.coach_add"}}
+        )
+
 
             

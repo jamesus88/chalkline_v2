@@ -72,13 +72,13 @@ def profile():
 
         elif request.form.get('removeLoc'):
             league = request.form['removeLoc']
-            user = User.remove_league(res['user'], league)
+            user = User.remove_league(res['user']['userId'], league)
             svr.login(user)
 
         elif request.form.get('addLeague'):
-            leagueId = request.form['new_league']
-            code = request.form['add_code']
-            User.add_league
+            league = League.get(request.form['new_league'])
+            user = User.add_league(res['user'], league, request.form)
+            svr.login(user)
 
         elif request.form.get('admin-features'):
             assert 'admin' in res['user']['groups'], "You do not have permission to access these features."

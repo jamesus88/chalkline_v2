@@ -1,5 +1,6 @@
 from chalkline.collections import teamData
 from chalkline.core import _safe
+from chalkline import PROTOCOL, DOMAIN
 from chalkline.core.user import User
 
 class Team:
@@ -7,6 +8,7 @@ class Team:
 
     @staticmethod
     def safe(team):
+        team['link'] = Team.get_share_link(team)
         return _safe(team)
     
     @staticmethod
@@ -37,7 +39,7 @@ class Team:
     def create(league, form):
         team = {
             'leagueId': league['leagueId'],
-            'teamId': form.get('age').upper()[:3] + form.get('teamId'),
+            'teamId': league['leagueId'] + '.' + form.get('age').upper()[:3] + form.get('teamId'),
             'name': form.get('name'),
             'seasons': {
                 league['current_season']: {'record': [0,0,0], 'coaches': form.getlist('coaches')}
@@ -55,3 +57,16 @@ class Team:
     @staticmethod
     def delete(leagueId, teamId):
         Team.col.delete_one({'leagueId': leagueId, 'teamId': teamId})
+
+    @staticmethod
+    def remove_coach(teamId, season, userId):
+        Team.col.update_one({'teamId': teamId}, {'$pull': {f'seasons.{season}.coaches': userId}})
+
+    @staticmethod
+    def add_coach(teamId, season, userId):
+        Team.col.update_one({'teamId': teamId}, {'$push': {f'seasons.{season}.coaches': userId}})
+
+    @staticmethod
+    def get_share_link(team):
+        link = f"{PROTOCOL}://{DOMAIN}/invite/add-team/{team['teamId']}"
+        return link

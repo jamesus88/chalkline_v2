@@ -4,116 +4,28 @@
 
 {% extends "design.html" %}
 
-{% block title %}View User{% endblock title %}
+{% block title %}{{user.firstLast}}{% endblock title %}
 
 {% block content %}
 <main>
     <center>
         <h1>View User</h1>
-        <h4 class='error'>{{sobj.msg}}</h4>
+        <h4 class='error'>{{res.msg}}</h4>
     </center>
     <section>
         <center>
-            <h2>{{view_user.firstName}} {{view_user.lastName}}</h2>
-            <h3>Email: {{view_user.email}}</h3>
-            <h3>Phone: {{view_user.phone}}</h3>
+            <h2>{{user.firstName}} {{user.lastName}}</h2>
+            <h3>Email: {{user.email}}</h3>
+            <h3>Phone: {{user.phone}}</h3>
         </center>
     </section>
     <section>
         <center>
-            <h3>Teams: {{view_user.teams|join(', ')}}</h3>
-            <h3>Roles: {{view_user.role|join(', ')}}</h3>
-            <h3>Leagues: {{view_user.locations|join(', ')}}</h3>
+            <h3>Teams: {{user.teams|join(', ')}}</h3>
+            <h3>Groups: {{user.groups|join(', ')}}</h3>
+            <h3>Leagues: {{user.leagues|join(', ')}}</h3>
         </center>
     </section>
-    {% if 'admin' in user.role %}
-    <center>
-        <p class="urgent">Admin Actions</p>
-    </center>
-    <section>
-        <center>
-            <h2>Umpire Permissions</h2>
-            <form method="post">
-                <label for="permissionSet">Umpire Permission Type: </label>
-                <select name="permissionSet" id="permissionSet" required onchange="updateForm()">
-                    <option value="U0">Umpire (any slot)</option>
-                    <option value="Y0">Youth (AA - MAJ field)</option>
-                    <option value="Y3">Youth (any field)</option>
-                    <option value="Y1">Youth (AA - AAA plate, any field)</option>
-                    <option value="Y2">Youth (AA - MAJ plate, any field)</option>
-                    <option value="C0">Coach (none)</option>
-                </select><br><br>
-                <button id="submitPermission" class="action" type="submit">Update</button>
-            </form>
-        </center>
-    </section>
-    <section>
-        <center>
-            <h2>Add Role</h2>
-            <form method="post">
-                <label for="addRole">Add Role: </label>
-                <select name="addRole" id="addRole" required>
-                    <option value="" selected disabled>Select</option>
-                    <option value="umpire">Umpire</option>
-                    <option value="youth">Youth Umpire</option>
-                    <option value="coach">Coach</option>
-                    <option value="parent">Parent</option>
-                    <option value="board">Director</option>
-                </select><br><br>
-                <button class="action" type="submit">Add</button>
-            </form>
-        </center>
-    </section>
-    <section>
-        <center>
-            <h2>Remove Role</h2>
-            <form method="post">
-                <label for="removeRole">Remove Role: </label>
-                <select name="removeRole" id="removeRole" required>
-                    <option value="" selected disabled>Select</option>
-                    <option value="umpire">Umpire</option>
-                    <option value="youth">Youth Umpire</option>
-                    <option value="coach">Coach</option>
-                    <option value="parent">Parent</option>
-                    <option value="board">Director</option>
-                </select><br><br>
-                <button class="action" type="submit">Remove</button>
-            </form>
-        </center>
-    </section>
-    {% if sobj.location in view_user.locations %}
-    <section>
-        <form method="post">
-            <center>
-                <h2 class="error">Remove From League</h2>
-                <button name="removeLoc" value="removeLoc" type="submit" class="action" style="background-color: red;" onclick="return confirm('Remove this user from your league? This cannot be undone!')">Remove</button>
-            </center>
-        </form>
-    </section>
-    {% endif %}
-{% endif %}
 </main>
-
-<script>
-    let permission = "{{view_user.permissionSet}}";
-    let permissionSelect = document.getElementById('permissionSet');
-    let submit = document.getElementById('submitPermission');
-
-    permissionSelect.value = permission;
-
-    function updateForm() {
-        if (permission == permissionSelect.value) {
-            submit.disabled = true;
-            submit.classList.add('disabled');
-        }
-        else {
-            submit.disabled = false;
-            submit.classList.remove('disabled');
-        }
-    }
-
-    updateForm()
-
-</script>
 
 {% endblock content %}

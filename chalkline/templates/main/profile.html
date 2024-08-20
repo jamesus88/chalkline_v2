@@ -180,6 +180,55 @@
                 </select>
                 <input type="text" name="add_code" id="add_code" placeholder="Group Code" required>
                 </h3>
+                <table class="center">
+                    <tr>
+                        <td><label for="role-parent">Parent</label></td>
+                        <td><input type="checkbox" name="role-parent" id="parent"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="role-coach">Coach</label></td>
+                        <td><input type="checkbox" name="role-coach" id="coach" onchange="updateCodes()"></td>
+                    </tr>
+                    <tr id="coachDisplay">
+                        <td><input type="text" name="coach_code" id="coach_code" placeholder="League Coach Code"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="role-umpire">Umpire</label></td>
+                        <td><input type="checkbox" name="role-umpire" id="umpire" onchange="updateCodes()"></td>
+                    </tr>
+                    <tr id="umpireDisplay">
+                        <td><input type="text" name="umpire_code" id="umpire_code" placeholder="League Umpire Code"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="role-director">Director</label></td>
+                        <td><input type="checkbox" name="role-director" id="director" onchange="updateCodes()"></td>
+                    </tr>
+                    <tr id="directorDisplay">
+                        <td><input type="text" name="director_code" id="director_code" placeholder="League Director Code"></td>
+                    </tr>
+                </table>
+                <script>
+                    const coachCode = document.getElementById('coachDisplay');
+                    const coachRole = document.getElementById('coach');
+                    const umpireCode = document.getElementById('umpire_code');
+                    const umpireRole = document.getElementById('umpire');
+                    const directorCode = document.getElementById('director_code');
+                    const directorRole = document.getElementById('director');
+
+                    function updateCodes() {
+                        coachCode.style.display = 'none';
+                        if (coachRole.checked) {coachCode.style.display = 'table-row'}
+
+                        umpireCode.style.display = 'none';
+                        if (umpireRole.checked) {umpireCode.style.display = 'table-row'}
+
+                        directorCode.style.display = 'none';
+                        if (directorRole.checked) {directorCode.style.display = 'table-row'}
+                    }
+
+                    updateCodes()
+
+                </script>
                 <button class="action" name="addLeague" value="1">Add League</button>
             </form>
 

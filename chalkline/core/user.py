@@ -115,18 +115,7 @@ class User:
             'created': now(),
             'last_login': None
         }
-        abbr = league['abbr']
-        if 'role-coach' in form:
-            assert league['auth']['coach_code'] == form.get('coach_code'), "Error: League Coach Code is invalid."
-            user['groups'].append(f'{abbr}.coach')
-        if 'role-parent' in form:
-            user['groups'].append(f'{abbr}.parent')
-        if 'role-umpire' in form:
-            assert league['auth']['umpire_code'] == form.get('umpire_code'), "Error: League Umpire Code is invalid."
-            user['groups'].append(f'{abbr}.umpire')
-        if 'role-director' in form:
-            assert league['auth']['director_code'] == form.get('director_code'), "Error: League Director Code is invalid."
-            user['groups'].append(f'{abbr}.director')
+        user['groups'] = User.authorize_groups(user, league, form)
 
         _id = User.col.insert_one(user).inserted_id
         user['_id'] = _id
@@ -168,17 +157,31 @@ class User:
         return User.safe(user)
     
     @staticmethod
-    def add_league(user, league, code):
-        if 'director' in user['groups']:
-            if code != league['auth']['director_code']:
-                raise PermissionError('You are a director, so you must enter the director code for the new league.')
+    def authorize_groups(user, league, form):
+        abbr = league['abbr']
+        if 'role-coach' in form:
+            assert league['auth']['coach_code'] == form.get('coach_code'), "Error: League Coach Code is invalid."
+            user['groups'].append(f'{abbr}.coach')
+        if 'role-parent' in form:
+            user['groups'].append(f'{abbr}.parent')
+        if 'role-umpire' in form:
+            assert league['auth']['umpire_code'] == form.get('umpire_code'), "Error: League Umpire Code is invalid."
+            user['groups'].append(f'{abbr}.umpire')
+        if 'role-director' in form:
+            assert league['auth']['director_code'] == form.get('director_code'), "Error: League Director Code is invalid."
+            user['groups'].append(f'{abbr}.director')
 
-        user = User.col.find_one_and_update({'userId': user['userId']}, {'$push': {'leagues': league['leagueId']}}, return_document=True)
+        return user['groups']
+    
+    @staticmethod
+    def add_league(user, league, form):
+        groups = User.authorize_groups(user, league, form)
+        user = User.col.find_one_and_update({'userId': user['userId']}, {'$push': {'leagues': league['leagueId']}, '$set': {'groups': groups}}, return_document=True)
         return User.safe(user)
     
     @staticmethod
-    def remove_league(user, leagueId):
-        user = User.col.find_one_and_update({'userId': user['userId']}, {'$pull': {'leagues': leagueId}}, return_document=True)
+    def remove_league(userId, leagueId):
+        user = User.col.find_one_and_update({'userId': userId}, {'$pull': {'leagues': leagueId}}, return_document=True)
         return User.safe(user)
 
     @staticmethod
@@ -190,6 +193,8 @@ class User:
     
     @staticmethod
     def find_groups(leagueId, groups: list):
+        abbr = leagueData.find_one({'leagueId': leagueId})['abbr']
+        groups = [abbr+'.'+g for g in groups]
         users = User.col.find({'leagues': {'$in': [leagueId]}, 'groups': {'$in': groups}, 'active': True})
         return [User.safe(u) for u in users]
     

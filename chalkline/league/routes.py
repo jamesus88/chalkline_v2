@@ -21,10 +21,6 @@ def master_schedule():
     league = League.get(res['league'])
     return render_template("league/master-schedule.html", res=res, events=events, league=league, filters=filters)
 
-@league.route("/info", methods=['GET', 'POST'])
-def info():
-    pass
-
 @league.route("/status")
 def status():
     pass

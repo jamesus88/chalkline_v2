@@ -1,0 +1,83 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='main/home.css')}}">
+    <script src="{{url_for('static', filename='share.js')}}" defer></script>
+</head>
+
+{% extends "design.html" %}
+
+{% block title %}{{team.teamId}}{% endblock title %}
+
+{% block content %}
+<main>
+    <center>
+        <h1>View Team</h1>
+        <h4 class='error'>{{res.msg}}</h4>
+        <section>
+            <h2>{{team.teamId}} - {{team.name}}</h2>
+        </section>
+        <section>
+            <h2>Standings: {{league.current_season}}</h2>
+            <h3>Current Seed: Not Placed</h3>
+            <table class="center">
+                <tr>
+                    <th>Wins</th>
+                    <th>Losses</th>
+                    <th>Ties</th>
+                </tr>
+                <tr>
+                    <td>{{team.seasons.get(league.current_season).record[0]}}</td>
+                    <td>{{team.seasons.get(league.current_season).record[1]}}</td>
+                    <td>{{team.seasons.get(league.current_season).record[2]}}</td>
+                </tr>
+            </table>
+        </section>
+        <section>
+            <h2>Coaches</h2>
+            
+            <table class="center">
+                <tr>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    {% if res.admin %}
+                        <th>Remove</th>
+                    {% endif %}
+                </tr>
+                {% for user in team.contacts if user.userId in team.seasons.get(league.current_season).coaches %}
+                <tr>
+                    <td>{{user.firstName}} {{user.lastName}}</td>
+                    <td>Coach</td>
+                    <td>{{user.phone}}</td>
+                    <td>{{user.email}}</td>
+                    {% if res.admin %}
+                    <form method="post">
+                        <td><button class="danger action" onclick="return confirm('Remove coach?')" name="removeCoach" value="{{user.userId}}"><i class="fa-solid fa-xmark"></i></button></td>
+                    </form>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+
+            </table>
+
+            {% if res.admin %}
+                <br>
+                <form method="post">
+                    <select name="addCoach" id="addCoach" required>
+                        <option value="" selected disabled>Add Coach</option>
+                        {% for c in all_coaches %}
+                            <option value="{{c.userId}}">{{c.fullName}}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="action" name="add" value="0">Add</button>
+                </form>
+            {% endif %}
+        </section>
+        
+        <div>
+            <button class='action' onclick="copy('{{team.link}}')">Share Team <i class="fa-solid fa-share-from-square"></i></button>
+        </div>
+    </center>
+</main>
+
+{% endblock content %}

@@ -21,6 +21,19 @@
             <p class="subtle">Hold ctrl on PC or cmd on Mac to select multiple groups/permissions</p>
             <p class="error">{{res.msg}}</p>
         </div>
+        <div>
+            <br>
+            <h3>Quick Actions</h3>
+            <form method="post">
+                <button class="action secondary" name="umpire_add_all" value="1" onclick="return confirm('Allow all active umpires in your league to add games?')">Open Umpire Add</button> 
+                <button class="action secondary" name="umpire_add_none" value="1" onclick="return confirm('Close umpire game adding?')">Close Umpire Add</button>
+                <button class="action secondary" name="umpire_remove_all" value="1" onclick="return confirm('Allow all umpires in your league to drop games?')">Open Umpire Drop</button> 
+                <button class="action secondary" name="umpire_remove_none" value="1" onclick="return confirm('Close umpire drop?')">Close Umpire Drop</button>
+                <br><br>
+                <button class="action secondary" name="coach_add_all" value="1" onclick="return confirm('Allow all active coaches in your league to request youth umps?')">Open Coach Add</button>
+                <button class="action secondary" name="coach_add_none" value="1" onclick="return confirm('Lock all youth umpire requests?')">Close Coach Add</button>
+            </form>
+        </div>
     </section>
     <button type="" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
     <form method="post">
@@ -49,6 +62,7 @@
                     <th>Phone</th>
                     <th>Groups</th>
                     <th>Permissions</th>
+                    <th>Remove</th>
                 </tr>
                 {% for u in users %}
                 <tr class="event-row">
@@ -90,6 +104,7 @@
                         }
                     </script>
                     
+                    <td><button type="submit" onclick="return confirm('Remove user from league? This cannot be undone!')" class="schedule-action danger" name="remove" value="{{u.userId}}">Remove</button></td>
                     
                 </tr>
 

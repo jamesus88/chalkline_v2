@@ -60,10 +60,9 @@ def info():
 
     team = Team.get(teamId)
     league = League.get(res['league'])
-    link = f"{res['protocol']}://{res['domain']}/invite/add-team/{teamId}"
     Team.load_contacts(team)
 
-    return render_template("teams/info.html", res=res, team=team, league=league, link=link)
+    return render_template("teams/info.html", res=res, team=team, league=league)
     
 @teams.route("/rentals", methods=['GET', 'POST'])
 def rentals():
