@@ -2,6 +2,7 @@ from chalkline.collections import eventData
 from datetime import datetime, timedelta
 from chalkline.core import now, _safe, ObjectId, localize
 from chalkline.core.user import User
+from chalkline.core.team import Team
 from chalkline import SEASON
 
 class Filter:
@@ -118,7 +119,7 @@ class Event:
         return False
     
     @staticmethod
-    def get(leagueId, user=None, team=None, check_user_teams=True, filters=Filter.default(), add_criteria = {}):
+    def get(leagueId, user=None, team=None, check_user_teams=True, filters=Filter.default(), add_criteria = {}, localize_times=True):
         criteria = [{'leagueId': leagueId}, add_criteria]
 
         if filters.get('season'):
@@ -132,7 +133,7 @@ class Event:
         if filters.get('end'):
             criteria.append({'date': {'$lte': filters['end']}})
 
-        all_events = [Event.safe(e) for e in Event.col.find({'$and': criteria}).sort(['date', 'field'])]
+        all_events = [Event.safe(e, localize_times=localize_times) for e in Event.col.find({'$and': criteria}).sort(['date', 'field'])]
         events = []
 
         # filter
@@ -160,11 +161,11 @@ class Event:
             return None
     
     @staticmethod
-    def safe(event):
+    def safe(event, localize_times=True):
         event = _safe(event)
-        umpires = [User.view(u) for u in User.col.find({'leagues': {'$in': [event['leagueId']]}, 'groups': {'$in': ['umpire']}})]
+        umpires = [User.view(u) for u in User.find_groups(event['leagueId'], ['umpire'])]
 
-        event['date'] = localize(event['date'])
+        #if localize_times: event['date'] = localize(event['date'])
 
         # fill in umpire data and add team hints
         full = True
@@ -186,6 +187,7 @@ class Event:
             event['team_umps'] = team_umps
         else:
             event['team_umps'] = ['None']
+
 
         return event
     

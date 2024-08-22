@@ -38,7 +38,7 @@
         </script>
     {% endif %}
     
-    {% if request.blueprint in ['league', 'director', 'admin'] %}
+    {% if request.blueprint in ['league', 'admin'] %}
         <select name="filter_umpires_only" id="filter_umpires_only">
             <option value="False">Need not have umpires</option>
             <option value="True">Has umpires</option>

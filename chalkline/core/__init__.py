@@ -5,7 +5,8 @@ from bson import ObjectId
 TIMEZONE = timezone('US/Eastern')
 
 def now():
-    return datetime.now(TIMEZONE)
+    dt = datetime.now(TIMEZONE).replace(tzinfo=None)
+    return dt
 
 def localize(dt: datetime):
     return dt.astimezone(TIMEZONE)
@@ -19,6 +20,11 @@ def check_unique(cls, field, value):
 def _safe(obj):
     obj['_id'] = str(obj['_id'])
     return obj
+
+def remove_dups(seq):
+    seen = set()
+    seen_add = seen.add
+    return [x for x in seq if not (x in seen or seen_add(x))]
 
 def get_us_states():
     return {

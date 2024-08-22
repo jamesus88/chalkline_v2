@@ -1,7 +1,9 @@
-from chalkline.core import mailer, ObjectId
+from chalkline.core import mailer, ObjectId, now, remove_dups
 from pymongo import UpdateOne
-from datetime import datetime
+from datetime import datetime, timedelta
 from chalkline.core.user import User
+from chalkline.core.director import Shift
+from chalkline.core.events import Event, Filter
 
 class Admin:
 
@@ -10,13 +12,13 @@ class Admin:
         updates = {}
 
         for key, value in form.items():
-            if '_' not in key:
+            if '_' not in key or 'filter' in key:
                 continue
 
             _id, attr = key.split('_')
 
             # formatting
-            date_attrs = ['date']
+            date_attrs = ['date', 'start_date', 'end_date']
             int_attrs = ['field']
             multi_attrs = ['groups', 'permissions']
 
@@ -86,5 +88,40 @@ class Admin:
             {'$pull': {'permissions': f"{league['abbr']}.coach_add"}}
         )
 
+    @staticmethod
+    def generate_dod_shifts(league):
 
+        Shift.col.delete_many({'leagueId': league['leagueId']})
+
+        filters = Filter.default()
+        filters['end'] = now() + timedelta(days=365)
+        events = Event.get(league['leagueId'], filters=filters, localize_times=False)
+
+        count = 0
+        for venue in league['venues']:
+            dates = remove_dups([e['date'] for e in events if e['venueId'] == venue])
+            shifts = []
+
+            for i in range(len(dates)):
+                if len(shifts) != 0:
+                    diff = dates[i] - shifts[-1]['start_date']
+                    if diff < timedelta(hours=Shift.SHIFT_LENGTH):
+                        continue
+
+                shifts.append(Shift.create(
+                    leagueId=league['leagueId'],
+                    form={
+                        'venueId': venue,
+                        'start-date': (dates[i] - timedelta(minutes=30)).isoformat()[:16],
+                        'end-date': (dates[i] - timedelta(minutes=30) + timedelta(hours=Shift.SHIFT_LENGTH)).isoformat()[:16]
+                    }, insert=False
+                ))
+
+            if len(shifts) > 0: Shift.col.insert_many(shifts)
+
+            count += len(shifts)
+
+        return count
+
+        
             

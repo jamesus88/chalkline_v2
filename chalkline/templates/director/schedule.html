@@ -1,5 +1,6 @@
 <head>
     <link rel="stylesheet" href="{{url_for('static', filename='schedule.css')}}">
+    <script src="{{url_for('static', filename='schedule.js')}}" defer></script>
 </head>
 
 {% extends "design.html" %}
@@ -17,51 +18,39 @@
             <p>To view shifts you are working.</p>
         </div>
     </section>
-    <button type="" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
+
     <form method="post">
-        <section id="filter-section" class="filter-section" style='display: none;'>
-            <select name="updateFilter" id="updateFilter" style="display: none;">
-                <option value="updateFilter" selected>UpdateFilter</option>
-            </select>
-            <select class="filter" name="hidePast" id="hidePast" onchange="this.form.submit()">
-                <option value="True" selected>Future only</option>
-                <option value="False">Past and Future</option>
-            </select>
-        
-            <script>
-                document.getElementById('hidePast').value = '{{hidePast}}';
-                function toggleFilterSection(section) {
-                    let sect = document.getElementById(section);
-                    if (sect.style.display == 'none') {
-                        sect.style.display = 'block';
-                    }
-                    else {
-                        sect.style.display = 'none';
-                    }
-                }
-            </script>
-        </section>
-        <p class="error">{{sobj.msg}}</p>
+    
+    {% include "filters.html" %}
+
+        <p class="error">{{res.msg}}</p>
         <section class="schedule-section scrollwrapper">
-            {% if shiftList|length < 1 %}
+            {% if shifts|length < 1 %}
             <h3 class="error">No shifts found.</h3>
             {% endif %}
             <table id="schedule-table" class="event-display">
                 <tr>
-                    <th>Date</th>
-                    <th>Start Time</th>
-                    <th>End Time</th>
+                    <th>Venue</th>
+                    <th>From</th>
+                    <th>To</th>
                     <th>Director</th>
+                    {% if res.admin %}
+                        <th>Admin</th>
+                    {% endif %}
                 </tr>
-                {% for shift in shiftList %}
+                {% for s in shifts %}
                 <tr>
-                    <td>{{shift.startDateTime.strftime('%a %m/%d')}}</td>
-                    <td>{{shift.startDateTime.strftime('%H:%M')}}</td>
-                    <td>{{shift.endDateTime.strftime('%H:%M')}}</td>
-                    {% if shift.directorInfo.fLast is none %}
-                    <td><button class="schedule-action" type="submit" name="addDirector" value="{{shift._id}}">+ director</button></td>
+                    <td>{{s.venue_info.name}}</td>
+                    <td>{{s.start_date.strftime('%a %m/%d %H:%M')}}</td>
+                    <td>{{s.end_date.strftime('%H:%M')}}</td>
+                    {% if s.director is none %}
+                    <td><button class="schedule-action" type="submit" name="add" value="{{s._id}}">+ add</button></td>
                     {% else %}
-                    <td><a target='_blank' href="{{url_for('view_info.user', user_id=shift.directorInfo._id)}}">{{shift.directorInfo.fLast}}</a></td>
+                    <td><a target='_blank' href="{{url_for('view_info.user', user_id=s.director.userId)}}">{{s.director.firstLast}}</a></td>
+                    {% endif %}
+
+                    {% if res.admin %}
+                    <td><button onclick="return confirm('Delete shift?')" class="schedule-action danger" type="submit" name="delete" value="{{s._id}}">Delete</button></td>
                     {% endif %}
                 </tr>
                 {% endfor %}

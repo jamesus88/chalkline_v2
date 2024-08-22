@@ -39,7 +39,8 @@ class Team:
     def create(league, form):
         team = {
             'leagueId': league['leagueId'],
-            'teamId': league['leagueId'] + '.' + form.get('age').upper()[:3] + form.get('teamId'),
+            'teamId': league['abbr'] + '-' + form.get('age').upper()[:3] + form.get('teamId'),
+            'code': form.get('age').upper()[:3] + form.get('teamId'),
             'name': form.get('name'),
             'seasons': {
                 league['current_season']: {'record': [0,0,0], 'coaches': form.getlist('coaches')}
@@ -57,6 +58,7 @@ class Team:
     @staticmethod
     def delete(leagueId, teamId):
         Team.col.delete_one({'leagueId': leagueId, 'teamId': teamId})
+        User.col.update_many({}, {'$pull': {'teams': teamId}})
 
     @staticmethod
     def remove_coach(teamId, season, userId):

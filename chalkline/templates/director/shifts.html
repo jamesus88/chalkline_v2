@@ -1,67 +1,49 @@
 <head>
     <link rel="stylesheet" href="{{url_for('static', filename='schedule.css')}}">
+    <script src="{{url_for('static', filename='schedule.js')}}" defer></script>
 </head>
 
 {% extends "design.html" %}
-{% block title %}Director Schedule{% endblock title %}
+{% block title %}My Shifts{% endblock title %}
 
 {% block content %}
 <main>
     <section class="split">
         <div>
-            <h1>Director Shifts - {{user.firstName[0]}}. {{user.lastName}}</h1>
-            <h3>View and manage your shifts.</h3>
+            <h1>My Shifts</h1>
+            <h3>View schedule and add shifts.</h3>
         </div>
         <div class="align-right">
-            <h3>Go to <a href="{{url_for('director.schedule')}}">Director Schedule</a></h3>
-            <p>To view director schedule and add shifts.</p>
+            <h3>Go to <a href="{{url_for('director.schedule')}}">All Shifts</a></h3>
+            <p>To view all available shifts and sign-up.</p>
         </div>
     </section>
-    <button type="" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
+
     <form method="post">
-        <section id="filter-section" class="filter-section" style='display: none;'>
-            <select name="updateFilter" id="updateFilter" style="display: none;">
-                <option value="updateFilter" selected>UpdateFilter</option>
-            </select>
-            <select class="filter" name="hidePast" id="hidePast" onchange="this.form.submit()">
-                <option value="True" selected>Future only</option>
-                <option value="False">Past and Future</option>
-            </select>
-        
-            <script>
-                document.getElementById('hidePast').value = '{{hidePast}}';
-                function toggleFilterSection(section) {
-                    let sect = document.getElementById(section);
-                    if (sect.style.display == 'none') {
-                        sect.style.display = 'block';
-                    }
-                    else {
-                        sect.style.display = 'none';
-                    }
-                }
-            </script>
-        </section>
-        <p class="error">{{sobj.msg}}</p>
+    
+    {% include "filters.html" %}
+
+        <p class="error">{{res.msg}}</p>
         <section class="schedule-section scrollwrapper">
-            {% if shiftList|length < 1 %}
-            <h3 class="error">No shifts found. Sign up on the <a href="{{url_for('director.schedule')}}">Director Schedule</a></h3>
+            {% if shifts|length < 1 %}
+            <h3 class="error">No shifts found.</h3>
             {% endif %}
             <table id="schedule-table" class="event-display">
                 <tr>
-                    <th>Date</th>
-                    <th>Start Time</th>
-                    <th>End Time</th>
+                    <th>Venue</th>
+                    <th>From</th>
+                    <th>To</th>
                     <th>Remove</th>
                 </tr>
-                
-                {% for shift in shiftList %}
+                {% for s in shifts %}
                 <tr>
-                    <td>{{shift.startDateTime.strftime('%a %m/%d')}}</td>
-                    <td>{{shift.startDateTime.strftime('%H:%M')}}</td>
-                    <td>{{shift.endDateTime.strftime('%H:%M')}}</td>
-                    <td><button onclick="return confirm('Remove shift?')" type="submit" class="schedule-action" name="removeDirector" value="{{shift._id}}">Remove</button></td>
+                    <td>{{s.venue_info.name}}</td>
+                    <td>{{s.start_date.strftime('%a %m/%d %H:%M')}}</td>
+                    <td>{{s.end_date.strftime('%H:%M')}}</td>
+                    <td><button onclick="return confirm('Remove shift?')" class="schedule-action danger" type="submit" name="remove" value="{{s._id}}">Remove</button></td>
                 </tr>
                 {% endfor %}
+                
                 
             </table>
             

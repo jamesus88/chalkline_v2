@@ -44,7 +44,7 @@
                         <td>{{e.field}}</td>
                         <td>{{e.age}}</td>
                         <td>{{e.status}}</td>
-                        {% if e.umpire_full %}
+                        {% if e.umpire_full or 'umpire_add' not in res.user.permissions %}
                         <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action"><i class="fa-solid fa-magnifying-glass"></i> view</button></td>
                         {% else %}
                         <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action">+ add</button></td>

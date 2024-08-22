@@ -16,6 +16,8 @@ def event_data():
 
     res = svr.obj()
     filters = Filter.default()
+    league = League.get(res['league'])
+    league['teams'] = Team.get_league_teams(res['league'])
 
     if request.method == 'POST':
         filters = Filter.parse(request.form)
@@ -28,9 +30,12 @@ def event_data():
             Admin.delete(Event, request.form['delete'])
             res['msg'] = 'Event deleted.'
 
+        elif request.form.get('genShifts'):
+            count = Admin.generate_dod_shifts(league)
+            res['msg'] = f"{count} DOD shifts added!"
+
     events = Event.get(res['league'], filters=filters)
-    league = League.get(res['league'])
-    league['teams'] = Team.get_league_teams(res['league'])
+    
 
     return render_template("admin/event-data.html", res=res, events=events, league=league, filters=filters)
 

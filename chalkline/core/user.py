@@ -36,7 +36,7 @@ class User:
         return [User.safe(u, autopick_gps) for u in users]
 
     @staticmethod
-    def get_user(userId=None, email=None):
+    def get_user(userId=None, email=None, view=False):
         if not(userId or email):
             raise ValueError('UserId or Email must be provided')
         elif userId:
@@ -45,7 +45,10 @@ class User:
             user = User.col.find_one({'email': email})
 
         if user:
-            return User.safe(user)
+            if view:
+                return User.view(user)
+            else:
+                return User.safe(user)
         else:
             return None
     
@@ -60,7 +63,8 @@ class User:
     
     @staticmethod
     def mark_active(user):
-        User.col.update_one({'userId': user['userId']}, {'$set': {'active': True}})
+        user = User.col.find_one_and_update({'userId': user['userId']}, {'$set': {'active': True}}, return_document=True)
+        return User.safe(user)
     
     @staticmethod
     def create_pword(pword):

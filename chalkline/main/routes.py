@@ -16,7 +16,9 @@ def home():
     if res['user']:
         if not res['user']['active']:
             league = League.get(res['league'])
-            User.mark_active(res['user'])
+            user = User.mark_active(res['user'])
+            svr.login(user)
+            res = svr.obj()
             res['popup'] = f"Welcome back {res['user']['firstName']}! Your account has been marked active for the {league['current_season']} season!"
 
     return render_template("main/home.html", res=res)
@@ -132,7 +134,8 @@ def login(next=None):
             res['msg'] = "Email or password is invalid. Please try again."
             del session['league']
     
-    return render_template("main/login.html", res=res)
+    all_leagues = League.get_all()
+    return render_template("main/login.html", res=res, all_leagues=all_leagues)
 
 @main.route("/send-reset", methods=['GET', 'POST'])
 def send_reset():

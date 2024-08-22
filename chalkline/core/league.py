@@ -1,5 +1,6 @@
-from chalkline.collections import leagueData, teamData, venueData
+from chalkline.collections import leagueData, teamData, venueData, directorData
 from chalkline.core import now, _safe
+from chalkline.core.user import User
 from chalkline import SEASON
 
 class League:
@@ -61,6 +62,12 @@ class League:
         }
         League.col.update_one({'leagueId': leagueId}, {'$set': {'auth': codes}})
 
+    @staticmethod
+    def load_venues(league):
+        venues = Venue.col.find({'venueId': {'$in': league['venues']}})
+        league['venue_info'] = [Venue.safe(v) for v in venues]
+        return league
+
 class Venue:
     col = venueData
 
@@ -82,3 +89,20 @@ class Venue:
         _id = Venue.col.insert_one(venue).inserted_id
         venue['_id'] = _id
         return Venue.safe(venue)
+    
+    @staticmethod
+    def get(venueId):
+        return Venue.safe(Venue.col.find_one({'venueId': venueId}))
+    
+    @staticmethod
+    def find_director(venue):
+        shift = directorData.find_one({'venueId': venue, 'start_date': {'$lte': now()}, 'end_date': {'$gte': now()}})
+        if shift:
+            if shift['director']:
+                user = User.get_user(userId=shift['director'], view = True)
+                if user: return user
+        return None
+    
+    @staticmethod
+    def update_status(venueId, status):
+        Venue.col.update_one({'venueId': venueId}, {'$set': {'status': status}})

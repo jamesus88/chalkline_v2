@@ -14,9 +14,9 @@
                 <label for="league">League</label>
                 <select name="league" id="league" required>
                     <option value="" selected disabled>Select</option>
-                    <option value="Sarasota">Sarasota</option>
-                    <option value="Venice">Venice</option>
-                    <option value="Braden River">Braden River</option>
+                    {% for l in all_leagues %}
+                        <option value="{{l.leagueId}}">{{l.name}}</option>
+                    {% endfor %}
                 </select>
                 <label class="sign-in" for="email">Email or Username</label>
                 <input type="text" name="email" id="email" required>

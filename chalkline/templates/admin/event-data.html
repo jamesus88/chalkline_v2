@@ -22,6 +22,9 @@
         </div>
         <div class="align-right">
             <h3><a href="{{url_for('admin.add_event')}}">Add Event</a></h3>
+            <form method="post">
+                <button class="action secondary" onclick="return confirm('Generate director shifts? This will replace any existing shifts for this season!')" name="genShifts" value="1">Generate DOD Shifts</button>
+            </form>
         </div>
     </section>
 

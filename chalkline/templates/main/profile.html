@@ -178,7 +178,6 @@
                     <option value="{{l.leagueId}}">{{l.name}}</option>
                     {% endfor %}
                 </select>
-                <input type="text" name="add_code" id="add_code" placeholder="Group Code" required>
                 </h3>
                 <table class="center">
                     <tr>
@@ -229,7 +228,7 @@
                     updateCodes()
 
                 </script>
-                <button class="action" name="addLeague" value="1">Add League</button>
+                <button class="action disabled" name="addLeague" value="1" disabled>Add League</button>
             </form>
 
         </section>

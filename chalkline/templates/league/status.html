@@ -6,22 +6,35 @@
 
 {% block content %}
 <main>
-    <h1>Field Status</h1>
-    <section>
-        <h2>Director On Duty</h2>
-        <h3>Twin Lakes Park - {{currentDirector.fLast}}</h3>
-        <h3>Phone: {{currentDirector.phone}}</h3>
-    </section>
-    
-    <h2>{{sobj.location}}</h2>
-    {% for venue in venues %}
-        <section>
-            <h2>{{venue.name}}</h2>
-            <h3>Field Status: <b class="urgent">{{venue.status}}</b></h3>
-            <h3>{{venue.address}}</h3>
-            <iframe src="https://www.google.com/maps/embed{{venue.embed}}" style="overflow: hidden;" width="350" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-        </section>
-    {% endfor %}
+    <center>
+        <h1>Field Status</h1>
+        
+        <h2>{{league.name}}</h2>
+        {% for v in league.venue_info %}
+            <section>
+                <form method="post">
+
+                <h2>{{v.name}}</h2>
+
+                <h3>Field Status:
+                {% if res.admin %}
+                        <input type="text" name="status" value="{{v.status}}" required>
+                        <button class="action" name="updateStatus" value="{{v.venueId}}" onclick="return confirm('Update status? This will send updates to users in your league.')" >Update</button>
+                {% else %}
+                    <b class="urgent">{{v.status}}</b>
+                {% endif %}
+                </h3>
+
+                <h4>{{v.street}}</h4>
+                <h4>{{v.city}}, {{v.state}} {{v.zipcode}}</h4>
+                <br>
+                {% if v.director %}
+                <h3>Director On Duty: {{v.director.firstLast}} ({{v.director.phone}})</h3>
+                {% endif %}
+                </form>
+            </section>
+        {% endfor %}
+    </center>
 </main>
 
 {% endblock content %}
