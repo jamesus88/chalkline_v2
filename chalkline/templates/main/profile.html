@@ -10,8 +10,8 @@
     <center>
         <h1>Profile</h1>
         <h3>Need Help? Check the <a href="{{url_for('docs.profile')}}">Docs</a>. Or <a href="{{url_for('main.home')}}">Return Home</a>.</h3>
-        <h4></h4>
         <h3 class='error'>{{res.msg}}</h3>
+
         {% if res.user.auth.calendar %}
         <section>
             <h3>Chalkline iCalendar Feed</h3>

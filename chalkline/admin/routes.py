@@ -70,7 +70,7 @@ def user_data():
             Admin.update_all(request.form, User, res['league'])
             res['msg'] = "Users updated!"
         elif request.form.get('remove'):
-            u = User.remove_league(request.form['remove'], res['league'])
+            u = User.remove_league(request.form['remove'], res['league']['leagueId'])
             res['msg'] = f"{u['firstLast']} removed from your league."
         elif request.form.get('umpire_add_all'):
             Admin.umpire_add_all(res['league'])

@@ -4,6 +4,7 @@ from chalkline.core.user import User
 from chalkline.core.calendar import Calendar
 from chalkline.core.events import Event
 from chalkline.core import server as svr
+from chalkline.core import mailer
 
 invite = Blueprint('invite', __name__) 
     
@@ -39,12 +40,25 @@ def substitute(eventId, auth):
 
     if request.method == "POST":
         if request.form.get('accept'):
-            Event.subsitute(event, pos, res['user'])
-            # send mail
+            try:
+                Event.substitute(event, pos, res['user'])
+                User.remove_sub_req(req_user, event)
+                msg = mailer.ChalklineEmail(
+                    subject="Substitute Request Fulfilled!",
+                    html=render_template("emails/shift-fulfilled.html", replaced=res['user']['fullName'], event=event),
+                    recipients=[req_user['email']]
+                )
+                mailer.sendMail(msg)
+            except PermissionError as e:
+                res['msg'] = e
+            else:
+                return render_template(url_for('main.home'))
+            
         elif request.form.get('decline'):
             User.remove_sub_req(req_user, event)
+            return render_template(url_for('main.home'))
 
-        return render_template(url_for('main.home'))
+
 
     return render_template("umpire/substitute.html", res=res, req_user=req_user, event=event, pos=pos)
 

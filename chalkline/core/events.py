@@ -314,3 +314,13 @@ class Event:
             'RF',
             'Misc'
         ]
+    
+    @staticmethod
+    def substitute(event, pos, user):
+        ump = event['umpires'][pos]
+        if User.check_permissions_to_add(ump, user):
+            Event.col.update_one({'_id': ObjectId(event['_id'])}, {'$set': {f'umpires.{pos}.user': user['userId']}})
+        else:
+            raise PermissionError("You do not have permission to add this game!")
+
+    

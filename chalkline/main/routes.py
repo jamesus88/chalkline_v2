@@ -38,8 +38,6 @@ def signup():
         except (ValueError, AssertionError) as e:
             print(e)
             res['msg'] = e
-
-        res = svr.obj()
     
     return render_template("main/create-account.html", res=res)
             
@@ -118,10 +116,9 @@ def login(next=None):
         email = request.form['email']
         pword = request.form['pword']
         leagueId = request.form['league']
-
         
-        user = User.authenticate(email, pword)
-        if user:
+        try:
+            user = User.authenticate(email, pword, leagueId)
             try:
                 svr.login(user, leagueId, 'admin' in user['groups'][leagueId])
                 User.set_last_login(user)
@@ -134,8 +131,8 @@ def login(next=None):
                     return redirect(url_for(next))
                 else:
                     return redirect(url_for('main.home'))
-        else:
-            res['msg'] = "Email or password is invalid. Please try again."
+        except (ValueError, PermissionError) as e:
+            res['msg'] = e
     
     all_leagues = League.get_all()
     return render_template("main/login.html", res=res, all_leagues=all_leagues)
@@ -152,7 +149,7 @@ def send_reset():
         if user:
             try: 
                 token = User.reset_password(user)
-                html = render_template('emails/password-reset.html', res=res, email=user['email'], token=token)
+                html = render_template('emails/password-reset.html', res=res, email=user['email'], token=token, userId=user['userId'])
                 msg = mailer.ChalklineEmail(
                     subject="Password Reset: Chalkline Baseball",
                     recipients=[user['email']],
@@ -161,6 +158,8 @@ def send_reset():
                 mailer.sendMail(msg)
             except PermissionError as e:
                 res['msg'] = e
+            else:
+                res['msg'] = "Sent! Check your email."
     
     return render_template("main/send-reset.html", res=res)
 

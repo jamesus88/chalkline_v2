@@ -9,10 +9,10 @@
     <main>
         <h2>Umpire Shift Covered!</h2>
         <section>
-            <h3>Your umpire duty for {{team}} on {{event.eventDate.strftime('%a %m/%d at %H:%M')}} has been filled!</h3>
+            <h3>Your umpire duty for {{replaced}} on {{event.date.strftime('%a %m/%d at %H:%M')}} has been filled!</h3>
             <h4>Don't forget to contact the umpire who filled this duty for verification.</h4>
         </section>
-        <p>View game here: www.chalklinebaseball.com/view-info/event/{{event._id}}</p>
+        <p>View game here: www.chalklinebaseball.com/view/event/{{event._id}}</p>
     </main>
     <p>If you did not request this, please contact an administrator immediately.</p>
     <br><br>

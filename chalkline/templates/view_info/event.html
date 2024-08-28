@@ -58,7 +58,7 @@
                             <label for="sub">Subsitute with: </label>
                             {% if res.user.auth.get('sub_' + event._id) %}
                             <select name="sub" id="sub" required>
-                                <option value="" selected disabled>{{ump.sub_req.firstLast}}</option>
+                                <option value="" selected disabled>Pending</option>
                             </select>
                             <button class="action disabled" disabled>Sent!</button>
                             {% else %}

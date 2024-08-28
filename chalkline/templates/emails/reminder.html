@@ -8,6 +8,7 @@
 <body>
     <main>
         <h2>Weekly Reminder: You have events this week in {{sobj.location}}!</h2>
+        <p>Hi {{user.firstName}}! Here's a summary of your upcoming events:</p>
         <section>
             {% for item in events %}
             <h3>You are the {{item.role}} on {{item.event.eventVenue}} Field {{item.event.eventField}} on {{item.event.eventDate.strftime('%a %m/%d at %H:%M')}} ({{item.event.eventAgeGroup}})</h3>
@@ -15,7 +16,7 @@
             <br>
             {% endfor %}
         </section>
-        <p>This email was sent automatically to {{user.email}} via Chalkline&trade;</p>
+        <p>This email was sent automatically to {{user.email}} via Chalkline Baseball&trade;</p>
         <p>You may opt out from reminders at anytime through your <a href="https://chalklinebaseball.com/profile">Profile</a>.</p>
     </main>
 

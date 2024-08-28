@@ -79,12 +79,14 @@ class User:
             return None
     
     @staticmethod
-    def authenticate(email_or_userId, pword):
+    def authenticate(email_or_userId, pword, leagueId):
         user = User.get_user(email=email_or_userId) or User.get_user(userId=email_or_userId)
         if user:
+            if leagueId not in user['leagues']:
+                raise PermissionError("You do not belong to this league!")
             if check_password_hash(user['pword'], pword):
                 return user
-        return None
+        raise ValueError("Incorrect Username/Email or Password. Please try again.")
     
     @staticmethod
     def mark_active(user):
@@ -104,6 +106,7 @@ class User:
     def reset_password(user):
         uuid = str(uuid4())
         user = User.col.find_one_and_update({'userId': user['userId'], 'auth.pword_reset': None}, {'$set': {'auth.pword_reset': uuid}})
+
         if user:
             return uuid
         else:
@@ -130,7 +133,9 @@ class User:
             'firstName': form['firstName'],
             'lastName': form['lastName'],
             'leagues': [form['league']],
-            'groups': {},
+            'groups': {
+                form['league']: []
+            },
             'permissions': {
                 form['league']: []
             },
@@ -151,7 +156,14 @@ class User:
         _id = User.col.insert_one(user).inserted_id
         user['_id'] = _id
 
-        return User.safe(user, abbr=league['abbr'])
+        msg = mailer.ChalklineEmail(
+            subject="Chalkline Account Created!",
+            recipients=[user['email']],
+            html=render_template("emails/account-created.html", user=user)
+        )
+        mailer.sendMail(msg)
+
+        return User.safe(user)
 
     @staticmethod
     def set_last_login(user, dt=None):
@@ -271,9 +283,13 @@ class User:
         User.col.update_one({'userId': user['userId']}, {"$set": {f"auth.sub_{event['_id']}": h}})
         
         msg = mailer.ChalklineEmail(
-            subject=f"Substitue Request from {user['firstLast']}",
+            subject=f"Substitute Request from {user['firstLast']}",
             recipients=[substitute['email']],
             html=render_template("emails/substitute-req.html", user=user, event=event, pos=pos, auth=h)
         )
         mailer.sendMail(msg)
         return f"Substitute request sent to {substitute['firstLast']}"
+    
+    @staticmethod
+    def remove_sub_req(user, event):
+        User.col.update_one({'userId': user['userId']}, {'$unset': {f'auth.sub_{event['_id']}': 0}})
