@@ -59,10 +59,9 @@ def info():
         teamId = request.form['teamId']
 
     team = Team.get(teamId)
-    league = League.get(res['league'])
     Team.load_contacts(team)
 
-    return render_template("teams/info.html", res=res, team=team, league=league)
+    return render_template("teams/info.html", res=res, team=team)
     
 @teams.route("/rentals", methods=['GET', 'POST'])
 def rentals():

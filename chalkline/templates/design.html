@@ -27,7 +27,7 @@
 
             {% if res.user %}
 
-                {% if 'coach' in res.user.groups %}
+                {% if 'coach' in res.user.groups.get(res.league.leagueId) %}
                 <div class="dropdown dropdown-team">
                     <button class="dropdown-button">Teams <i class="fa-solid fa-caret-down"></i></button>
                     <div class="dropdown-content team">
@@ -37,7 +37,7 @@
                 </div>
                 {% endif %}
                 
-                {% if 'umpire' in res.user.groups %}
+                {% if 'umpire' in res.user.groups.get(res.league.leagueId) %}
                 <div class="dropdown dropdown-umpire">
                     <button class="dropdown-button">Umpire <i class="fa-solid fa-caret-down"></i></button>
                     <div class="dropdown-content umpire">
@@ -47,7 +47,7 @@
                 </div>
                 {% endif %}
 
-                {% if 'director' in res.user.groups %}
+                {% if 'director' in res.user.groups.get(res.league.leagueId) %}
                 <div class="dropdown dropdown-board">
                     <button class="dropdown-button">Director <i class="fa-solid fa-caret-down"></i></button>
                     <div class="dropdown-content umpire">

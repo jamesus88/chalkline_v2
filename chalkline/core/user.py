@@ -2,22 +2,40 @@ from chalkline.collections import userData, leagueData
 from werkzeug.security import check_password_hash, generate_password_hash
 from chalkline.core import now, check_unique, _safe
 from uuid import uuid4
-from flask import session
+from flask import session, render_template
+from chalkline.core import mailer
 
 class User:
     col = userData
 
+    class Filter:
+        @staticmethod
+        def default():
+            return {
+                'group': None,
+                'active': True
+            }
+
+        @staticmethod
+        def parse(form) -> dict:
+            filters = User.Filter.default()
+
+            if form.get('filter_reset'):
+                return filters
+
+            if form.get('filter_group', 'None') != 'None':
+                filters['group'] = form['filter_group']
+
+            filters['active'] = form.get('filter_active', 'True') == 'True'
+            
+            return filters
+
     @staticmethod
-    def safe(user, autopick_gps=True):
+    def safe(user):
         user = _safe(user)
         user['firstLast'] = user['firstName'][0] + '. ' + user['lastName']
         user['fullName'] = user['firstName'] + ' ' + user['lastName']
-
-        if session.get('league') and autopick_gps:
-            abbr = leagueData.find_one({'leagueId': session['league']})['abbr']
-            user['groups'] = [g.split('.')[1] for g in user['groups'] if abbr == g.split('.')[0]]
-            user['permissions'] = [p.split('.')[1] for p in user['permissions'] if abbr == p.split('.')[0]]
-
+        
         return user
     
     @staticmethod
@@ -31,9 +49,17 @@ class User:
         return user
     
     @staticmethod
-    def get(criteria, autopick_gps=True):
-        users = User.col.find(criteria)
-        return [User.safe(u, autopick_gps) for u in users]
+    def get(res, add_criteria, filters=Filter.default()):
+        criteria = [add_criteria]
+
+        if filters.get('group') is not None:
+            criteria.append({f'groups.{res['league']['leagueId']}': {'$in': [filters['group']]}})
+
+        if filters['active']:
+            criteria.append({'active': True})
+
+        users = User.col.find({'$and': criteria}).sort('lastName', 1)
+        return [User.safe(u) for u in users]
 
     @staticmethod
     def get_user(userId=None, email=None, view=False):
@@ -57,7 +83,6 @@ class User:
         user = User.get_user(email=email_or_userId) or User.get_user(userId=email_or_userId)
         if user:
             if check_password_hash(user['pword'], pword):
-                User.col.update_one({'email': user['email']}, {'$set': {'last_login': now()}})
                 return user
         return None
     
@@ -105,9 +130,11 @@ class User:
             'firstName': form['firstName'],
             'lastName': form['lastName'],
             'leagues': [form['league']],
+            'groups': {},
+            'permissions': {
+                form['league']: []
+            },
             'teams': [],
-            'permissions': [],
-            'groups': [],
             'auth': {},
             'preferences': {
                 'hide_email': False,
@@ -119,12 +146,12 @@ class User:
             'created': now(),
             'last_login': None
         }
-        user['groups'] = User.authorize_groups(user, league, form)
+        User.authorize_groups(user, league, form)
 
         _id = User.col.insert_one(user).inserted_id
         user['_id'] = _id
 
-        return User.safe(user)
+        return User.safe(user, abbr=league['abbr'])
 
     @staticmethod
     def set_last_login(user, dt=None):
@@ -162,18 +189,17 @@ class User:
     
     @staticmethod
     def authorize_groups(user, league, form):
-        abbr = league['abbr']
         if 'role-coach' in form:
             assert league['auth']['coach_code'] == form.get('coach_code'), "Error: League Coach Code is invalid."
-            user['groups'].append(f'{abbr}.coach')
+            user['groups'][league['leagueId']].append('coach')
         if 'role-parent' in form:
-            user['groups'].append(f'{abbr}.parent')
+            user['groups'][league['leagueId']].append('parent')
         if 'role-umpire' in form:
             assert league['auth']['umpire_code'] == form.get('umpire_code'), "Error: League Umpire Code is invalid."
-            user['groups'].append(f'{abbr}.umpire')
+            user['groups'][league['leagueId']].append('umpire')
         if 'role-director' in form:
             assert league['auth']['director_code'] == form.get('director_code'), "Error: League Director Code is invalid."
-            user['groups'].append(f'{abbr}.director')
+            user['groups'][league['leagueId']].append('director')
 
         return user['groups']
     
@@ -196,35 +222,58 @@ class User:
         return None
     
     @staticmethod
-    def find_groups(leagueId, groups: list):
-        abbr = leagueData.find_one({'leagueId': leagueId})['abbr']
-        groups = [abbr+'.'+g for g in groups]
-        users = User.col.find({'leagues': {'$in': [leagueId]}, 'groups': {'$in': groups}, 'active': True})
+    def find_groups(league, groups: list):
+        users = User.col.find({'leagues': {'$in': [league['leagueId']]}, f'groups.{league['leagueId']}': {'$in': groups}, 'active': True})
         return [User.safe(u) for u in users]
     
     @staticmethod
-    def generate_permissions(league, positions):
-        abbr = league['abbr']
+    def generate_permissions(league):
         perms = [
-            f'{abbr}.umpire_add',
-            f'{abbr}.umpire_remove',
-            f'{abbr}.coach_add',
-            f'{abbr}.coach_remove',
+            'umpire_add',
+            'umpire_remove',
+            'coach_add',
+            'coach_remove',
         ]
 
         for age in league['age_groups']:
-            perms.append(f"{abbr}.umpire_Plate_{age}")
-            perms.append(f"{abbr}.umpire_Field_{age}")
+            perms.append(f"umpire_Plate_{age}")
+            perms.append(f"umpire_Field_{age}")
 
         return perms
     
     @staticmethod
-    def get_all_groups(league):
-        abbr = league['abbr']
+    def get_all_groups():
         return [
-            f'{abbr}.umpire',
-            f'{abbr}.coach',
-            f'{abbr}.parent',
-            f'{abbr}.director',
-            f'{abbr}.admin'
+            'umpire',
+            'coach',
+            'parent',
+            'director',
+            'admin'
         ]
+    
+    @staticmethod
+    def check_permissions_to_add(position, user):
+        leagueId = session['league']['leagueId']
+        for perm in position['permissions']:
+                    if perm not in user['permissions'][leagueId]:
+                        print(perm)
+                        return False
+        return True
+
+    @staticmethod
+    def request_sub(user, event, pos, subId):
+        substitute = User.get_user(userId=subId)
+
+        if not User.check_permissions_to_add(event['umpires'][pos], substitute):
+            return "This user does not have permission to take this position."
+        
+        h = str(uuid4())
+        User.col.update_one({'userId': user['userId']}, {"$set": {f"auth.sub_{event['_id']}": h}})
+        
+        msg = mailer.ChalklineEmail(
+            subject=f"Substitue Request from {user['firstLast']}",
+            recipients=[substitute['email']],
+            html=render_template("emails/substitute-req.html", user=user, event=event, pos=pos, auth=h)
+        )
+        mailer.sendMail(msg)
+        return f"Substitute request sent to {substitute['firstLast']}"

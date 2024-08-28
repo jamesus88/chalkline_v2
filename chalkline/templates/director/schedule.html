@@ -46,7 +46,7 @@
                     {% if s.director is none %}
                     <td><button class="schedule-action" type="submit" name="add" value="{{s._id}}">+ add</button></td>
                     {% else %}
-                    <td><a target='_blank' href="{{url_for('view_info.user', user_id=s.director.userId)}}">{{s.director.firstLast}}</a></td>
+                    <td><a target='_blank' href="{{url_for('view_info.user', userId=s.director.userId)}}">{{s.director.firstLast}}</a></td>
                     {% endif %}
 
                     {% if res.admin %}

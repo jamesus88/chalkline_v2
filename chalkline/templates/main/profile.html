@@ -58,7 +58,7 @@
         </section>
         {% endif %}
 
-        {% if 'coach' in res.user.groups or 'parent' in res.user.groups %}
+        {% if 'coach' in res.user.groups.get(res.league.leagueId) or 'parent' in res.user.groups.get(res.league.leagueId) %}
         <section>
             <form method="post" id="teams">
                 <h3>My Teams</h3>
@@ -235,7 +235,7 @@
         <section>
             <h3>Session</h3>
             <form method="post" id="logout">
-                {% if 'admin' in res.user.groups %}
+                {% if 'admin' in res.user.groups.get(res.league.leagueId) %}
                     <table class="center">
                         <tr>
                             <td><label for="admin-features">Admin Features: </label></td>
@@ -257,7 +257,7 @@
                     {% endfor %}
                 </select>
                 <script>
-                    document.getElementById('location').value = "{{res.league}}";
+                    document.getElementById('location').value = "{{res.league.leagueId}}";
                 </script>
 
             </form>

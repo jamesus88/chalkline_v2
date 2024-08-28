@@ -23,8 +23,7 @@ def schedule():
                 res['msg'] = e
 
     events = Event.get(res['league'], add_criteria={'umpires': {'$ne': {}}}, filters=filters)
-    league = League.get(res['league'])
-    return render_template("umpire/schedule.html", res=res, events=events, league=league, filters=filters)
+    return render_template("umpire/schedule.html", res=res, events=events, filters=filters)
 
 @umpire.route('/assignments', methods=['GET', 'POST'])
 def assignments():
@@ -52,5 +51,4 @@ def assignments():
 
 
     events = Event.get(res['league'], res['user'], check_user_teams=False, filters=filters)
-    league = League.get(res['league'])
-    return render_template("umpire/assignments.html", res=res, events=events, league=league, filters=filters)
+    return render_template("umpire/assignments.html", res=res, events=events, filters=filters)

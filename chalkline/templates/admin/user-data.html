@@ -35,10 +35,8 @@
             </form>
         </div>
     </section>
-    <button type="" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
     <form method="post">
-        <section id="filter-section" class="filter-section">
-        </section>
+        {% include "user-filters.html" %}
 
         <section class="schedule-section scrollwrapper">
             {% if users|length < 1 %}
@@ -78,14 +76,14 @@
                     </select></td>
                     <td><select name="{{u._id}}_permissions" id="{{u._id}}_permissions" multiple>
                         <option value="blank">None</option>
-                        {% for p in league.permissions %}
+                        {% for p in res.league.permissions %}
                         <option value="{{p}}">{{p}}</option>
                         {% endfor %}
                     </select></td>
 
                     <script>
-                        groups = JSON.parse('{{u.groups|tojson}}')
-                        permissions = JSON.parse('{{u.permissions|tojson}}')
+                        groups = JSON.parse('{{u.groups.get(res.league.leagueId)|tojson}}')
+                        permissions = JSON.parse('{{u.permissions.get(res.league.leagueId)|tojson}}')
                         groups_select = document.getElementById('{{u._id}}_groups')
                         permissions_select = document.getElementById('{{u._id}}_permissions')
                         for (g of groups) {

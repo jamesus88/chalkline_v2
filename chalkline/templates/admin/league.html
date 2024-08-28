@@ -14,8 +14,8 @@
     </center>
     <section>
         <center>
-            <h2>{{league.name}} ({{league.abbr}})</h2>
-            <h3 class="subtle"><i class="fa-solid fa-id-card"></i> {{league.leagueId}}</h3>
+            <h2>{{res.league.name}} ({{res.league.abbr}})</h2>
+            <h3 class="subtle"><i class="fa-solid fa-id-card"></i> {{res.league.leagueId}}</h3>
         </center>
     </section>
 
@@ -23,14 +23,14 @@
             <form method="post">
             <center>
                 <h3>Current Season: <select name="current_season" id="current_season">
+                    <option value="Spring {{res.date.year}}">Spring {{res.date.year}}</option>
                     <option value="Summer {{res.date.year}}">Summer {{res.date.year}}</option>
                     <option value="Fall {{res.date.year}}">Fall {{res.date.year}}</option>
-                    <option value="Spring {{res.date.year}}">Spring {{res.date.year}}</option>
                     <option value="Spring {{res.date.year + 1}}">Spring {{res.date.year + 1}}</option>
                 </select></h3>
                 <button class="action" name="updateSeason" value="0" onclick="return confirm('Update season? This will reset all team and game progress if changed.')">Update</button>
                 <script>
-                    document.getElementById('current_season').value = '{{league.current_season}}';
+                    document.getElementById('current_season').value = '{{res.league.current_season}}';
                 </script>
             </center>
             </form>
@@ -46,7 +46,7 @@
                         <th>Code</th>
                         <th>Remove</th>
                     </tr>
-                    {% for a in league.age_groups %}
+                    {% for a in res.league.age_groups %}
                     <tr>
                         <td>{{a}}</td>
                         <td>{{a.upper()[:3]}}</td>
@@ -71,9 +71,9 @@
             <center>
                 <h3>Authentication Codes</h3>
                 <p>Coaches, umpires, and directors use their respective codes below to sign up for your league with higher permissions.</p>
-                <h3>Umpire: <input type="text" name="umpire_code" id="umpire_code" value="{{league.auth.umpire_code}}" required></h3>
-                <h3>Coach: <input type="text" name="coach_code" id="coach_code" value="{{league.auth.coach_code}}" required></h3>
-                <h3>Director: <input type="text" name="director_code" id="director_code" value="{{league.auth.director_code}}" required></h3>
+                <h3>Umpire: <input type="text" name="umpire_code" id="umpire_code" value="{{res.league.auth.umpire_code}}" required></h3>
+                <h3>Coach: <input type="text" name="coach_code" id="coach_code" value="{{res.league.auth.coach_code}}" required></h3>
+                <h3>Director: <input type="text" name="director_code" id="director_code" value="{{res.league.auth.director_code}}" required></h3>
                 <button class="action" name="updateCodes" value="1">Update</button>
 
             </center>

@@ -1,6 +1,5 @@
-from flask import render_template, abort, Blueprint, session
+from flask import render_template, abort, Blueprint
 import traceback
-from chalkline import server as srv
 from chalkline.core import server as svr
 
 errors = Blueprint('errors', __name__)

@@ -40,9 +40,9 @@ class Shift:
         return _safe(s)
 
     @staticmethod
-    def create(leagueId, form, insert=True):
+    def create(league, form, insert=True):
         shift = {
-            'leagueId': leagueId,
+            'leagueId': league['leagueId'],
             'venueId': form['venueId'],
             'start_date': datetime.strptime(form.get('start-date'), '%Y-%m-%dT%H:%M'),
             'end_date': datetime.strptime(form.get('start-date'), '%Y-%m-%dT%H:%M'),
@@ -70,8 +70,8 @@ class Shift:
         Shift.col.update_one({'_id': ObjectId(shiftId)}, {'$set': {'director': None}})
 
     @staticmethod
-    def get(leagueId, user=None, filters=Filter.default(), add_criteria={}):
-        criteria = [{'leagueId': leagueId}, add_criteria]
+    def get(league, user=None, filters=Filter.default(), add_criteria={}):
+        criteria = [{'leagueId': league['leagueId']}, add_criteria]
 
         if filters.get('start'):
             criteria.append({'start_date': {'$gte': filters['start']}})

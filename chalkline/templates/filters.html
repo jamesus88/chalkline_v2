@@ -1,10 +1,10 @@
 <button type="button" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
 <section id="filter-section" class="filter-section" style='display: none;'>
     <br>
-    {% if league %}
+    {% if res.league %}
         <select class="filter" name="filter_age" id="filter_age">
             <option value="None" selected>All Age Groups</option>
-            {% for a in league.age_groups %}
+            {% for a in res.league.age_groups %}
                 <option value="{{a}}">{{a}} only</option>
             {% endfor %}
         </select>
@@ -25,10 +25,10 @@
         document.getElementById('filter_season').value = "{{filters.season}}";
     </script>
 
-    {% if request.blueprint != "umpire" and league %}
+    {% if request.blueprint != "umpire" and res.league %}
         <select class="filter" name="filter_team" id="filter_team">
             <option value="None" selected>All teams</option>
-            {% for t in league.teams %}
+            {% for t in res.league.teams %}
                 <option value="{{t.teamId}}">{{t.teamId}} only</option>
             {% endfor %}
         </select>

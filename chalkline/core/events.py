@@ -2,7 +2,7 @@ from chalkline.collections import eventData
 from datetime import datetime, timedelta
 from chalkline.core import now, _safe, ObjectId, localize
 from chalkline.core.user import User
-from chalkline.core.team import Team
+from flask import session
 from chalkline import SEASON
 
 class Filter:
@@ -44,6 +44,10 @@ class Event:
 
     @staticmethod
     def create(league, form):
+        form = dict(form)
+        if form.get('home') == "": form['home'] = None
+        if form.get('away') == "": form['away'] = None
+
         event = {
             'date': datetime.strptime(form.get('date'), '%Y-%m-%dT%H:%M'),
             'season': league['current_season'],
@@ -100,8 +104,12 @@ class Event:
         # check umpires
         for ump in event['umpires'].values():
             if ump['user']:
-                if ump['user']['userId'] == user['userId']:
-                    return True
+                try:
+                    if ump['user']['userId'] == user['userId']:
+                        return True
+                except TypeError:
+                    if ump['user'] == user['userId']:
+                        return True
             
         # check teams
         if check_user_teams:
@@ -119,8 +127,8 @@ class Event:
         return False
     
     @staticmethod
-    def get(leagueId, user=None, team=None, check_user_teams=True, filters=Filter.default(), add_criteria = {}, localize_times=True):
-        criteria = [{'leagueId': leagueId}, add_criteria]
+    def get(league, user=None, team=None, check_user_teams=True, filters=Filter.default(), add_criteria = {}, safe=True):
+        criteria = [{'leagueId': league['leagueId']}, add_criteria]
 
         if filters.get('season'):
             criteria.append({'season': filters['season']})
@@ -133,7 +141,10 @@ class Event:
         if filters.get('end'):
             criteria.append({'date': {'$lte': filters['end']}})
 
-        all_events = [Event.safe(e, localize_times=localize_times) for e in Event.col.find({'$and': criteria}).sort(['date', 'field'])]
+        all_events = list(Event.col.find({'$and': criteria}).sort(['date', 'field']))
+        if safe:
+            all_events = [Event.safe(e) for e in all_events]
+        
         events = []
 
         # filter
@@ -161,9 +172,10 @@ class Event:
             return None
     
     @staticmethod
-    def safe(event, localize_times=True):
+    def safe(event):
         event = _safe(event)
-        umpires = [User.view(u) for u in User.find_groups(event['leagueId'], ['umpire'])]
+        league = session['league']
+        umpires = [User.view(u) for u in User.find_groups(league, ['umpire'])]
 
         #if localize_times: event['date'] = localize(event['date'])
 
@@ -191,6 +203,7 @@ class Event:
 
         return event
     
+    
     @staticmethod
     def add_umpire(eventId, user, pos):
         event = Event.col.find_one({'_id': ObjectId(eventId)})
@@ -200,9 +213,9 @@ class Event:
             raise ValueError('Position is not empty!')
         
         # check permissions
-        for perm in umpire['permissions']:
-            if perm not in user['permissions']:
-                raise PermissionError('You are not authorized to take this game!')
+        if not User.check_permissions_to_add(umpire, user):
+            raise PermissionError("You are not authorized to add this game!")
+
         
         # ADD
         Event.col.update_one({'_id': ObjectId(eventId)}, {'$set': {f'umpires.{pos}.user': user['userId']}})
@@ -228,6 +241,11 @@ class Event:
             'permissions': [],
             'coach_req': None
         }
+        if pos == 'Plate':
+            blank['permissions'].append(f'umpire_Plate_{event['age']}')
+        else:
+            blank['permissions'].append(f'umpire_Field_{event['age']}')
+
         return blank
 
     @staticmethod
@@ -256,6 +274,10 @@ class Event:
 
     @staticmethod
     def update(event, form):
+        form = dict(form)
+        if form.get('away') == 'None': form['away'] = None
+        if form.get('home') == 'None': form['home'] = None
+
         event['date'] = datetime.strptime(form['date'], "%Y-%m-%dT%H:%M")
         event['venueId'] = form['venueId']
         event['field'] = int(form['field'])

@@ -17,7 +17,7 @@
 <main>
     <section class="split">
         <div>
-            <h1>Events ({{league.current_season}})</h1>
+            <h1>Events ({{res.league.current_season}})</h1>
             <p class="error">{{res.msg}}</p>
         </div>
         <div class="align-right">
@@ -61,26 +61,26 @@
                     <td class="event-type">{{e.type}}</td>
                     <td><input class="admin" type="datetime-local" name="{{e._id}}_date" id="date" value="{{e.date.isoformat()[0:16]}}"></td>
                     <td><select class="admin" name="{{e._id}}_venueId" id="{{e._id}}_venueId">
-                        {% for v in league.venues %}
+                        {% for v in res.league.venues %}
                             <option value="{{v}}">{{v}}</option>
                         {% endfor %}
                     </select></td>
                     <td><input class="admin" type="number" name="{{e._id}}_field" id="field" value="{{e.field}}"></td>
                     <td><select class="admin" name="{{e._id}}_age" id="{{e._id}}_age">
-                        {% for a in league.age_groups %}
+                        {% for a in res.league.age_groups %}
                             <option value="{{a}}">{{a}}</option>
                         {% endfor %}
                     </select></td>
                     <td><input class="admin" type="text" name="{{e._id}}_status" id="status" value="{{e.status}}"></td>
                     <td><select class="admin" name="{{e._id}}_away" id="{{e._id}}_away">
                         <option value="None">None</option> 
-                        {% for t in league.teams %}
+                        {% for t in res.league.teams %}
                             <option value="{{t.teamId}}">{{t.teamId}}</option>
                         {% endfor %}
                     </select></td>
                     <td><select class="admin" name="{{e._id}}_home" id="{{e._id}}_home">
                         <option value="None">None</option> 
-                        {% for t in league.teams %}
+                        {% for t in res.league.teams %}
                             <option value="{{t.teamId}}">{{t.teamId}}</option>
                         {% endfor %}
                     </select></td>

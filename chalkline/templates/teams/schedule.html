@@ -60,18 +60,18 @@
                     {% for pos, u in e.umpires.items() %}
                     <label for="{{pos}}">{{pos}}: </label>
                         {% if u.user %}
-                            <a>{{u.user.firstLast}}</a>
+                            <a href="{{url_for('view_info.user', userId=u.user.userId)}}">{{u.user.firstLast}}</a>
                         {% elif not u.team_duty %}
                             Open
                         {% else %}
                             {% if not u.coach_req %}
                                 {{u.team_duty}}
-                                {% if 'coach' in res.user.groups and u.team_duty in res.user.teams and 'coach_add' in res.user.permissions %}
+                                {% if 'coach' in res.user.groups.get(res.league.leagueId) and u.team_duty in res.user.teams and 'coach_add' in res.user.permissions.get(res.league.leagueId) %}
                                     <button type="submit" name="request" value="{{pos}}_{{e._id}}" class="schedule-action">Request Umpire</button>
                                 {% endif %}
                             {% else %}
                                 <b>Pending</b> 
-                                {% if 'coach' in res.user.groups and u.team_duty in res.user.teams and 'coach_remove' in res.user.permissions %}
+                                {% if 'coach' in res.user.groups.get(res.league.leagueId) and u.team_duty in res.user.teams and 'coach_remove' in res.user.permissions.get(res.league.leagueId) %}
                                     <button type="submit" name="remove" value="{{pos}}_{{e._id}}" class="schedule-action danger">Remove Request</button>
                                 {% endif %}
                             {% endif %}

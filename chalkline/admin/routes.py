@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, session, request, Blueprint
+from flask import render_template, redirect, url_for, session, request, Blueprint, abort
 from chalkline.core import server as svr
 from chalkline.core.events import Event, Filter
 from chalkline.core.league import League
@@ -16,14 +16,13 @@ def event_data():
 
     res = svr.obj()
     filters = Filter.default()
-    league = League.get(res['league'])
-    league['teams'] = Team.get_league_teams(res['league'])
+    res['league']['teams'] = Team.get_league_teams(res['league'])
 
     if request.method == 'POST':
         filters = Filter.parse(request.form)
 
         if request.form.get('save'):
-            Admin.update_all(request.form, Event)
+            Admin.update_all(request.form, Event, res['league'])
             res['msg'] = 'Events updated!'
         
         elif request.form.get('delete'):
@@ -31,13 +30,13 @@ def event_data():
             res['msg'] = 'Event deleted.'
 
         elif request.form.get('genShifts'):
-            count = Admin.generate_dod_shifts(league)
+            count = Admin.generate_dod_shifts(res['league'])
             res['msg'] = f"{count} DOD shifts added!"
 
     events = Event.get(res['league'], filters=filters)
     
 
-    return render_template("admin/event-data.html", res=res, events=events, league=league, filters=filters)
+    return render_template("admin/event-data.html", res=res, events=events, filters=filters)
 
 @admin.route("/add-event", methods=['GET', 'POST'])
 def add_event():
@@ -45,17 +44,16 @@ def add_event():
     if mw: return mw
 
     res = svr.obj()
-    league = League.get(res['league'])
-    league['ump_positions'] = Event.get_all_ump_positions()
+    res['league']['ump_positions'] = Event.get_all_ump_positions()
 
     if request.method == 'POST':
         try:
-            Event.create(league, request.form)
+            Event.create(res['league'], request.form)
             res['msg'] = 'Event Added!'
         except ValueError as e:
             res['msg'] = e
 
-    return render_template("admin/add-event.html", res=res, league=league)
+    return render_template("admin/add-event.html", res=res)
 
 @admin.route("/user-data", methods=['GET', 'POST'])
 def user_data():
@@ -63,39 +61,41 @@ def user_data():
     if mw: return mw
 
     res = svr.obj()
-    league = League.get(res['league'])
+    filters = User.Filter.default()
 
     if request.method == 'POST':
+        filters = User.Filter.parse(request.form)
+
         if request.form.get('save'):
-            Admin.update_all(request.form, User)
+            Admin.update_all(request.form, User, res['league'])
             res['msg'] = "Users updated!"
         elif request.form.get('remove'):
             u = User.remove_league(request.form['remove'], res['league'])
             res['msg'] = f"{u['firstLast']} removed from your league."
         elif request.form.get('umpire_add_all'):
-            Admin.umpire_add_all(league)
+            Admin.umpire_add_all(res['league'])
             res['msg'] = "Umpire add opened."
         elif request.form.get('umpire_add_none'):
-            Admin.umpire_add_none(league)
+            Admin.umpire_add_none(res['league'])
             res['msg'] = "Umpire add closed."
         elif request.form.get('umpire_remove_all'):
-            Admin.umpire_remove_all(league)
+            Admin.umpire_remove_all(res['league'])
             res['msg'] = "Umpire drop opened."
         elif request.form.get('umpire_remove_none'):
-            Admin.umpire_remove_none(league)
+            Admin.umpire_remove_none(res['league'])
             res['msg'] = "Umpire drop closed."
         elif request.form.get('coach_add_all'):
-            Admin.coach_add_all(league)
+            Admin.coach_add_all(res['league'])
             res['msg'] = "Coach add opened."
         elif request.form.get('coach_add_none'):
-            Admin.coach_add_none(league)
+            Admin.coach_add_none(res['league'])
             res['msg'] = "Coach add closed."
 
-    users = User.get({'leagues': {'$in': [res['league']]}}, autopick_gps=False)
-    league['permissions'] = User.generate_permissions(league, Event.get_all_ump_positions())
-    groups = User.get_all_groups(league)
+    users = User.get(res, add_criteria={'leagues': {'$in': [res['league']['leagueId']]}}, filters=filters)
+    res['league']['permissions'] = User.generate_permissions(res['league'])
+    groups = User.get_all_groups()
 
-    return render_template("admin/user-data.html", res=res, users=users, league=league, groups=groups)
+    return render_template("admin/user-data.html", res=res, users=users, groups=groups, filters=filters)
 
 @admin.route("/team-data", methods=['GET', 'POST'])
 def team_data():
@@ -103,20 +103,21 @@ def team_data():
     if mw: return mw
 
     res = svr.obj()
+    filters = Team.Filter.default()
 
     if request.method == 'POST':
+        filters = Team.Filter.parse(request.form)
         if request.form.get('delete'):
             teamId = request.form['delete']
             Team.delete(res['league'], teamId)
             res['msg'] = f"{teamId} deleted."
         elif request.form.get('save'):
-            Admin.update_all(request.form, Team)
+            Admin.update_all(request.form, Team, res['league'])
             res['msg'] = "Teams updated."
 
 
-    teams = Team.get_league_teams(res['league'])
-    league = League.get(res['league'])
-    return render_template("admin/team-data.html", res=res, teams=teams, league=league)
+    teams = Team.get_league_teams(res['league']['leagueId'], filters=filters)
+    return render_template("admin/team-data.html", res=res, teams=teams, filters=filters)
     
 @admin.route("/add-team", methods=['GET', 'POST'])
 def add_team():
@@ -124,29 +125,20 @@ def add_team():
     if mw: return mw
 
     res = svr.obj()
-    league = League.get(res['league'])
     coaches = User.find_groups(res['league'], ['coach'])
 
     if request.method == 'POST':
         try:
-            t = Team.create(league, request.form)
+            t = Team.create(res['league'], request.form)
             res['msg'] = f"{t['teamId']} created and saved!"
         except ValueError as e:
             res['msg'] = e
 
-    return render_template("admin/add-team.html", res=res, league=league, coaches=coaches)
+    return render_template("admin/add-team.html", res=res, coaches=coaches)
 
 @admin.route("/announcement", methods=['GET', 'POST'])
 def announcement():
-    pass
-
-@admin.route("/dod-data", methods=['GET', 'POST'])
-def dod_data():
-    pass
-    
-@admin.route("/add-shift", methods=['GET', 'POST'])
-def add_shift():
-    pass
+    return redirect(url_for('main.home'))
 
 @admin.route("/manage-league", methods=['GET', 'POST'])
 def manage_league():
@@ -164,9 +156,8 @@ def manage_league():
             League.update_season(res['league'], request.form['current_season'])
         elif request.form.get('updateCodes'):
             League.update_codes(res['league'], request.form)
-        
 
+        svr.login(res['user'], res['league']['leagueId'])
+        res = svr.obj()
 
-    league = League.get(res['league'])
-
-    return render_template("admin/league.html", res=res, league=league)
+    return render_template("admin/league.html", res=res)

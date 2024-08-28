@@ -11,15 +11,13 @@ main = Blueprint('main', __name__)
 @main.route("/home")
 def home():
     res = svr.obj()
-
     # Welcome back!
     if res['user']:
         if not res['user']['active']:
-            league = League.get(res['league'])
             user = User.mark_active(res['user'])
             svr.login(user)
             res = svr.obj()
-            res['popup'] = f"Welcome back {res['user']['firstName']}! Your account has been marked active for the {league['current_season']} season!"
+            res['popup'] = f"Welcome back {res['user']['firstName']}! Your account has been marked active for the {res['league']['current_season']} season!"
 
     return render_template("main/home.html", res=res)
 
@@ -34,10 +32,14 @@ def signup():
         try:
             league = League.get(request.form['league'])
             user = User.create(request.form, league)
-            svr.login(user, request.form['league'])
+            svr.login(user, league['leagueId'], False)
+            print('User created!')
             return redirect(url_for('main.home'))
         except (ValueError, AssertionError) as e:
+            print(e)
             res['msg'] = e
+
+        res = svr.obj()
     
     return render_template("main/create-account.html", res=res)
             
@@ -73,8 +75,8 @@ def profile():
             svr.login(user)
 
         elif request.form.get('removeLoc'):
-            league = request.form['removeLoc']
-            user = User.remove_league(res['user']['userId'], league)
+            leagueId = request.form['removeLoc']
+            user = User.remove_league(res['user']['userId'], leagueId)
             svr.login(user)
 
         elif request.form.get('addLeague'):
@@ -92,14 +94,14 @@ def profile():
             svr.login(res['user'], admin=admin)
 
         elif request.form.get('location'):
-            league = request.form.get('location')
-            svr.login(res['user'], league=league)
+            leagueId = request.form.get('location')
+            svr.login(res['user'], leagueId=leagueId)
 
         res = svr.obj()
         res['msg'] = msg
 
     res['user'] = Team.load_teams(res['user'], res['league'])
-    all_teams = Team.get_league_teams(res['league'])
+    all_teams = Team.get_league_teams(res['league']['leagueId'])
     all_leagues = League.get_all()
     return render_template('main/profile.html', res=res, all_teams=all_teams, all_leagues=all_leagues)
     
@@ -115,24 +117,25 @@ def login(next=None):
     if request.method == 'POST':
         email = request.form['email']
         pword = request.form['pword']
-        league = request.form['league']
+        leagueId = request.form['league']
 
-        session['league'] = league
+        
         user = User.authenticate(email, pword)
         if user:
             try:
-                svr.login(user, league, 'admin' in user['groups'])
+                svr.login(user, leagueId, 'admin' in user['groups'][leagueId])
                 User.set_last_login(user)
             except ValueError as e:
                 res['msg'] = e
             else:
-                if next:
+                if session.get('next_url'):
+                    return redirect(session['next_url'])
+                elif next:
                     return redirect(url_for(next))
                 else:
                     return redirect(url_for('main.home'))
         else:
             res['msg'] = "Email or password is invalid. Please try again."
-            del session['league']
     
     all_leagues = League.get_all()
     return render_template("main/login.html", res=res, all_leagues=all_leagues)

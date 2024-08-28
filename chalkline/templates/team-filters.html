@@ -1,0 +1,31 @@
+<button type="button" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
+<section id="filter-section" class="filter-section" style='display: none;'>
+    <br>
+
+    <select class="filter" name="filter_age" id="filter_age">
+        <option value="None" selected>All Age Groups</option>
+        {% for a in res.league.age_groups %}
+            <option value="{{a}}">{{a}} only</option>
+        {% endfor %}
+    </select>
+
+    <script>
+        document.getElementById('filter_age').value = "{{filters.age}}";
+    </script>
+
+    <select class="filter" name="filter_season" id="filter_season">
+        <option value="Spring {{res.date.year}}">Spring {{res.date.year}}</option>
+        <option value="Summer {{res.date.year}}">Summer {{res.date.year}}</option>
+        <option value="Fall {{res.date.year}}">Fall {{res.date.year}}</option>
+        <option value="Spring {{res.date.year + 1}}">Spring {{res.date.year + 1}}</option>
+    </select>
+
+    <script>
+        document.getElementById('filter_season').value = "{{filters.season}}";
+    </script>
+
+    <br><br>
+    <button class="action secondary"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+    <button class="action secondary" name="filter_reset" value="0"><i class="fa-solid fa-arrow-rotate-left"></i> Reset</button>
+
+</section>

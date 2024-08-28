@@ -17,10 +17,10 @@
         <div class="split"><button class="action" name="add" value="add" type="submit">Add Team</button></div>
         <section>
             <center>
-                <h3>Season: {{league.current_season}}</h3>
+                <h3>Season: {{res.league.current_season}}</h3>
                 <h3>Age Group: <select name="age" id="age" onchange="loadCodePrefix()" required>
                     <option value="" disabled selected>Select</option>
-                    {% for a in league.age_groups %}
+                    {% for a in res.league.age_groups %}
                         <option value="{{a}}">{{a}}</option>
                     {% endfor %}
                 </select></h3>

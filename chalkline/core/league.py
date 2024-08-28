@@ -1,6 +1,7 @@
 from chalkline.collections import leagueData, teamData, venueData, directorData
 from chalkline.core import now, _safe
 from chalkline.core.user import User
+from chalkline.core.team import Team
 from chalkline import SEASON
 
 class League:
@@ -8,7 +9,7 @@ class League:
 
     @staticmethod
     def safe(league):
-        league['teams'] = list(teamData.find({'leagueId': league['leagueId']}))
+        league['teams'] = Team.get_league_teams(league['leagueId'])
         return _safe(league)
 
     @staticmethod
@@ -42,25 +43,25 @@ class League:
         return league
     
     @staticmethod
-    def delete_age(leagueId, age):
-        League.col.update_one({'leagueId': leagueId}, {'$pull': {'age_groups': age}})
+    def delete_age(league, age):
+        League.col.update_one({'leagueId': league['leagueId']}, {'$pull': {'age_groups': age}})
 
     @staticmethod
-    def add_age(leagueId, age):
-        League.col.update_one({'leagueId': leagueId, 'age_groups': {'$nin': [age]}}, {'$push': {'age_groups': age}})
+    def add_age(league, age):
+        League.col.update_one({'leagueId': league['leagueId'], 'age_groups': {'$nin': [age]}}, {'$push': {'age_groups': age}})
 
     @staticmethod
-    def update_season(leagueId, s):
-        League.col.update_one({'leagueId': leagueId}, {'$set': {'current_season': s}})
+    def update_season(league, s):
+        League.col.update_one({'leagueId': league['leagueId']}, {'$set': {'current_season': s}})
 
     @staticmethod
-    def update_codes(leagueId, form):
+    def update_codes(league, form):
         codes = {
             'umpire_code': form['umpire_code'],
             'coach_code': form['coach_code'],
             'director_code': form['director_code']
         }
-        League.col.update_one({'leagueId': leagueId}, {'$set': {'auth': codes}})
+        League.col.update_one({'leagueId': league['leagueId']}, {'$set': {'auth': codes}})
 
     @staticmethod
     def load_venues(league):

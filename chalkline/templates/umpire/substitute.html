@@ -14,37 +14,41 @@
         <button type="submit" name="accept" value="accept" class="action" style="background-color: green;" onclick="return confirm('Accept substitution?')">Accept</button>
         <button type="submit" name="decline" value="decline" class="action" style="background-color: red;" onclick="return confirm('Decline substitution?')">Decline</button>
     </form>
-    <h3 class="error">{{sobj.msg}}</h3>
+    <section>
+        <p class="urgent">You would replace {{req_user.firstLast}} at {{pos}}!</p>
+    </section>
+    <h3 class="error">{{res.msg}}</h3>
     <section>
         <center>
-            <h2>{{event.eventLocation}} - {{pos[0]}}</h2>
-            <h3>{{event.eventDate.strftime('%a %m/%d @ %H:%M')}}</h3>
-            <h3>{{event.eventVenue}} Field {{event.eventField}}</h3>
-            {% if event.eventType == 'Game' %}
-            <h3>(away) {{event.awayTeam}} vs. {{event.homeTeam}} (home)</h3>
-            <h3>Umpire Duty: {{event.umpireDuty}}</h3>
-            {% else %}
-            <h3>Team: {{event.homeTeam}}</h3>
-            {% endif %}
+            <h2>{{event.leagueId}} - {{pos}}</h2>
+            <h3>{{event.date.strftime('%a %m/%d @ %H:%M')}}</h3>
+            <h3>{{event.venueId}} Field {{event.field}}</h3>
+            <h3>(away) {{event.away}} vs. {{event.home}} (home)</h3>
         </center>
     </section>
-    <h3 class="urgent">
-        {% if pos[1] == 0 %}
-        You will be replacing {{event.plateUmpireInfo.fLast}} behind the plate!
+
+    <center><h3>Umpires</h3></center>
+    
+    {% for pos, ump in event.umpires.items() %}
+    <section>
+        {% if ump.user %}
+        <center>
+            <h3>{{pos}}: {{ump.user.firstLast}}</h3>
+            <p>Email: {{ump.user.email}}</p>
+            <p>Phone: {{ump.user.phone}}</p>
+        </center>
+        {% elif ump.team_duty %}
+        <center>
+            <h3>{{pos}}: Team Duty ({{ump.team_duty}})</h3>
+        </center>
         {% else %}
-        You will be replacing {{event.field1UmpireInfo.fLast}} in the field!
+        <center>
+            <h3>{{pos}}: Open</h3>
+        </center>
         {% endif %}
-    </h3>
-    <section>
-        <h3>Current Plate Umpire: {{event.plateUmpireInfo.fLast}}</h3>
-        <h4>Email: {{event.plateUmpireInfo.email}}</h4>
-        <h4>Phone: {{event.plateUmpireInfo.phone}}</h4>
+
     </section>
-    <section>
-        <h3>Current Field Umpire: {{event.field1UmpireInfo.fLast}}</h3>
-        <h4>Email: {{event.field1UmpireInfo.email}}</h4>
-        <h4>Phone: {{event.field1UmpireInfo.phone}}</h4>
-    </section>
+    {% endfor %}
 </center>
 </main>
 

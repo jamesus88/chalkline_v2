@@ -1,0 +1,29 @@
+<button type="button" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
+<section id="filter-section" class="filter-section" style='display: none;'>
+    <br>
+
+    <select class="filter" name="filter_group" id="filter_group">
+        <option value="None">All groups</option>
+        {% for g in groups %}
+            <option value="{{g}}">{{g}}(s) only</option>
+        {% endfor %}
+    </select>
+
+    <script>
+        document.getElementById('filter_group').value = "{{filters.group}}";
+    </script>
+
+    <select class="filter" name="filter_active" id="filter_active">
+        <option value="True">Active only</option>
+        <option value="False">Active/Inactive</option>
+    </select>
+
+    <script>
+        document.getElementById('filter_active').value = "{{filters.active}}";
+    </script>
+
+    <br><br>
+    <button class="action secondary"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+    <button class="action secondary" name="filter_reset" value="0"><i class="fa-solid fa-arrow-rotate-left"></i> Reset</button>
+
+</section>

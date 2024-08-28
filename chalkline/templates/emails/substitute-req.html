@@ -7,14 +7,14 @@
 </head>
 <body>
     <main>
-        <h2>{{user.firstName}} {{user.lastName}} requested you cover their {{pos[0]}} duty.</h2>
+        <h2>{{user.firstName}} {{user.lastName}} requested you cover their {{pos}} duty.</h2>
         <section>
-            <h3>The game is on {{event.eventDate.strftime('%a %m/%d at %H:%M')}}</h3>
-            <h3>The age group is {{event.eventAgeGroup}}.</h3>
+            <h3>The game is on {{event.date.strftime('%a %m/%d at %H:%M')}}</h3>
+            <h3>The age group is {{event.age}}.</h3>
             <h4>Chalkline did not find any conflicts for you during this time, but be sure to double check before accepting.</h4>
             <br>
-            <h3>Please accept or decline the request <a href="https://chalklinebaseball.com/invite/sub-request/{{event._id}}/{{code}}">here</a></h3>
-            <p>Or click: www.chalklinebaseball.com/invite/sub-request/{{event._id}}/{{code}}</p>
+            <h3>Please accept or decline the request <a href="https://chalklinebaseball.com/invite/substitute/{{event._id}}/{{auth}}">here</a></h3>
+            <p>Or click: www.chalklinebaseball.com/invite/sub-request/{{event._id}}/{{auth}}</p>
             <p>This link will expire at 7:00 am.</p>
         </section>
     </main>

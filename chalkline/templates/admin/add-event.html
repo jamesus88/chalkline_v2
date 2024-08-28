@@ -18,7 +18,7 @@
         <section>
             <center>
                 <h2>
-                    <p>{{league.name}}</p> 
+                    <p>{{res.league.name}}</p> 
                     <select name="type" id="type">
                         <option value="Game">Game</option>
                         <option value="Practice">Practice</option>
@@ -27,13 +27,13 @@
                 <h3><input type="datetime-local" name="date" id="date" required></h3>
                 <h3>Age Group: <select name="age" id="age" required>
                     <option value="" selected disabled>Select</option>
-                    {% for a in league.age_groups %}
+                    {% for a in res.league.age_groups %}
                         <option value="{{a}}">{{a}}</option>
                     {% endfor %}
                 </select></h3>
                 <h3>Venue: <select name="venueId" id="venueId" required>
                     <option value="" selected disabled>Select</option>
-                    {% for v in league.venues %}
+                    {% for v in res.league.venues %}
                         <option value="{{v}}">{{v}}</option>
                     {% endfor %}
                 </select></h3>
@@ -41,15 +41,15 @@
                 <h3>Field <input type="number" name="field" id="field" required></h3>
 
                 <h3>(away) 
-                    <select name="away" id="away" required>
-                        <option value="None" selected>None</option>
-                        {% for t in league.teams %}
+                    <select name="away" id="away">
+                        <option value="" selected>None</option>
+                        {% for t in res.league.teams %}
                             <option value="{{t.teamId}}">{{t.teamId}}</option>
                         {% endfor %}
                     </select> vs. 
-                    <select name="home" id="home" required>
-                        <option value="None" selected>None</option>
-                        {% for t in league.teams %}
+                    <select name="home" id="home">
+                        <option value="" selected>None</option>
+                        {% for t in res.league.teams %}
                             <option value="{{t.teamId}}">{{t.teamId}}</option>
                         {% endfor %}
                     </select> (home)
@@ -90,13 +90,13 @@
                 <center>
                     <h3>Position: <select name="ump${ump_count}_pos" required>
                         <option value="" selected disabled>Select</option>
-                        {% for pos in league.ump_positions %}
+                        {% for pos in res.league.ump_positions %}
                             <option value="{{pos}}">{{pos}}</option>
                         {% endfor %}
                     </select></h3>
                     <h3>Team Duty: <select name="ump${ump_count}_team" required>
                         <option value="None" selected>None</option>
-                        {% for t in league.teams %}
+                        {% for t in res.league.teams %}
                             <option value="{{t.teamId}}">{{t.teamId}}</option>
                         {% endfor %}
                     </select></h3>

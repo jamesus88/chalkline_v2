@@ -56,19 +56,19 @@
                         {% if ump.user.userId == res.user.userId %}
                         <form method="post">
                             <label for="sub">Subsitute with: </label>
-                            {% if ump.sub_req %}
+                            {% if res.user.auth.get('sub_' + event._id) %}
                             <select name="sub" id="sub" required>
                                 <option value="" selected disabled>{{ump.sub_req.firstLast}}</option>
                             </select>
                             <button class="action disabled" disabled>Sent!</button>
                             {% else %}
-                            <select name="sub" id="sub" required>
+                            <select name="sub_user" id="sub" required>
                                 <option value="" selected disabled>Select Umpire</option>
                                 {% for u in all_umpires %}
                                     <option value="{{u.userId}}">{{u.firstLast}}</option>
                                 {% endfor %}
                             </select>
-                            <button class="action">Substitute</button>
+                            <button name="substitute" value="{{pos}}" class="action">Substitute</button>
                             {% endif %}
                         </form>
                         {% endif %}
@@ -111,6 +111,7 @@
 
                     {% if event.type == 'Game' %}
                     <h3>(away) <select name="away" id="away">
+                        <option value="None">None</option>
                         {% for t in event.league_info.teams %}
                         <option value="{{t.teamId}}">{{t.teamId}}</option>
                         {% endfor %}
@@ -118,6 +119,7 @@
                     </select> 
                     vs. 
                     <select name="home" id="home">
+                        <option value="None">None</option>
                         {% for t in event.league_info.teams %}
                         <option value="{{t.teamId}}">{{t.teamId}}</option>
                         {% endfor %}

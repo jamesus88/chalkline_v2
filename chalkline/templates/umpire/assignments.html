@@ -56,9 +56,9 @@
                             {% if u.coach_req or not u.team_duty %}
                                 {% if u.user %}
                                     {% if u.user.userId == res.user.userId %}
-                                    <a>{{u.user.firstLast}}</a>
+                                    <a href="{{url_for('view_info.user', userId=u.user.userId)}}">{{u.user.firstLast}}</a>
                                     <button type="submit" name="substitute" value="{{e._id}}" class="schedule-action">Substitute</button>
-                                        {% if 'umpire_remove' in res.user.permissions %}
+                                        {% if 'umpire_remove' in res.user.permissions.get(res.league.leagueId) %}
                                             <button type="submit" name="remove" value="{{pos}}_{{e._id}}" class="schedule-action danger">Remove</button>
                                         {% endif %}
                                     {% else %}

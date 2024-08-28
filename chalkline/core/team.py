@@ -1,10 +1,32 @@
 from chalkline.collections import teamData
 from chalkline.core import _safe
-from chalkline import PROTOCOL, DOMAIN
+from chalkline import PROTOCOL, DOMAIN, SEASON
 from chalkline.core.user import User
 
 class Team:
     col = teamData
+
+    class Filter:
+        @staticmethod
+        def default():
+            return {
+                'age': None,
+                'season': SEASON
+            }
+
+        @staticmethod
+        def parse(form) -> dict:
+            filters = Team.Filter.default()
+
+            if form.get('filter_reset'):
+                return filters
+
+            if form.get('filter_age', 'None') != 'None':
+                filters['age'] = form['filter_age']
+
+            filters['season'] = form.get('filter_season')
+            
+            return filters
 
     @staticmethod
     def safe(team):
@@ -26,14 +48,20 @@ class Team:
         team['contacts'] = users
 
     @staticmethod
-    def load_teams(user, leagueId):
-        teams = list(Team.col.find({'leagueId': leagueId, 'teamId': {'$in': user['teams']}}))
+    def load_teams(user, league):
+        teams = list(Team.col.find({'leagueId': league['leagueId'], 'teamId': {'$in': user['teams']}}))
         user['team_info'] = [Team.safe(t) for t in teams]
         return user
     
     @staticmethod
-    def get_league_teams(leagueId):
-        return [Team.safe(t) for t in Team.col.find({'leagueId': leagueId})]
+    def get_league_teams(leagueId, filters=Filter.default()):
+
+        criteria = [{'leagueId': leagueId}, {f'seasons.{filters['season']}': {'$exists': True}}]
+        
+        if filters.get('age') is not None:
+            criteria.append({'age': filters['age']})
+
+        return [Team.safe(t) for t in Team.col.find({'$and': criteria})]
     
     @staticmethod
     def create(league, form):
@@ -56,8 +84,8 @@ class Team:
             return team
         
     @staticmethod
-    def delete(leagueId, teamId):
-        Team.col.delete_one({'leagueId': leagueId, 'teamId': teamId})
+    def delete(league, teamId):
+        Team.col.delete_one({'leagueId': league['leagueId'], 'teamId': teamId})
         User.col.update_many({}, {'$pull': {'teams': teamId}})
 
     @staticmethod
@@ -72,3 +100,5 @@ class Team:
     def get_share_link(team):
         link = f"{PROTOCOL}://{DOMAIN}/invite/add-team/{team['teamId']}"
         return link
+    
+

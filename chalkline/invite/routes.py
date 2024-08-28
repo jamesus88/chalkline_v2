@@ -1,130 +1,51 @@
-from flask import redirect, url_for, session, Blueprint, render_template, request, make_response
-from chalkline import db, get_events, send_mail, calendar_srv
-from chalkline import server as srv
-from werkzeug.security import generate_password_hash
-import os
-invite = Blueprint('invite', __name__)
+from flask import Blueprint, request, abort, render_template, url_for
 
-@invite.route('/add-team/<teamId>')
-def add_team(teamId=None):
-    if not teamId:
-        return redirect(url_for('main.home'))
-    user = srv.getUser()
-    if user is None:
-        session['next-url'] = request.path
-        return redirect(url_for('main.login'))
-    if 'coach' in user['role'] or 'parent' in user['role']:
-        response = db.addTeamToUser(user, teamId)
-        if type(response) != str:
-            user = response
-            session['user'] = user
-        
-    return redirect(url_for('main.profile'))
-    
-@invite.route('/daily-reminders', methods=['GET', 'POST'])
-def daily_reminders():
-    print('Daily Reminder Job Attempted...')
-    location = 'Sarasota'
+from chalkline.core.user import User
+from chalkline.core.calendar import Calendar
+from chalkline.core.events import Event
+from chalkline.core import server as svr
 
-    if request.args.get('chalkline_auth') == os.environ.get('CHALKLINE_AUTH') and request.method == 'POST':
-        today = srv.todaysDate
-        nextWeek = today(17 + 24*6) # rest of today (7:00) + 6 days
-        eventFilter = get_events.EventFilter()
-        eventList = get_events.getEventList(location, eventFilter, {'eventDate': {'$gte': today(), '$lte': nextWeek}}, safe=False)
-        
-        day = srv.todaysDate().weekday() # [0, 1, ... , 6]
-        userList = db.getUserList(location)
-        
-        usersToMail = userList[day::7]
-        
-        msg, code = srv.sendReminders(location, eventList, usersToMail)
-        
-        print('Daily Reminder Job executed.')
-
-        # delete all substitute requests
-        db.clearSubstituteRequests()
-        print('All sub requests cleared.')
-
-        return msg, code
-        
-    else:
-        raise PermissionError('PermissionError: Resource is Forbidden.')
-
-@invite.route('/sub-request')
-@invite.route('/sub-request/<eventId>')
-@invite.route('/sub-request/<eventId>/<code>', methods=['POST', 'GET'])
-def sub_request(eventId=None, code=None):
-    user = srv.getUser()
-    if user is None:
-        session['next-url'] = request.path
-        return redirect(url_for('main.login'))
-    elif 'umpire' not in user['role'] and 'youth' not in user['role']:
-        raise PermissionError("Error: You are not authorized to umpire games")
+invite = Blueprint('invite', __name__) 
     
-    if not(eventId and code):
-        raise Exception("Pre-condition failure: missing url parameters")
-    
-    event = db.getEventInfo(eventId)
-    if not event:
-        raise Exception("Event does not exist.")
-    
-    if event['eventDate'] < srv.todaysDate():
-        raise Exception("Error: cannot edit past events.")
-    
-    if not code.isdigit():
-        raise Exception("Error: invalid parameters.")
-
-    if 'sub-code' not in event:
-        raise Exception("Error: substitution request is no longer valid.")
-    
-    if int(code) != event['sub-code']:
-        raise PermissionError("Error: invalid sub-code")
-    
-    if str(code)[-1] == '0':
-        pos = ('Plate Umpire', 0)
-    elif str(code)[-1] == '1':
-        pos = ('Field Umpire', 1)
-    else:
-        raise Exception("Error: invalid position")
-    
-    msg = ''
-    
-    if request.method == 'POST':
-        if request.form.get('accept'):
-                if pos[1] == 0:
-                    old_umpire = db.getUser(userId=event['plateUmpire'])
-                    msg = db.addPlate(user, eventId, check_empty=False)
-                else:
-                    old_umpire = db.getUser(userId=event['field1Umpire'])
-                    msg = db.addField1(user, eventId, check_empty=False)
-                    
-                if 'Error:' not in msg:
-                    print(f"Sub: {user['userId']} for {pos[0]} in {eventId}")
-                    db.removeSubCode(eventId)
-                    email = send_mail.ChalklineEmail(
-                        subject="Substitution Request Accepted!",
-                        recipients=[old_umpire['email']],
-                        html=render_template("emails/shift-fulfilled.html", event=event, team=pos[0])
-                    )
-                    send_mail.sendMail(email)
-                    return redirect(url_for('umpire.assignments'))
-        
-        elif request.form.get('decline'):
-            db.removeSubCode(eventId)
-            return redirect(url_for('main.home'))
-            
-    userList = db.getUserList(session['location'])
-    sobj=srv.getSessionObj(session, msg=msg)
-
-    return render_template("umpire/substitute.html", user=user, event=srv.safeEvent(event, userList), pos=pos, sobj=sobj)
-    
-    
-@invite.route("/calendar/<user_id>/<code>")
-def calendar(user_id=None, code=None):
-    assert (user_id and code), "Missing email or code."
-    user = db.getUser(user_id)
+@invite.route("/calendar/<userId>/<code>")
+def calendar(userId=None, code=None):
+    assert (userId and code), "Missing email or code."
+    user = User.get_user(userId=userId)
     assert user, "User does not exist."
-    assert user['cal-code'] == code, "Invalid calendar code."
+    assert user['auth'].get('calendar') == code, "Invalid calendar code."
 
-    cal = calendar_srv.serve_calendar(user)
+    cal = Calendar.serve_calendar(user)
     return cal
+
+@invite.route("/substitute/<eventId>/<auth>", methods=['GET', 'POST'])
+def substitute(eventId, auth):
+    mw = svr.authorized_only("umpire", request.url)
+    if mw: return mw
+
+    res = svr.obj()
+
+    req_user = User.safe(User.col.find_one({f'auth.sub_{eventId}': auth}))
+    event = Event.find(eventId)
+
+    if not (req_user and event): abort(404)
+
+    # we have the req user, current user, and event
+    pos = None
+    for p, ump in event['umpires'].items():
+        if ump['user']['userId'] == req_user['userId']:
+            pos = p
+
+    if not pos: abort(404)
+
+    if request.method == "POST":
+        if request.form.get('accept'):
+            Event.subsitute(event, pos, res['user'])
+            # send mail
+        elif request.form.get('decline'):
+            User.remove_sub_req(req_user, event)
+
+        return render_template(url_for('main.home'))
+
+    return render_template("umpire/substitute.html", res=res, req_user=req_user, event=event, pos=pos)
+
+    

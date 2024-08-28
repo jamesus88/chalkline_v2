@@ -33,6 +33,12 @@ def event(eventId):
         elif request.form.get('add_umpire'):
             Event.add_ump_pos(e, request.form['pos'])
             res['msg'] = f"{request.form['pos']} position added."
+
+        elif request.form.get('substitute'):
+            sub = request.form['sub_user']
+            pos = request.form['substitute']
+            res['msg'] = User.request_sub(res['user'], e, pos, sub)
+
         
         # reload event
         e = Event.find(eventId)
@@ -49,13 +55,12 @@ def user(userId=None):
     res = svr.obj()
 
     if userId:
-        u = User.get_user(userId=userId)
+        u = User.get_user(userId=userId, view=True)
         if not u:
             abort(404)
     else:
         return redirect(url_for('main.home'))
 
-    u = User.view(u)
     return render_template("view_info/user.html", res=res, user=u)
 
 @view_info.route("/team/<teamId>", methods=['GET', 'POST'])
@@ -68,20 +73,19 @@ def team(teamId=None):
         return redirect(url_for('main.home'))
 
     res = svr.obj()
-    league = League.get(res['league'])
     all_coaches = User.find_groups(res['league'], ['coach'])
 
     if request.method == 'POST':
         if not res['admin']:
             raise PermissionError('This action is restricted to Admins only.')
         if request.form.get('removeCoach'):
-            Team.remove_coach(teamId, league['current_season'], request.form['removeCoach'])
+            Team.remove_coach(teamId, res['league']['current_season'], request.form['removeCoach'])
         elif request.form.get('add'):
-            Team.add_coach(teamId, league['current_season'], request.form['addCoach'])
+            Team.add_coach(teamId, res['league']['current_season'], request.form['addCoach'])
     
     team = Team.get(teamId)
     if not team:
         abort(404)
     Team.load_contacts(team)
 
-    return render_template("view_info/team.html", res=res, team=team, league=league, all_coaches=all_coaches)
+    return render_template("view_info/team.html", res=res, team=team, all_coaches=all_coaches)

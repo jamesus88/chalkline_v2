@@ -8,7 +8,7 @@ from chalkline.core.events import Event, Filter
 class Admin:
 
     @staticmethod
-    def update_all(form, cls):
+    def update_all(form, cls, league):
         updates = {}
 
         for key, value in form.items():
@@ -21,6 +21,7 @@ class Admin:
             date_attrs = ['date', 'start_date', 'end_date']
             int_attrs = ['field']
             multi_attrs = ['groups', 'permissions']
+            league_specific = ['groups', 'permissions']
 
             if attr in date_attrs:
                 value = datetime.strptime(value, "%Y-%m-%dT%H:%M")
@@ -28,6 +29,9 @@ class Admin:
                 value = int(value)
             elif attr in multi_attrs:
                 value = form.getlist(key)
+
+            if attr in league_specific:
+                attr = f"{attr}.{league['leagueId']}"
 
             # append to updates
 
@@ -49,43 +53,43 @@ class Admin:
     @staticmethod
     def umpire_add_all(league):
         User.col.update_many(
-            {'active': True, 'leagues': {'$in': [league['leagueId']]}, 'groups': {'$in': [f"{league['abbr']}.umpire"]}}, 
-            {'$push': {'permissions': f"{league['abbr']}.umpire_add"}}
+            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'{league['abbr']}-groups': {'$in': ["umpire"]}}, 
+            {'$push': {f'{league['abbr']}-permissions': "umpire_add"}}
         )
 
     @staticmethod
     def umpire_add_none(league):
         User.col.update_many(
-            {'active': True, 'leagues': {'$in': [league['leagueId']]}, 'groups': {'$in': [f"{league['abbr']}.umpire"]}}, 
-            {'$pull': {'permissions': f"{league['abbr']}.umpire_add"}}
+            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'{league['abbr']}-groups': {'$in': ["umpire"]}}, 
+            {'$pull': {f'{league['abbr']}-permissions': "umpire_add"}}
         )
 
     @staticmethod
     def umpire_remove_all(league):
         User.col.update_many(
-            {'active': True, 'leagues': {'$in': [league['leagueId']]}, 'groups': {'$in': [f"{league['abbr']}.umpire"]}}, 
-            {'$push': {'permissions': f"{league['abbr']}.umpire_remove"}}
+            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'{league['abbr']}-groups': {'$in': ["umpire"]}}, 
+            {'$push': {f'{league['abbr']}-permissions': "umpire_remove"}}
         )
 
     @staticmethod
     def umpire_remove_none(league):
         User.col.update_many(
-            {'active': True, 'leagues': {'$in': [league['leagueId']]}, 'groups': {'$in': [f"{league['abbr']}.umpire"]}}, 
-            {'$pull': {'permissions': f"{league['abbr']}.umpire_remove"}}
+            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'{league['abbr']}-groups': {'$in': ["umpire"]}}, 
+            {'$pull': {f'{league['abbr']}-permissions': "umpire_remove"}}
         )
     
     @staticmethod
     def coach_add_all(league):
         User.col.update_many(
-            {'active': True, 'leagues': {'$in': [league['leagueId']]}, 'groups': {'$in': [f"{league['abbr']}.coach"]}}, 
-            {'$push': {'permissions': f"{league['abbr']}.coach_add"}}
+            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'{league['abbr']}-groups': {'$in': ["coach"]}}, 
+            {'$push': {f'{league['abbr']}-permissions': "coach_add"}}
         )
 
     @staticmethod
     def coach_add_none(league):
         User.col.update_many(
-            {'active': True, 'leagues': {'$in': [league['leagueId']]}, 'groups': {'$in': [f"{league['abbr']}.coach"]}}, 
-            {'$pull': {'permissions': f"{league['abbr']}.coach_add"}}
+            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'{league['abbr']}-groups': {'$in': ["coach"]}}, 
+            {'$pull': {f'{league['abbr']}-permissions': "coach_add"}}
         )
 
     @staticmethod
@@ -95,7 +99,7 @@ class Admin:
 
         filters = Filter.default()
         filters['end'] = now() + timedelta(days=365)
-        events = Event.get(league['leagueId'], filters=filters, localize_times=False)
+        events = Event.get(league, filters=filters)
 
         count = 0
         for venue in league['venues']:
@@ -109,7 +113,7 @@ class Admin:
                         continue
 
                 shifts.append(Shift.create(
-                    leagueId=league['leagueId'],
+                    league=league,
                     form={
                         'venueId': venue,
                         'start-date': (dates[i] - timedelta(minutes=30)).isoformat()[:16],

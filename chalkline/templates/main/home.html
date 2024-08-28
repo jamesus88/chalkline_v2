@@ -13,14 +13,14 @@
         <a href="{{url_for('main.signup')}}">Create Account</a>
         {% else %}
         <h1>Hello, {{res.user.firstName}}!</h1>
-            {% if ('coach' in res.user.groups or 'parent' in res.user.groups) and res.user.teams == [] %}
+            {% if ('coach' in res.user.groups.get(res.league.leagueId) or 'parent' in res.user.groups.get(res.league.leagueId)) and res.user.teams == [] %}
                 <h3 class="error">You have 0 teams linked to your account. Add one to your <a href="{{url_for('main.profile')}}">profile</a>!</h3>
             {% endif %}
         {% endif %}
     <br>
         {% if res.user %}
         <div class="divide">
-            {% if 'coach' in res.user.groups or 'parent' in res.user.groups %}
+            {% if 'coach' in res.user.groups.get(res.league.leagueId) or 'parent' in res.user.groups.get(res.league.leagueId) %}
             <section class="menu" onclick="toggleOpen('teams-menu')">
                 <h2>Teams</h2>
                 <i class="fa-solid fa-users menu"></i>
@@ -30,7 +30,7 @@
                 </div> 
             </section>
             {% endif %}
-            {% if 'umpire' in res.user.groups or 'youth' in res.user.groups %}
+            {% if 'umpire' in res.user.groups.get(res.league.leagueId) or 'youth' in res.user.groups.get(res.league.leagueId) %}
             <section class="menu" onclick="toggleOpen('umpire-menu')">
                 <h2>Umpire</h2>
                 <i class="fa-solid fa-clipboard-list menu"></i>
@@ -40,7 +40,7 @@
                 </div>
             </section>
             {% endif %}
-            {% if 'director' in res.user.groups %}
+            {% if 'director' in res.user.groups.get(res.league.leagueId) %}
             <section class="menu" onclick="toggleOpen('director-menu')">
                 <h2>Director</h2>
                 <i class="fa-solid fa-street-view menu"></i>

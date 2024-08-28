@@ -16,10 +16,9 @@
             <h3><a href="{{url_for('admin.add_team')}}">Add Team</a></h3>
         </div>
     </section>
-    <button type="" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
+
     <form method="post">
-        <section id="filter-section" class="filter-section">
-        </section>
+        {% include "team-filters.html" %}
 
         <section class="schedule-section scrollwrapper">
             <section class="split">
@@ -47,7 +46,7 @@
                     <td>{{t.teamId}}</td>
                     <td><input class="admin" type="text" name="{{t._id}}_name" id="{{t._id}}_name" value="{{t.name}}"></td>
                     <td><select class="admin" name="{{t._id}}_age" id="{{t._id}}_age">
-                        {% for a in league.age_groups %}
+                        {% for a in res.league.age_groups %}
                             <option value="{{a}}">{{a}}</option>
                         {% endfor %}
                     </select></td>

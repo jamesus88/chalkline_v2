@@ -13,10 +13,11 @@
         <h1>View Team</h1>
         <h4 class='error'>{{res.msg}}</h4>
         <section>
-            <h2>{{team.teamId}} - {{team.name}}</h2>
+            <h2>{{team.name}}</h2>
+            <h3 class="subtle"><i class="fa-solid fa-id-card"></i> {{team.teamId}}</h3>
         </section>
         <section>
-            <h2>Standings: {{league.current_season}}</h2>
+            <h2>Standings: {{res.league.current_season}}</h2>
             <h3>Current Seed: Not Placed</h3>
             <table class="center">
                 <tr>
@@ -25,9 +26,9 @@
                     <th>Ties</th>
                 </tr>
                 <tr>
-                    <td>{{team.seasons.get(league.current_season).record[0]}}</td>
-                    <td>{{team.seasons.get(league.current_season).record[1]}}</td>
-                    <td>{{team.seasons.get(league.current_season).record[2]}}</td>
+                    <td>{{team.seasons.get(res.league.current_season).record[0]}}</td>
+                    <td>{{team.seasons.get(res.league.current_season).record[1]}}</td>
+                    <td>{{team.seasons.get(res.league.current_season).record[2]}}</td>
                 </tr>
             </table>
         </section>
@@ -44,7 +45,7 @@
                         <th>Remove</th>
                     {% endif %}
                 </tr>
-                {% for user in team.contacts if user.userId in team.seasons.get(league.current_season).coaches %}
+                {% for user in team.contacts if user.userId in team.seasons.get(res.league.current_season).coaches %}
                 <tr>
                     <td>{{user.firstName}} {{user.lastName}}</td>
                     <td>Coach</td>
