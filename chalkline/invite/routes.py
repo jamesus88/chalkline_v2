@@ -1,4 +1,4 @@
-from flask import Blueprint, request, abort, render_template, url_for
+from flask import Blueprint, request, abort, render_template, url_for, jsonify
 
 from chalkline.core.user import User
 from chalkline.core.calendar import Calendar
@@ -10,10 +10,10 @@ invite = Blueprint('invite', __name__)
     
 @invite.route("/calendar/<userId>/<code>")
 def calendar(userId=None, code=None):
-    assert (userId and code), "Missing email or code."
+    if not (userId and code): return jsonify("Missing email or code.")
     user = User.get_user(userId=userId)
-    assert user, "User does not exist."
-    assert user['auth'].get('calendar') == code, "Invalid calendar code."
+    if not user: return jsonify("User does not exist.")
+    if user['auth'].get('calendar') != code: return jsonify("Invalid calendar code.")
 
     cal = Calendar.serve_calendar(user)
     return cal
