@@ -45,6 +45,7 @@ def add_event():
 
     res = svr.obj()
     res['league']['ump_positions'] = Event.get_all_ump_positions()
+    res['league']['teams'] = Team.get_league_teams(res['league']['leagueId'])
 
     if request.method == 'POST':
         try:
