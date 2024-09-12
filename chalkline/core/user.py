@@ -35,6 +35,7 @@ class User:
         user = _safe(user)
         user['firstLast'] = user['firstName'][0] + '. ' + user['lastName']
         user['fullName'] = user['firstName'] + ' ' + user['lastName']
+        if 'none' in user['teams']: user['teams'].remove('none')
         
         return user
     

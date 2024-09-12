@@ -12,6 +12,7 @@ def schedule():
     if mw: return mw
 
     res = svr.obj()
+    print(res['user']['teams'])
     Team.load_teams(res['user'], res['league'])
     filters = Filter.default()
 
@@ -52,13 +53,16 @@ def info():
 
     res = svr.obj()
 
-    try: teamId = res['user']['teams'][0]
+    try: 
+        teamId = res['user']['teams'][0]
     except IndexError: return redirect(url_for('main.profile'))
 
     if request.method == 'POST':
         teamId = request.form['teamId']
 
     team = Team.get(teamId)
+    if not team:
+        return redirect(url_for('main.profile'))
     Team.load_contacts(team)
 
     return render_template("teams/info.html", res=res, team=team)
