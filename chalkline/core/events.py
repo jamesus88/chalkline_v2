@@ -124,6 +124,10 @@ class Event:
         if team in (event['away'], event['home']):
             return True
         
+        for ump in event['umpires'].values():
+            if team == ump['team_duty']:
+                return True
+        
         return False
     
     @staticmethod
@@ -142,9 +146,11 @@ class Event:
             criteria.append({'date': {'$lte': filters['end']}})
 
         all_events = list(Event.col.find({'$and': criteria}).sort(['date', 'field']))
+
         if safe:
-            all_events = [Event.safe(e) for e in all_events]
-        
+            umps = User.find_groups(league, ["umpire"])
+            all_events = [Event.safe(e, umps) for e in all_events]
+
         events = []
 
         # filter
@@ -159,6 +165,17 @@ class Event:
                 if not Event.team_in_event(e, filters['team']):
                     continue
 
+            if filters['umpires_only']:
+                found = False
+                for ump in e['umpires'].values():
+                    if not ump['team_duty']:
+                        found = True
+                    else:
+                        if ump['coach_req']:
+                            found = True
+                
+                if not found: continue
+
             events.append(e)
 
         return events
@@ -172,10 +189,11 @@ class Event:
             return None
     
     @staticmethod
-    def safe(event):
+    def safe(event, user_list=None):
         event = _safe(event)
         league = session['league']
-        umpires = [User.view(u) for u in User.find_groups(league, ['umpire'])]
+        if user_list is None: umpires = [User.view(u) for u in User.find_groups(league, ['umpire'])]
+        else: umpires = user_list
 
         #if localize_times: event['date'] = localize(event['date'])
 
@@ -192,14 +210,13 @@ class Event:
                 continue
             else:
                 full = False
-        
+
         event['umpire_full'] = full
 
         if len(team_umps) > 0:
             event['team_umps'] = team_umps
         else:
             event['team_umps'] = ['None']
-
 
         return event
     

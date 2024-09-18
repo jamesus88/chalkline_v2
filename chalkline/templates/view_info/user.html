@@ -22,7 +22,7 @@
     <section>
         <center>
             <h3>Teams: {{user.teams|join(', ')}}</h3>
-            <h3>Groups: {{user.groups|join(', ')}}</h3>
+            <h3>Groups: {{user.groups.get(res.league.leagueId)|join(', ')}}</h3>
             <h3>Leagues: {{user.leagues|join(', ')}}</h3>
         </center>
     </section>

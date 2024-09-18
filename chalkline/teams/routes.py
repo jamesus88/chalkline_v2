@@ -12,7 +12,6 @@ def schedule():
     if mw: return mw
 
     res = svr.obj()
-    print(res['user']['teams'])
     Team.load_teams(res['user'], res['league'])
     filters = Filter.default()
 

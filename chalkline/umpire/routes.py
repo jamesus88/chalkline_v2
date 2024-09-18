@@ -22,7 +22,9 @@ def schedule():
             except (ValueError, PermissionError) as e:
                 res['msg'] = e
 
-    events = Event.get(res['league'], add_criteria={'umpires': {'$ne': {}}}, filters=filters)
+    filters['umpires_only'] = True
+    events = Event.get(res['league'], filters=filters)
+
     return render_template("umpire/schedule.html", res=res, events=events, filters=filters)
 
 @umpire.route('/assignments', methods=['GET', 'POST'])

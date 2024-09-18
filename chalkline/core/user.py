@@ -236,7 +236,7 @@ class User:
     
     @staticmethod
     def find_groups(league, groups: list):
-        users = User.col.find({'leagues': {'$in': [league['leagueId']]}, f'groups.{league['leagueId']}': {'$in': groups}, 'active': True})
+        users = User.col.find({'leagues': {'$in': [league['leagueId']]}, f'groups.{league['leagueId']}': {'$in': groups}, 'active': True}).sort("lastName")
         return [User.safe(u) for u in users]
     
     @staticmethod

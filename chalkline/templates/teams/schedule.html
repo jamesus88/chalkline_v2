@@ -49,9 +49,17 @@
                 <td>{{e.status}}</td>
                 <td>{{e.away}}</td>
                 <td>{{e.home}}</td>
-                <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action">
-                    <i class="fa-solid fa-magnifying-glass"></i> {{e.team_umps|join(', ')}}</button>
+                <td>
+                    {% if team in e.team_umps %}
+                    <button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        {{e.team_umps|join(', ')}}
+                    </button>
+                    {% else %}
+                        {{e.team_umps|join(', ')}}
+                    {% endif %}
                 </td>
+                
 
                 <dialog class="popup" id="popup_{{e._id}}">
                     <a onclick="closePopup('{{e._id}}')" class="error"><i class="fa-solid fa-xmark"></i> Close</a>
