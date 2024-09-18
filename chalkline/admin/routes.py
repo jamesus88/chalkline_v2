@@ -16,7 +16,7 @@ def event_data():
 
     res = svr.obj()
     filters = Filter.default()
-    res['league']['teams'] = Team.get_league_teams(res['league'])
+    res['league']['teams'] = Team.get_league_teams(res['league']['leagueId'])
 
     if request.method == 'POST':
         filters = Filter.parse(request.form)
