@@ -269,7 +269,6 @@ class User:
         leagueId = session['league']['leagueId']
         for perm in position['permissions']:
                     if perm not in user['permissions'][leagueId]:
-                        print(perm)
                         return False
         return True
 

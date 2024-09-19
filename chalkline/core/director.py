@@ -59,10 +59,7 @@ class Shift:
         return shift
 
     @staticmethod
-    def add_director(shiftId, user):
-        if 'director' not in user['groups']:
-            raise PermissionError('You cannot add director shifts.')
-        
+    def add_director(shiftId, user):        
         Shift.col.update_one({'_id': ObjectId(shiftId)}, {'$set': {'director': user['userId']}})
 
     @staticmethod

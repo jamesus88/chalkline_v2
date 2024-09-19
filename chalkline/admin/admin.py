@@ -53,43 +53,43 @@ class Admin:
     @staticmethod
     def umpire_add_all(league):
         User.col.update_many(
-            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'{league['abbr']}-groups': {'$in': ["umpire"]}}, 
-            {'$push': {f'{league['abbr']}-permissions': "umpire_add"}}
+            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'groups.{league['leagueId']}': {'$in': ["umpire"]}}, 
+            {'$push': {f'permissions.{league['leagueId']}': "umpire_add"}}
         )
 
     @staticmethod
     def umpire_add_none(league):
         User.col.update_many(
-            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'{league['abbr']}-groups': {'$in': ["umpire"]}}, 
-            {'$pull': {f'{league['abbr']}-permissions': "umpire_add"}}
+            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'groups.{league['leagueId']}': {'$in': ["umpire"]}}, 
+            {'$pull': {f'permissions.{league['leagueId']}': "umpire_add"}}
         )
 
     @staticmethod
     def umpire_remove_all(league):
         User.col.update_many(
-            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'{league['abbr']}-groups': {'$in': ["umpire"]}}, 
-            {'$push': {f'{league['abbr']}-permissions': "umpire_remove"}}
+            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'groups.{league['leagueId']}': {'$in': ["umpire"]}}, 
+            {'$push': {f'permissions.{league['leagueId']}': "umpire_remove"}}
         )
 
     @staticmethod
     def umpire_remove_none(league):
         User.col.update_many(
-            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'{league['abbr']}-groups': {'$in': ["umpire"]}}, 
-            {'$pull': {f'{league['abbr']}-permissions': "umpire_remove"}}
+            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'groups.{league['leagueId']}': {'$in': ["umpire"]}}, 
+            {'$pull': {f'permissions.{league['leagueId']}': "umpire_remove"}}
         )
     
     @staticmethod
     def coach_add_all(league):
         User.col.update_many(
-            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'{league['abbr']}-groups': {'$in': ["coach"]}}, 
-            {'$push': {f'{league['abbr']}-permissions': "coach_add"}}
+            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'groups.{league['leagueId']}': {'$in': ["coach"]}}, 
+            {'$push': {f'permissions.{league['leagueId']}': {"$each": ["coach_add", "coach_remove"]}}}
         )
 
     @staticmethod
     def coach_add_none(league):
         User.col.update_many(
-            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'{league['abbr']}-groups': {'$in': ["coach"]}}, 
-            {'$pull': {f'{league['abbr']}-permissions': "coach_add"}}
+            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'groups.{league['leagueId']}': {'$in': ["coach"]}}, 
+            {'$pull': {f'permissions.{league['leagueId']}': "coach_add"}}
         )
 
     @staticmethod
