@@ -38,6 +38,7 @@
                     <th>Id</th>
                     <th>Name</th>
                     <th>Age Group</th>
+                    <th>Managed?</th>
                     <th>Delete</th>
                 </tr>
                 {% for t in teams %}
@@ -50,6 +51,13 @@
                             <option value="{{a}}">{{a}}</option>
                         {% endfor %}
                     </select></td>
+                    <td>
+                        {% if t.seasons.get(res.league.current_season).coaches|length > 0 %}
+                        <i class="fa-solid fa-square-check green-text"></i>
+                        {% else %}
+                        <i class="fa-solid fa-square-xmark"></i>
+                        {% endif %}
+                    </td>
                     <td><button class="schedule-action danger" type="submit" name="delete" value="{{t.teamId}}" onclick="return confirm('Delete team?')">Delete</button></td>
                 </tr>
                 <script>

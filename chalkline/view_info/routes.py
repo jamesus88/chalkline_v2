@@ -9,7 +9,7 @@ view_info = Blueprint('view_info', __name__)
 
 @view_info.route("/event/<eventId>", methods=['GET', 'POST'])
 def event(eventId):
-    mw = svr.authorized_only()
+    mw = svr.authorized_only(set_next_url=request.url)
     if mw: return mw
 
     res = svr.obj()
@@ -49,7 +49,7 @@ def event(eventId):
 @view_info.route("/user/<userId>", methods=['GET', 'POST'])
 @view_info.route("/user")
 def user(userId=None):
-    mw = svr.authorized_only()
+    mw = svr.authorized_only(set_next_url=request.url)
     if mw: return mw
 
     res = svr.obj()
@@ -66,7 +66,7 @@ def user(userId=None):
 @view_info.route("/team/<teamId>", methods=['GET', 'POST'])
 @view_info.route("/team")
 def team(teamId=None):
-    mw = svr.authorized_only()
+    mw = svr.authorized_only(set_next_url=request.url)
     if mw: return mw
 
     if not teamId:

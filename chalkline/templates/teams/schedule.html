@@ -52,8 +52,13 @@
                 <td>
                     {% if team in e.team_umps %}
                     <button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        {{e.team_umps|join(', ')}}
+                        {% if not e.get('ump_' + team).coach_req %}
+                            <i class="fa-solid fa-magnifying-glass"></i> {{team}}
+                        {% elif not e.get('ump_' + team).user %}
+                            <i class="fa-solid fa-spinner"></i> requested
+                        {% else %}
+                            <i class="fa-solid fa-square-check green-text"></i> fulfilled
+                        {% endif %}
                     </button>
                     {% else %}
                         {{e.team_umps|join(', ')}}

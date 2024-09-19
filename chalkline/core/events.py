@@ -1,8 +1,9 @@
 from chalkline.collections import eventData
 from datetime import datetime, timedelta
-from chalkline.core import now, _safe, ObjectId, localize
+from chalkline.core import now, _safe, ObjectId
 from chalkline.core.user import User
-from flask import session
+import chalkline.core.mailer as mailer
+from flask import session, render_template
 from chalkline import SEASON
 
 class Filter:
@@ -201,8 +202,10 @@ class Event:
         full = True
         team_umps = []
         for u in event['umpires'].values():
+
             if u['team_duty']:
                 team_umps.append(u['team_duty'])
+                event["ump_" + u['team_duty']] = u
 
             if u['user']:
                 u['user'] = User.filter_for(umpires, userId=u['user'])
@@ -232,6 +235,17 @@ class Event:
         # check permissions
         if not User.check_permissions_to_add(umpire, user):
             raise PermissionError("You are not authorized to add this game!")
+        
+        if umpire.get("coach_req") is not None:
+            coach = User.get_user(userId=umpire["coach_req"])
+            msg = mailer.ChalklineEmail(
+                "Umpire Request Fulfilled!",
+                #recipients=[coach['email']],
+                recipients=['aidan.hurwitz88@gmail.com'],
+                html=render_template("emails/shift-fulfilled.html", event=event, replaced=pos), 
+            )
+
+            mailer.sendMail(msg)
 
         
         # ADD
