@@ -240,8 +240,7 @@ class Event:
             coach = User.get_user(userId=umpire["coach_req"])
             msg = mailer.ChalklineEmail(
                 "Umpire Request Fulfilled!",
-                #recipients=[coach['email']],
-                recipients=['aidan.hurwitz88@gmail.com'],
+                recipients=[coach['email']],
                 html=render_template("emails/shift-fulfilled.html", event=event, replaced=pos), 
             )
 
