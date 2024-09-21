@@ -47,7 +47,7 @@
                         {% if e.umpire_full or 'umpire_add' not in res.user.permissions.get(res.league.leagueId) %}
                         <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action"><i class="fa-solid fa-magnifying-glass"></i> view</button></td>
                         {% else %}
-                        <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action">+ add</button></td>
+                        <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action blue-text">+ add</button></td>
                         {% endif %}
                     </tr>
 
