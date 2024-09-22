@@ -37,6 +37,23 @@
         </section>
 
         <section>
+            <center>
+                <form method="post">
+                    <h3>Permissions</h3>
+                    <p>
+                        <button class="action" name="toggleUmpireAdd" value="toggleUmpireAdd"><i class="fa-solid fa-power-off"></i></button>
+                        Umpire Add: 
+                        {% if res.league.umpire_add %}
+                        <i class="fa-solid fa-square-check success"></i>
+                        {% else %}
+                        <i class="fa-solid fa-square-xmark error"></i>
+                        {% endif %}
+                    </p>
+                </form>
+            </center>
+        </section>
+
+        <section>
             <form method="post">
             <center>
                 <h3>Age Groups</h3>

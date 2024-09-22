@@ -68,6 +68,18 @@ h1, h2, h3 {
     margin-bottom: 10px;
     padding: 0;
 }
+.blue-text {
+    color: blue;
+    font-weight: bold;
+}
+.red-text {
+    color: red;
+    font-weight: bold;
+}
+.green-text {
+    color: green;
+    font-weight: bold;
+}
 button.blue-text {
     color: blue;
     font-weight: bold;
@@ -80,7 +92,7 @@ button.green-text {
     color: green;
     font-weight: bold;
 }
-button.blue-text:hover, .red-text:hover, .green-text:hover {
+button.blue-text:hover, button.red-text:hover, button.green-text:hover {
     color: white
 }
 

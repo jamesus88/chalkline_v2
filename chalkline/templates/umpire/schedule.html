@@ -18,8 +18,13 @@
             <p>To view games you are working.</p>
         </div>
     </section>
-    <form method="post">
+    <form method="post">        
         {% include "filters.html" %}
+        <br><br>
+
+        {% if not res.league.umpire_add %}
+            <h3><i class="fa-solid fa-lock"></i> The schedule is currently locked.</h3>
+        {% endif %}
 
         <p class="error">{{res.msg}}</p>
         <section class="schedule-section scrollwrapper">
@@ -45,10 +50,12 @@
                         <td>{{e.age}}</td>
                         <td>{{e.status}}</td>
                         {% if e.umpire_full or 'umpire_add' not in res.user.permissions.get(res.league.leagueId) %}
-                        <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action"><i class="fa-solid fa-magnifying-glass"></i> view</button></td>
+                        <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action"><i class="fa-solid fa-magnifying-glass"></i> view
                         {% else %}
-                        <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action blue-text">+ add</button></td>
+                        <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action blue-text">+ add
                         {% endif %}
+                        
+                        ({{e.full_umps}}/{{e.total_umps}})</button></td>
                     </tr>
 
                     <dialog class="popup" id="popup_{{e._id}}">

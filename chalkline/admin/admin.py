@@ -1,9 +1,11 @@
-from chalkline.core import mailer, ObjectId, now, remove_dups
+from chalkline.core import ObjectId, now, remove_dups
 from pymongo import UpdateOne
 from datetime import datetime, timedelta
 from chalkline.core.user import User
 from chalkline.core.director import Shift
 from chalkline.core.events import Event, Filter
+from chalkline.core.league import League
+
 
 class Admin:
 
@@ -49,6 +51,10 @@ class Admin:
     @staticmethod
     def delete(cls, id):
         cls.col.delete_one({'_id': ObjectId(id)})
+
+    @staticmethod
+    def toggle_perm(league, perm):
+        League.col.update_one({'leagueId': league['leagueId']}, {"$set": {perm: not(league[perm])}})
 
     @staticmethod
     def umpire_add_all(league):

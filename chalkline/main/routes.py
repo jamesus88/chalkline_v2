@@ -113,7 +113,7 @@ def login(next=None):
     res = svr.obj()
 
     if request.method == 'POST':
-        email = request.form['email']
+        email = request.form['email'].lower()
         pword = request.form['pword']
         leagueId = request.form['league']
         
@@ -144,7 +144,7 @@ def send_reset():
     res = svr.obj()
 
     if request.method == 'POST':
-        email = request.form['email']
+        email = request.form['email'].lower()
         user = User.get_user(email=email)
         if user:
             try: 
@@ -180,9 +180,12 @@ def new_password(userId=None, auth=None):
         user = res['user']
 
     if request.method == 'POST':
-        User.set_password(user, request.form['pword'])
-        svr.logout()
-        res['msg'] = "Password reset successfully. Please login again."
+        if request.form['pword'].strip() != request.form['check'].strip():
+            res['msg'] = "Those passwords don't match, try again."
+        else:
+            User.set_password(user, request.form['pword'].strip())
+            svr.logout()
+            res['msg'] = "Password reset successfully. Please login again."
 
     return render_template("main/reset-password.html", res=res, user=user)
 

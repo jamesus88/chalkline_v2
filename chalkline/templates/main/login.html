@@ -15,7 +15,7 @@
                 <select name="league" id="league" required>
                     <option value="" selected disabled>Select</option>
                     {% for l in all_leagues %}
-                        <option value="{{l.leagueId}}">{{l.name}}</option>
+                        <option value="{{l.leagueId}}" selected>{{l.name}}</option>
                     {% endfor %}
                 </select>
                 <label class="sign-in" for="email">Email or Username</label>

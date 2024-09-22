@@ -1,4 +1,4 @@
-from chalkline.collections import eventData
+from chalkline.collections import eventData, leagueData
 from datetime import datetime, timedelta
 from chalkline.core import now, _safe, ObjectId
 from chalkline.core.user import User
@@ -201,8 +201,10 @@ class Event:
         # fill in umpire data and add team hints
         full = True
         team_umps = []
+        total_umps = 0
+        open_umps = 0
         for u in event['umpires'].values():
-
+            total_umps += 1
             if u['team_duty']:
                 team_umps.append(u['team_duty'])
                 event["ump_" + u['team_duty']] = u
@@ -212,9 +214,13 @@ class Event:
             elif u['team_duty'] and not u['coach_req']:
                 continue
             else:
+                open_umps += 1
                 full = False
 
         event['umpire_full'] = full
+        event['total_umps'] = total_umps
+        event['open_umps'] = open_umps
+        event['full_umps'] = total_umps - open_umps
 
         if len(team_umps) > 0:
             event['team_umps'] = team_umps
@@ -226,6 +232,11 @@ class Event:
     
     @staticmethod
     def add_umpire(eventId, user, pos):
+        # check league is open
+        umpire_add = leagueData.find_one({'leagueId': session['league']['leagueId']})['umpire_add']
+        if not umpire_add:
+            raise ValueError("Sorry, signups are closed right now. Check again later.")
+
         event = Event.col.find_one({'_id': ObjectId(eventId)})
         umpire = event['umpires'][pos]
         # check empty (safety catch)

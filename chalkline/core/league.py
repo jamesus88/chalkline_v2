@@ -36,6 +36,8 @@ class League:
                 'director_code': form['director_code']
             },
             'active': True,
+            'umpire_add': False,
+            'coach_add': True,
             'created': now()
         }
         _id = League.col.insert_one(league).inserted_id

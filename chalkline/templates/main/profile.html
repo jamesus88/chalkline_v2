@@ -139,9 +139,11 @@
                         <script>document.getElementById('hide_phone').checked = "{{res.user.preferences.hide_phone}}" == 'True';</script>
                     </tr>
                 </table>
-                
 
                 <button class="action" type="submit" name="updateProfile" value="updateProfile">Save</button>
+                <br><br>
+                <h4>Your permissions: </h4>
+                <p>{{res.user.permissions.get(res.league.leagueId)|join(', ')}}</p>
             </form>
         </section>
         <section>

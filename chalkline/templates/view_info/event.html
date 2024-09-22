@@ -151,10 +151,11 @@
                         <center>
                             <h3>{{pos}}: <select name="{{pos}}_user" id="{{pos}}_user">
                                 <option value="">Open</option>
+                                {{ump.user.userId}}
                                 {% for u in all_umpires %}
                                     <option value="{{u.userId}}">{{u.firstLast}}</option>
                                 {% endfor %}
-                                <script>document.getElementById('{{pos}}_user').value = "{{event.umpires.get(pos).user.userId}}"</script>
+                                <script>document.getElementById('{{pos}}_user').value = "{{ump.user.userId}}"</script>
                             </select></h3>
 
                             <h4> Team Duty:
