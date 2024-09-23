@@ -37,6 +37,19 @@
             document.getElementById('filter_team').value = "{{filters.team}}";
         </script>
     {% endif %}
+
+    {% if request.blueprint == 'admin' %}
+        <select class="filter" name="filter_umpire" id="filter_umpire">
+            <option value="None" selected>All umpires</option>
+            {% for u in all_umps %}
+                <option value="{{u.userId}}">{{u.firstLast}}</option>
+            {% endfor %}
+        </select>
+
+        <script>
+            document.getElementById('filter_umpire').value = "{{filters.umpire}}";
+        </script>
+    {% endif %}
     
     {% if request.blueprint in ['league', 'admin'] %}
         <select name="filter_umpires_only" id="filter_umpires_only">

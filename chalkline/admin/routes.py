@@ -34,9 +34,9 @@ def event_data():
             res['msg'] = f"{count} DOD shifts added!"
 
     events = Event.get(res['league'], filters=filters)
-    
+    all_umps = User.find_groups(res['league'], ['umpire'])
 
-    return render_template("admin/event-data.html", res=res, events=events, filters=filters)
+    return render_template("admin/event-data.html", res=res, events=events, filters=filters, all_umps=all_umps)
 
 @admin.route("/add-event", methods=['GET', 'POST'])
 def add_event():

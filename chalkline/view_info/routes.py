@@ -37,7 +37,15 @@ def event(eventId):
         elif request.form.get('substitute'):
             sub = request.form['sub_user']
             pos = request.form['substitute']
-            res['msg'] = User.request_sub(res['user'], e, pos, sub)
+            try:
+                user, req_user = User.request_sub(res['user'], e, pos, sub)
+            except ValueError as e:
+                res['msg'] = e
+            else:
+                svr.login(user)
+                res = svr.obj()
+                res['msg'] = f"Request sent to {req_user['firstLast']}"
+            
 
         
         # reload event

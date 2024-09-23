@@ -15,7 +15,8 @@ class Filter:
             'end': now() + timedelta(days=200),
             'umpires_only': False,
             'team': None,
-            'season': SEASON
+            'season': SEASON,
+            'umpire': None
         }
 
     @staticmethod
@@ -35,6 +36,8 @@ class Filter:
             filters['end'] = datetime.strptime(form['filter_end'], "%Y-%m-%dT%H:%M")
         if form.get('filter_team', 'None') != 'None':
             filters['team'] = form['filter_team']
+        if form.get('filter_umpire', 'None') != 'None':
+            filters['umpire'] = form['filter_umpire']
 
         filters['season'] = form.get('filter_season')
         
@@ -134,6 +137,7 @@ class Event:
     @staticmethod
     def get(league, user=None, team=None, check_user_teams=True, filters=Filter.default(), add_criteria = {}, safe=True):
         criteria = [{'leagueId': league['leagueId']}, add_criteria]
+        umpire = None
 
         if filters.get('season'):
             criteria.append({'season': filters['season']})
@@ -145,6 +149,8 @@ class Event:
             criteria.append({'date': {'$gte': filters['start']}})
         if filters.get('end'):
             criteria.append({'date': {'$lte': filters['end']}})
+        if filters.get('umpire'):
+            umpire = User.get_user(userId=filters.get('umpire'))
 
         all_events = list(Event.col.find({'$and': criteria}).sort(['date', 'field']))
 
@@ -164,6 +170,9 @@ class Event:
                     continue
             elif filters.get('team'):
                 if not Event.team_in_event(e, filters['team']):
+                    continue
+            elif umpire:
+                if not Event.user_in_event(e, umpire, check_user_teams=False):
                     continue
 
             if filters['umpires_only']:
@@ -260,6 +269,7 @@ class Event:
         
         # ADD
         Event.col.update_one({'_id': ObjectId(eventId)}, {'$set': {f'umpires.{pos}.user': user['userId']}})
+        print(f"{user['userId']} added {pos} duty ({eventId}).")
         return "Game added!"
     
     @staticmethod

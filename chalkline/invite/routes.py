@@ -1,4 +1,4 @@
-from flask import Blueprint, request, abort, render_template, url_for, jsonify
+from flask import Blueprint, request, abort, render_template, url_for, jsonify, redirect
 
 from chalkline.core.user import User
 from chalkline.core.calendar import Calendar
@@ -20,21 +20,24 @@ def calendar(userId=None, code=None):
 
 @invite.route("/substitute/<eventId>/<auth>", methods=['GET', 'POST'])
 def substitute(eventId, auth):
-    mw = svr.authorized_only("umpire", request.url)
+    mw = svr.authorized_only("umpire", set_next_url=request.url)
     if mw: return mw
 
     res = svr.obj()
 
-    req_user = User.safe(User.col.find_one({f'auth.sub_{eventId}': auth}))
+    req_user = User.col.find_one({f'auth.sub_{eventId}': auth})
     event = Event.find(eventId)
 
     if not (req_user and event): abort(404)
 
+    req_user = User.safe(req_user)
+
     # we have the req user, current user, and event
     pos = None
     for p, ump in event['umpires'].items():
-        if ump['user']['userId'] == req_user['userId']:
-            pos = p
+        if ump['user']:
+            if ump['user']['userId'] == req_user['userId']:
+                pos = p
 
     if not pos: abort(404)
 
@@ -52,11 +55,11 @@ def substitute(eventId, auth):
             except PermissionError as e:
                 res['msg'] = e
             else:
-                return render_template(url_for('main.home'))
+                return redirect(url_for('main.home'))
             
         elif request.form.get('decline'):
             User.remove_sub_req(req_user, event)
-            return render_template(url_for('main.home'))
+            return redirect(url_for('main.home'))
 
 
 
