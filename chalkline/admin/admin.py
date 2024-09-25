@@ -1,7 +1,11 @@
 from chalkline.core import ObjectId, now, remove_dups
+from flask import render_template
 from pymongo import UpdateOne
 from datetime import datetime, timedelta
 from chalkline.core.user import User
+from chalkline.core.team import Team
+
+import chalkline.core.mailer as mailer
 from chalkline.core.director import Shift
 from chalkline.core.events import Event, Filter
 from chalkline.core.league import League
@@ -47,6 +51,34 @@ class Admin:
             writes.append(UpdateOne({'_id': ObjectId(key)}, {'$set': map}))
 
         cls.col.bulk_write(writes)
+
+        return updates
+    
+    @staticmethod
+    def send_updates(old_events, updates):
+        for e in old_events:
+            if e['_id'] in updates:
+                new = updates[e['_id']]
+
+                if (
+                    new['status'] != e['status'] or
+                    new['date'] != e['date'] or
+                    new['field'] != e['field'] or
+                    new['venueId'] != e['venueId']
+                ):
+                    
+                    users = Event.get_users_in_event(e)
+                    emails = []
+                    for u in users:
+                        if u['preferences']['email_nots']:
+                            msg = mailer.ChalklineEmail(
+                                subject=f"Event Update!",
+                                recipients=[u['email']],
+                                html=render_template("emails/event-update.html", old=e, new=new)
+                            )
+                            emails.append(msg)
+
+                    mailer.sendBulkMail(emails)
 
     @staticmethod
     def delete(cls, id):

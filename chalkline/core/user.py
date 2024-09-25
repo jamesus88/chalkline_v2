@@ -50,7 +50,7 @@ class User:
         return user
     
     @staticmethod
-    def get(res, add_criteria, filters=Filter.default()):
+    def get(res, add_criteria={}, filters=Filter.default()):
         criteria = [add_criteria]
 
         if filters.get('group') is not None:

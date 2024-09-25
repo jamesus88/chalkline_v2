@@ -9,26 +9,7 @@
 <main>
     <center>
         <h1>Send Announcement</h1>
-        <h3 class="error">{{sobj.msg}}</h3>
-        {% for venue in venues %}
-            <section>
-                <h2>{{venue.name}}</h2>
-                <form method="post" id="status-wf">
-                    <h3>Field Status: <select name="fieldStatus" id="fieldStatus_{{venue.venueId}}" value="{{venue.status}}">
-                        <option value="Open">Open</option>
-                        <option value="Closed">Closed</option>
-                        <option value="Rain Delay">Rain Delay</option>
-                        <option value="Games Canceled">Games Canceled</option>
-                    </select></h3>
-                    <h3>Send status alert: <input type="checkbox" name="sendStatusAlert" value="sendStatusAlert" id="sendStatusAlert" checked></h3>
-                    <button class="action" name="updateStatus" value="{{venue.venueId}}" type="submit">Update</button>
-                    <h4 class="urgent">Updating with status alert will send email and text to all users!</h4>
-                </form>
-            </section>
-            <script>
-                document.getElementById('fieldStatus_{{venue.venueId}}').value = "{{venue.status}}";
-            </script>
-        {% endfor %}
+        <h3 class="error">{{res.msg}}</h3>
         
         <div class="divide">
             <section>
@@ -57,29 +38,25 @@
                         <p><b>Groups</b> - Send to certain groups (every team)</p>
                         <div>
                             <label for="coach">All Coaches</label>
-                            <input type="checkbox" name="coach" id="coach">
+                            <input type="checkbox" name="group" value="coach" id="coach">
                         </div>
                         <div>
                             <label for="parent">All Parents</label>
-                            <input type="checkbox" name="parent" id="parent">
+                            <input type="checkbox" name="group" value="parent" id="parent">
                         </div>
                         <div>
                             <label for="umpire">All Umpires</label>
-                            <input type="checkbox" name="umpire" id="umpire">
+                            <input type="checkbox" name="group" value="umpire" id="umpire">
                         </div>
                         <div>
-                            <label for="youth">All Youth Umpires</label>
-                            <input type="checkbox" name="youth" id="youth">
-                        </div>
-                        <div>
-                            <label for="board">All Board Members</label>
-                            <input type="checkbox" name="board" id="board">
+                            <label for="board">All Directors</label>
+                            <input type="checkbox" name="group" value="director" id="director">
                         </div>
                         <p><b>Teams</b> - Send to coaches and parents of each team</p>
-                        {% for team in allTeams %}
+                        {% for t in all_teams %}
                         <div>
-                            <label for="{{team.teamId}}">{{team.teamId}}</label>
-                            <input type="checkbox" name="{{team.teamId}}" id="{{team.teamId}}">
+                            <label for="{{t.teamId}}">{{t.teamId}}</label>
+                            <input type="checkbox" name="teams" value="{{t.teamId}}" id="{{t.teamId}}">
                         </div>
                         {% endfor %}
                         <script>
@@ -99,11 +76,8 @@
                         </script>
                     </details>
                     <h3>Message</h3>
-                    <p>Upload HTML</p>
-                    <input style="display: block; margin: auto;" class="action" type="file" name="file" id="file" accept="text/html">
-                    <p>or type below</p>
-                    <textarea style="resize: none;" name="msg" id="msg" cols="40" rows="5" maxlength="130" onkeyup="updateChars(this, 'chars', 130)"></textarea>
-                    <p class="error" id='chars'>Characters remaining: 130</p>
+                    <textarea style="resize: none;" name="msg" id="msg" cols="40" rows="5" maxlength="300" onkeyup="updateChars(this, 'chars', 300)"></textarea>
+                    <p class="error" id='chars'>Characters remaining: 300</p>
                     <button class="action" type="submit" name="sendMessage" value="sendMessage" onclick="return confirm('Send message?')">Send</button>
                 </form>
             </section>

@@ -2,6 +2,7 @@ from chalkline.collections import eventData, leagueData
 from datetime import datetime, timedelta
 from chalkline.core import now, _safe, ObjectId
 from chalkline.core.user import User
+from chalkline.core.team import Team
 import chalkline.core.mailer as mailer
 from flask import session, render_template
 from chalkline import SEASON
@@ -156,7 +157,7 @@ class Event:
 
         if safe:
             umps = User.find_groups(league, ["umpire"])
-            all_events = [Event.safe(e, umps) for e in all_events]
+            all_events = [Event.safe(e, umps, league=league) for e in all_events]
 
         events = []
 
@@ -199,9 +200,9 @@ class Event:
             return None
     
     @staticmethod
-    def safe(event, user_list=None):
+    def safe(event, user_list=None, league=None):
         event = _safe(event)
-        league = session['league']
+        league = session.get('league') or league
         if user_list is None: umpires = [User.view(u) for u in User.find_groups(league, ['umpire'])]
         else: umpires = user_list
 
@@ -374,4 +375,44 @@ class Event:
         else:
             raise PermissionError("You do not have permission to add this game!")
 
-    
+    @staticmethod
+    def get_users_in_event(e):
+        users = []
+        users.extend(Team.load_contacts(e['home'], team_is_loaded=False))
+        users.extend(Team.load_contacts(e['away'], team_is_loaded=False))
+        for pos, ump in e['umpires'].items():
+            if ump['user']:
+                users.append(ump['user'])
+
+        return users
+
+    @staticmethod
+    def create_reminder(league, user):
+        filters = Filter.default()
+        filters['start'] = now()
+        filters['end'] = filters['start'] + timedelta(days=7)
+        events = Event.get(league, user, filters=filters)
+
+        if len(events) < 1:
+            return None
+        
+        for e in events:
+            e['user_role'] = ""
+            for pos, ump in e['umpires'].items():
+                if ump['user']:
+                    if ump['user']['userId'] == user['userId']:
+                        e['user_role'] = pos + " Umpire"
+                        break
+            if e['home'] in user['teams']:
+                e['user_role'] = "Home team"
+            elif e['away'] in user['teams']:
+                e['user_role'] = "Away team"
+            
+        msg = mailer.ChalklineEmail(
+            subject="Weekly Reminder from Chalkline", 
+            #recipients=[user['email']],
+            recipients=['aidan.hurwitz88@gmail.com'],
+            html=render_template("emails/reminder.html", events=events, league=league, user=user)
+        )
+        
+        return msg

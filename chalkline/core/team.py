@@ -42,10 +42,12 @@ class Team:
             return None
         
     @staticmethod
-    def load_contacts(team):
-        users = User.col.find({'teams': {'$in': [team['teamId']]}})
+    def load_contacts(team, team_is_loaded=True):
+        if team_is_loaded: team = team['teamId']
+        users = User.col.find({'teams': {'$in': [team]}})
         users = [User.view(u) for u in users]
-        team['contacts'] = users
+        if team_is_loaded: team['contacts'] = users
+        return users
 
     @staticmethod
     def load_teams(user, league):

@@ -7,12 +7,12 @@
 </head>
 <body>
     <main>
-        <h2>Weekly Reminder: You have events this week in {{sobj.location}}!</h2>
+        <h2>Weekly Reminder: You have events this week in {{league.leagueId}}!</h2>
         <p>Hi {{user.firstName}}! Here's a summary of your upcoming events:</p>
         <section>
-            {% for item in events %}
-            <h3>You are the {{item.role}} on {{item.event.eventVenue}} Field {{item.event.eventField}} on {{item.event.eventDate.strftime('%a %m/%d at %H:%M')}} ({{item.event.eventAgeGroup}})</h3>
-            <p>View event: www.chalklinebaseball.com/view-info/event/{{item.event._id}}</p>
+            {% for e in events %}
+            <h3>You are the {{e.user_role}} on {{e.venueId}} Field {{e.field}} on {{e.date.strftime('%a %m/%d at %H:%M')}} ({{e.age}})</h3>
+            <p>View event: www.chalklinebaseball.com/view/event/{{e._id}}</p>
             <br>
             {% endfor %}
         </section>

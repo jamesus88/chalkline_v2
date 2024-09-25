@@ -3,8 +3,11 @@ from flask import Blueprint, request, abort, render_template, url_for, jsonify, 
 from chalkline.core.user import User
 from chalkline.core.calendar import Calendar
 from chalkline.core.events import Event
+from chalkline.core.league import League
+from chalkline.core import now
 from chalkline.core import server as svr
 from chalkline.core import mailer
+from chalkline import CHALKLINE_AUTH
 
 invite = Blueprint('invite', __name__) 
     
@@ -65,4 +68,30 @@ def substitute(eventId, auth):
 
     return render_template("umpire/substitute.html", res=res, req_user=req_user, event=event, pos=pos)
 
+@invite.post("/daily-reminders")
+def daily_reminders(chalkline_auth=None):
+    if chalkline_auth != CHALKLINE_AUTH:
+        raise PermissionError("Credentials failed")
     
+    all_leagues = League.get_all()
+    day_of_week = now().weekday()
+    msgs = []
+
+    for l in all_leagues:
+        users = User.find_groups(l, ['umpire', 'coach', 'director', 'parent', 'admin'])
+
+        for i in range(len(users)):
+            if (i % 7) == day_of_week:
+                if users[i]['preferences']['email_nots']:
+                    msg = Event.create_reminder(l, users[i])
+                    if msg: msgs.append(msg)
+
+    mailer.sendBulkMail(msgs)
+
+    print("Daily reminders sent!")
+    print(f"({len(msgs)} sent)")
+
+    User.col.update_many({'auth.pword_reset': {'$exists': True}}, {'$unset': {'auth.pword_reset': 0}})
+    print("Password reset links marked invalid.")
+    
+    return jsonify("Success!")

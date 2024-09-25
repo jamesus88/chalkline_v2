@@ -4,6 +4,8 @@ from chalkline.core.events import Event, Filter
 from chalkline.core.league import League
 from chalkline.core.team import Team
 from chalkline.core.user import User
+import chalkline.core.mailer as mailer
+
 
 from .admin import Admin
 
@@ -18,11 +20,15 @@ def event_data():
     filters = Filter.default()
     res['league']['teams'] = Team.get_league_teams(res['league']['leagueId'])
 
+    events = Event.get(res['league'], filters=filters)
+
+
     if request.method == 'POST':
         filters = Filter.parse(request.form)
 
         if request.form.get('save'):
-            Admin.update_all(request.form, Event, res['league'])
+            updates = Admin.update_all(request.form, Event, res['league'])
+            Admin.send_updates(events, updates)
             res['msg'] = 'Events updated!'
         
         elif request.form.get('delete'):
@@ -33,7 +39,8 @@ def event_data():
             count = Admin.generate_dod_shifts(res['league'])
             res['msg'] = f"{count} DOD shifts added!"
 
-    events = Event.get(res['league'], filters=filters)
+        events = Event.get(res['league'], filters=filters)
+        
     all_umps = User.find_groups(res['league'], ['umpire'])
 
     return render_template("admin/event-data.html", res=res, events=events, filters=filters, all_umps=all_umps)
@@ -137,10 +144,6 @@ def add_team():
 
     return render_template("admin/add-team.html", res=res, coaches=coaches)
 
-@admin.route("/announcement", methods=['GET', 'POST'])
-def announcement():
-    return redirect(url_for('main.home'))
-
 @admin.route("/manage-league", methods=['GET', 'POST'])
 def manage_league():
     mw = svr.authorized_only('admin')
@@ -164,3 +167,50 @@ def manage_league():
         res = svr.obj()
 
     return render_template("admin/league.html", res=res)
+
+@admin.route("/announcement", methods=['GET', 'POST'])
+def announcement():
+    mw = svr.authorized_only("admin")
+    if mw: return mw
+
+    res = svr.obj()
+    all_teams = Team.get_league_teams(res['league']['leagueId'])
+
+    if request.method == 'POST':
+        content = request.form.get("msg")
+
+        groups = request.form.getlist("group")
+        teams = request.form.getlist("teams")
+
+        if content is None or content == "":
+            res['msg'] = "Error: Enter a message."
+        elif request.form.get('email'):                
+
+            users = User.find_groups(res['league'], groups)
+            for t in teams:
+                users.extend(Team.load_contacts(t, team_is_loaded=False))
+
+            emails = {u['email'] for u in users}
+            if request.form.get("bcc"):
+                emails.add(res['user']['email'])
+
+            msgs = []
+
+            for e in emails:
+                msg = mailer.ChalklineEmail(
+                    subject=f"Chalkline Announcement from {res['user']['fullName']}",
+                    recipients=[e],
+                    html=render_template("emails/announcement.html", user=res['user'], content=content)
+                )
+
+                msgs.append(msg)
+
+            print(f"{res['user']['fullName']} ({res['user']['userId']}) sent an announcement to:")
+            print(len(emails), "recipients.")
+
+            mailer.sendBulkMail(msgs)
+            res['msg'] = "Sent!"
+        else:
+            res['msg'] = "Error: Select email or text."
+
+    return render_template("admin/announcement.html", res=res, all_teams=all_teams)
