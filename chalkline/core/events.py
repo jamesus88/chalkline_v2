@@ -410,8 +410,7 @@ class Event:
             
         msg = mailer.ChalklineEmail(
             subject="Weekly Reminder from Chalkline", 
-            #recipients=[user['email']],
-            recipients=['aidan.hurwitz88@gmail.com'],
+            recipients=[user['email']],
             html=render_template("emails/reminder.html", events=events, league=league, user=user)
         )
         
