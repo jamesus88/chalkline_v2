@@ -156,8 +156,8 @@ class Event:
         all_events = list(Event.col.find({'$and': criteria}).sort(['date', 'field']))
 
         if safe:
-            umps = User.find_groups(league, ["umpire"])
-            all_events = [Event.safe(e, umps, league=league) for e in all_events]
+            umps_coaches = User.find_groups(league, ["umpire", "coach"], view=True)
+            all_events = [Event.safe(e, umps_coaches, league=league) for e in all_events]
 
         events = []
 
@@ -205,8 +205,8 @@ class Event:
     def safe(event, user_list=None, league=None):
         event = _safe(event)
         league = session.get('league') or league
-        if user_list is None: umpires = [User.view(u) for u in User.find_groups(league, ['umpire'])]
-        else: umpires = user_list
+        if user_list is None: umps_coaches = [User.view(u) for u in User.find_groups(league, ['umpire', 'coach'])]
+        else: umps_coaches = user_list
 
         #if localize_times: event['date'] = localize(event['date'])
 
@@ -221,8 +221,10 @@ class Event:
                 team_umps.append(u['team_duty'])
                 event["ump_" + u['team_duty']] = u
 
+            if u['coach_req']:
+                u['coach_req'] = User.filter_for(umps_coaches, userId=u['coach_req'])
             if u['user']:
-                u['user'] = User.filter_for(umpires, userId=u['user'])
+                u['user'] = User.filter_for(umps_coaches, userId=u['user'])
             elif u['team_duty'] and not u['coach_req']:
                 continue
             else:

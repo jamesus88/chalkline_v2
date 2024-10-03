@@ -83,6 +83,14 @@
                     </center>
                     {% endif %}
 
+                    {% if ump.coach_req %}
+                    <center>
+                        <h3>Coach Request: {{ump.coach_req.firstLast}}</h3>
+                        <p>Email: {{ump.coach_req.email}}</p>
+                        <p>Phone: {{ump.coach_req.phone}}</p>
+                    </center>
+                    {% endif %}
+
                 </section>
                 {% endfor %}
         {% endif %}
