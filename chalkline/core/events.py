@@ -179,7 +179,9 @@ class Event:
             if filters['umpires_only']:
                 found = False
                 for ump in e['umpires'].values():
-                    if not ump['team_duty']:
+                    if ump['user'] is not None:
+                        found = True
+                    elif not ump['team_duty']:
                         found = True
                     else:
                         if ump['coach_req']:
