@@ -6,3 +6,4 @@ requests
 certifi
 icalendar
 x-wr-timezone
+pytz
