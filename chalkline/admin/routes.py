@@ -35,9 +35,24 @@ def event_data():
             Admin.delete(Event, request.form['delete'])
             res['msg'] = 'Event deleted.'
 
+        elif request.form.get('lock'):
+            # lock game
+            Event.lock_game(request.form['lock'])
+            res['msg'] = 'Event locked.'
+
+        elif request.form.get('unlock'):
+            # unlock game
+            Event.unlock_game(request.form['unlock'])
+            res['msg'] = 'Event unlocked.'
+
         elif request.form.get('genShifts'):
             count = Admin.generate_dod_shifts(res['league'])
             res['msg'] = f"{count} DOD shifts added!"
+
+        elif request.form.get('unlockAll'):
+            Event.col.update_many({'leagueId': res['league']['leagueId']}, {'$set': {'locked': False}})
+            res['msg'] = f"All games unlocked!"
+
 
         events = Event.get(res['league'], filters=filters)
         

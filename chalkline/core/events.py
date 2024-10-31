@@ -252,6 +252,11 @@ class Event:
             raise ValueError("Sorry, signups are closed right now. Check again later.")
 
         event = Event.col.find_one({'_id': ObjectId(eventId)})
+
+        # locked game
+        if event['locked']:
+            raise ValueError("Sorry, this game is locked!")
+
         umpire = event['umpires'][pos]
         # check empty (safety catch)
         if umpire['user'] is not None:
@@ -419,3 +424,11 @@ class Event:
         )
         
         return msg
+    
+    @staticmethod
+    def lock_game(eventId):
+        Event.col.update_one({'_id': ObjectId(eventId)}, {'$set': {'locked': True}})
+
+    @staticmethod
+    def unlock_game(eventId):
+        Event.col.update_one({'_id': ObjectId(eventId)}, {'$set': {'locked': False}})

@@ -24,6 +24,7 @@
             <h3><a href="{{url_for('admin.add_event')}}">Add Event</a></h3>
             <form method="post">
                 <button class="action secondary" onclick="return confirm('Generate director shifts? This will replace any existing shifts for this season!')" name="genShifts" value="1">Generate DOD Shifts</button>
+                <button class="action secondary" onclick="return confirm('Unlock all games?')" name="unlockAll" value="1">Unlock all Games</button>
             </form>
         </div>
     </section>
@@ -46,6 +47,7 @@
                 <tr>
                     <th></th>
                     <th>Event</th>
+                    <th><i class="fa-solid fa-unlock"></i></th>
                     <th>Date/Time</th>
                     <th>Venue</th>
                     <th>Field</th>
@@ -59,6 +61,13 @@
                 <tr class="event-row">
                     <td><a class="icon-link" href="{{url_for('view_info.event', eventId=e._id)}}"><i class="fa-solid fa-info"></i></a></td>
                     <td class="event-type">{{e.type}}</td>
+                    <td>
+                        {% if e.locked %}
+                            <button name="unlock" value="{{e._id}}" class="schedule-action danger"><i class="fa-solid fa-lock"></i></button>
+                        {% else %}
+                            <button name="lock" value="{{e._id}}" class="schedule-action"><i class="fa-solid fa-unlock"></i></button>
+                        {% endif %}
+                    </td>
                     <td><input class="admin" type="datetime-local" name="{{e._id}}_date" id="date" value="{{e.date.isoformat()[0:16]}}"></td>
                     <td><select class="admin" name="{{e._id}}_venueId" id="{{e._id}}_venueId">
                         {% for v in res.league.venues %}
