@@ -66,6 +66,7 @@ class Event:
             'score': [0,0],
             'status': form.get('status'),
             'visible': True,
+            'locked': False,
             'umpires': {},
             'created': now()
         }
@@ -200,6 +201,10 @@ class Event:
             return Event.safe(e)
         else:
             return None
+        
+    @staticmethod
+    def delete(eventId):
+        Event.col.delete_one({'_id': ObjectId(eventId)})
     
     @staticmethod
     def safe(event, user_list=None, league=None):

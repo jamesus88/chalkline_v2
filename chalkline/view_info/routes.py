@@ -21,6 +21,9 @@ def event(eventId):
     if request.method == 'POST':
         if request.form.get('edit'):
             edit_view = True
+        elif request.form.get('delete'):
+            Event.delete(e['_id'])
+            return redirect(url_for('umpire.schedule'))
         elif request.form.get('cancel'):
             pass
         elif request.form.get('save'):
@@ -46,7 +49,6 @@ def event(eventId):
                 res = svr.obj()
                 res['msg'] = f"Request sent to {req_user['firstLast']}"
             
-
         
         # reload event
         e = Event.find(eventId)

@@ -16,6 +16,7 @@
     {% if res.admin and not edit_view %}
     <form method="post">
         <button name="edit" value="edit" class="action"><i class="fa-solid fa-pen"></i> Edit</button>
+        <button name="delete" value="delete" class="action danger" onclick="return confirm('Delete game?')"><i class="fa-solid fa-trash"></i> Delete</button>
     </form>
     {% endif %}
     <section>

@@ -69,12 +69,12 @@
                         <p><b>Umpires</b></p>
                         {% for pos, u in e.umpires.items() %}
                         <label for="{{pos}}">{{pos}}: </label>
-                            {% if e.locked %}
-                                Game Locked
-                            {% elif u.user %}
+                            {% if u.user %}
                                 <a href="{{url_for('view_info.user', userId=u.user.userId)}}">{{u.user.firstLast}}</a>
                             {% elif u.team_duty and not u.coach_req %}
                                 Team Duty ({{u.team_duty}})
+                            {% elif e.locked or not res.league.umpire_add %}
+                                Locked
                             {% elif 'umpire_add' in res.user.permissions.get(res.league.leagueId) and e.date > res.date %}
                                 <button class="schedule-action" name="add_game" value="{{e._id}}_{{pos}}">+ {{pos}}</button>
                             {% else %}

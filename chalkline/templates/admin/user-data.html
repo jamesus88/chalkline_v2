@@ -1,6 +1,7 @@
 <head>
     <link rel="stylesheet" href="{{url_for('static', filename='schedule.css')}}">
     <script src="{{url_for('static', filename='schedule.js')}}" defer></script>
+    <script src="{{url_for('static', filename='share.js')}}" defer></script>
     <style>
         @media screen and (max-width: 2000px) {
             main {
@@ -67,7 +68,7 @@
                     <td><a class="icon-link" href="{{url_for('view_info.user', userId=u.userId)}}"><i class="fa-solid fa-info"></i></a></td>
                     <td class="event-type">{{u.lastName}}</td>
                     <td class="event-type">{{u.firstName}}</td>
-                    <td class="event-type">{{u.email}}</td>
+                    <td class="event-type"><button class="schedule-action" type="button" onclick="copy('{{u.email}}')"><i class="fa-regular fa-clone"></i></button> {{u.email}}</td>
                     <td class="event-type">{{u.phone}}</td>
                     <td><select name="{{u._id}}_groups" id="{{u._id}}_groups" multiple>
                         {% for g in groups %}
