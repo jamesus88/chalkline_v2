@@ -16,6 +16,11 @@
             {% if ('coach' in res.user.groups.get(res.league.leagueId) or 'parent' in res.user.groups.get(res.league.leagueId)) and res.user.teams == [] %}
                 <h3 class="error">You have 0 teams linked to your account. Add one to your <a href="{{url_for('main.profile')}}">profile</a>!</h3>
             {% endif %}
+        <section>
+            <h3>New: Sync iCalendar or Google Calendar with Chalkline!</h3>
+            <p>See all of your games, practices, and umpire duties on the calendar app of your choice!</p>
+            <p>Go to your <a href="{{url_for('main.profile')}}">Profile</a> to get started.</p>
+        </section>
         {% endif %}
     <br>
         {% if res.user %}
@@ -81,23 +86,17 @@
             }
         </script>
         {% endif %}
-        <h2>Chalkline News</h2>
-        <section>
-            <p>All emailing features have been restored to normal function.</p>
-            <p><b>See all new v5.0.0 features <a href="#developers-log">below</a>!</b></p>
-        </section>
-        <section>
-            <h3>New: Sync iCalendar or Google Calendar with Chalkline!</h3>
-            <p>See all of your games, practices, and umpire duties on the calendar app of your choice!</p>
-            <p>Go to your <a href="{{url_for('main.profile')}}">Profile</a> to get started.</p>
-        </section>
         <section id="supporters">
-            <h3>You can support Chalkline <a target='_blank' href="https://buymeacoffee.com/aidanhurwitz">here!</a></h3>
+            <h3>Enjoying Chalkline? You can support me and Chalkline <a target='_blank' href="https://buymeacoffee.com/aidanhurwitz">here!</a></h3>
             <h3 class="urgent">Thank you to supporters of Chalkline&trade;!</h3>
             <p>Dave Miller</p>
             <p>Chris Riley</p>
             <p>Scott Elsberry</p>
             <p>Luke Radcliffe</p>
+        </section>
+        <section>
+            <p>All emailing features have been restored to normal function.</p>
+            <p><b>See all new v5.0.0 features <a href="#developers-log">below</a>!</b></p>
         </section>
         <section>
             <h3>Find a bug?</h3>
