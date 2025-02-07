@@ -66,7 +66,7 @@ class Team:
         if filters.get('age') is not None:
             criteria.append({'age': filters['age']})
 
-        return [Team.safe(t) for t in Team.col.find({'$and': criteria})]
+        return [Team.safe(t) for t in Team.col.find({'$and': criteria}).sort("teamId")]
     
     @staticmethod
     def create(league, form):
