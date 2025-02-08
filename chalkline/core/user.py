@@ -86,7 +86,7 @@ class User:
             if leagueId not in user['leagues']:
                 raise PermissionError("You do not belong to this league!")
             if check_password_hash(user['pword'], pword):
-                return user
+                return User.mark_active(user)
         raise ValueError("Incorrect Username/Email or Password. Please try again.")
     
     @staticmethod

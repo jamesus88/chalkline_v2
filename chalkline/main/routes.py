@@ -11,14 +11,6 @@ main = Blueprint('main', __name__)
 @main.route("/home")
 def home():
     res = svr.obj()
-    # Welcome back!
-    if res['user']:
-        if not res['user']['active']:
-            user = User.mark_active(res['user'])
-            svr.login(user)
-            res = svr.obj()
-            res['popup'] = f"Welcome back {res['user']['firstName']}! Your account has been marked active for the {res['league']['current_season']} season!"
-
     return render_template("main/home.html", res=res)
 
 @main.route("/signup", methods=["GET", "POST"])

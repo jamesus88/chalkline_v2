@@ -100,6 +100,7 @@ class Team:
     @staticmethod
     def add_coach(teamId, season, userId):
         Team.col.update_one({'teamId': teamId}, {'$push': {f'seasons.{season}.coaches': userId}})
+        User.col.update_one({'userId': userId}, {'$push': {'teams': teamId}})
 
     @staticmethod
     def get_share_link(team):
