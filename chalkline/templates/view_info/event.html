@@ -56,7 +56,7 @@
                         <p>Phone: {{ump.user.phone}}</p>
                         {% if ump.user.userId == res.user.userId %}
                         <form method="post">
-                            <label for="sub">Subsitute with: </label>
+                            <label for="sub">Substitute with: </label>
                             {% if res.user.auth.get('sub_' + event._id) %}
                             <select name="sub" id="sub" required>
                                 <option value="" selected disabled>Pending</option>
@@ -65,7 +65,7 @@
                             {% else %}
                             <select name="sub_user" id="sub" required>
                                 <option value="" selected disabled>Select Umpire</option>
-                                {% for u in all_umpires %}
+                                {% for u in all_users %}
                                     <option value="{{u.userId}}">{{u.firstLast}}</option>
                                 {% endfor %}
                             </select>
@@ -160,9 +160,8 @@
                         <center>
                             <h3>{{pos}}: <select name="{{pos}}_user" id="{{pos}}_user">
                                 <option value="">Open</option>
-                                {{ump.user.userId}}
-                                {% for u in all_umpires %}
-                                    <option value="{{u.userId}}">{{u.firstLast}}</option>
+                                {% for u in all_users if 'umpire' in u.groups.get(res.league.leagueId) %}
+                                    <option value="{{u.userId}}">{{u.fullName}}</option>
                                 {% endfor %}
                                 <script>document.getElementById('{{pos}}_user').value = "{{ump.user.userId}}"</script>
                             </select></h3>
@@ -174,6 +173,16 @@
                                         <option value="{{t.teamId}}">{{t.teamId}}</option>
                                     {% endfor %}
                                     <script>document.getElementById('{{pos}}_team').value = "{{event.umpires.get(pos).team_duty}}"</script>
+                                </select>
+                            </h4>
+
+                            <h4> Coach Req:
+                                <select name="{{pos}}_coach" id="{{pos}}_coach">
+                                    <option value="None">None</option>
+                                    {% for u in all_users if 'coach' in u.groups.get(res.league.leagueId) %}
+                                        <option value="{{u.userId}}">{{u.fullName}}</option>
+                                    {% endfor %}
+                                    <script>document.getElementById('{{pos}}_coach').value = "{{event.umpires.get(pos).coach_req.userId if event.umpires.get(pos).coach_req else None}}"</script>
                                 </select>
                             </h4>
 

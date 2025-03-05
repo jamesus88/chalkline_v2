@@ -361,11 +361,21 @@ class Event:
                 event['umpires'][pos]['team_duty'] = None
             else:
                 event['umpires'][pos]['team_duty'] = form[f'{pos}_team']
+            if form[f'{pos}_coach'] == 'None':
+                event['umpires'][pos]['coach_req'] = None
+            else:
+                event['umpires'][pos]['coach_req'] = form[f'{pos}_coach']
+            
+
         _id = event['_id']
         del event['_id']
         event.pop('league_info')
         event.pop('team_umps')
         event.pop('umpire_full')
+
+
+
+        print(event['umpires'])
 
         Event.col.replace_one({'_id': ObjectId(_id)}, event)
     

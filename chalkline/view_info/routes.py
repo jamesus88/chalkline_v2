@@ -15,7 +15,7 @@ def event(eventId):
     res = svr.obj()
     e = Event.find(eventId)
     e['league_info'] = League.get(e['leagueId'])
-    all_umpires = User.find_groups(res['league'], ['umpire'])
+    all_users = User.find_groups(res['league'], ['umpire', 'coach'])
     edit_view = False
 
     if request.method == 'POST':
@@ -54,7 +54,7 @@ def event(eventId):
         e = Event.find(eventId)
         e['league_info'] = League.get(e['leagueId'])
 
-    return render_template("view_info/event.html", res=res, edit_view=edit_view, event=e, all_umpires=all_umpires)
+    return render_template("view_info/event.html", res=res, edit_view=edit_view, event=e, all_users=all_users)
 
 @view_info.route("/user/<userId>", methods=['GET', 'POST'])
 @view_info.route("/user")
