@@ -65,8 +65,8 @@ class Event:
             'home': form.get('home'),
             'score': [0,0],
             'status': form.get('status'),
-            'visible': True,
-            'locked': False,
+            'visible': True if form.get("visible") else False,
+            'locked': True if form.get("locked") else False,
             'umpires': {},
             'created': now()
         }
