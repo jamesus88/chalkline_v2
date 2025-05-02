@@ -75,7 +75,7 @@ def profile():
             svr.login(user)
 
         elif request.form.get('admin-features'):
-            assert 'admin' in res['user']['groups'], "You do not have permission to access these features."
+            assert 'admin' in res['user']['groups'][res['league']['leagueId']], "You do not have permission to access these features."
             admin = request.form.get('admin-features') == "True"
             if not admin:
                 session['flash'] = "Admin features turned OFF."
@@ -85,6 +85,7 @@ def profile():
 
         elif request.form.get('location'):
             leagueId = request.form.get('location')
+            print(leagueId)
             svr.login(res['user'], leagueId=leagueId)
 
         res = svr.obj()

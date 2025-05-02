@@ -251,7 +251,8 @@
                         document.getElementById('admin-features').value = "{{res.admin}}";
                     </script>
                 {% endif %}
-
+            </form>
+            <form method="post">
                 <label for="location">Location: </label>
                 <select name="location" id="location" onchange="this.form.submit()">
                     {% for loc in res.user.leagues %}
@@ -261,8 +262,8 @@
                 <script>
                     document.getElementById('location').value = "{{res.league.leagueId}}";
                 </script>
-
             </form>
+            
             <a href="{{url_for('main.new_password')}}">Change Password</a> <br><br>
             <form method="post"><button class="action" type="submit" name="logout" value="logout"><b>Sign Out</b></button></form>
         </section>
