@@ -169,3 +169,8 @@ button.disabled:hover {
 .subtle {
     color: var(--subtle);
 }
+.fancy {
+    color: transparent;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    background-clip: text;
+}

@@ -10,7 +10,7 @@
 <main>
     <form method="post">
     <div>
-        <h1>Team Schedule</h1>
+        <h1 class="fancy">Team Schedule</h1>
         <h3>Your teams: {{res.user.teams|join(', ')}}</h3>
         <h3>Currently viewing: <select class="filter" name="team" id="team" onchange="this.form.submit()">
             {% for t in res.user.teams %}

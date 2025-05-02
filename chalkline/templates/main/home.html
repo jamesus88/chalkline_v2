@@ -8,19 +8,14 @@
 <main>
     <center>
         {% if not res.user %}
-        <h1 class="title">Chalkline Baseball</h1>
+        <h1 class="title fancy">Chalkline Baseball</h1>
         <a class="login large-link" href="{{url_for('main.login')}}">Sign In <i class="fa-solid fa-user"></i></a>
         <a href="{{url_for('main.signup')}}">Create Account</a>
         {% else %}
-        <h1>Hello, {{res.user.firstName}}!</h1>
+        <h1 class="fancy">Welcome back, {{res.user.firstName}}!</h1>
             {% if ('coach' in res.user.groups.get(res.league.leagueId) or 'parent' in res.user.groups.get(res.league.leagueId)) and res.user.teams == [] %}
                 <h3 class="error">You have 0 teams linked to your account. Add one to your <a href="{{url_for('main.profile')}}">profile</a>!</h3>
             {% endif %}
-        <section>
-            <h3>New: Sync iCalendar or Google Calendar with Chalkline!</h3>
-            <p>See all of your games, practices, and umpire duties on the calendar app of your choice!</p>
-            <p>Go to your <a href="{{url_for('main.profile')}}">Profile</a> to get started.</p>
-        </section>
         {% endif %}
     <br>
         {% if res.user %}
@@ -93,10 +88,6 @@
             <p>Chris Riley</p>
             <p>Scott Elsberry</p>
             <p>Luke Radcliffe</p>
-        </section>
-        <section>
-            <p>All emailing features have been restored to normal function.</p>
-            <p><b>See all new v5.0.0 features <a href="#developers-log">below</a>!</b></p>
         </section>
         <section>
             <h3>Find a bug?</h3>
@@ -205,6 +196,23 @@
     </center>
     <section id="developers-log">
         <h2>Developer's Log</h2>
+    </section>
+    <section>
+        <div class="split">
+            <div>
+                <p>Added: users can now switch leagues from profile.</p>
+                <p>Added: users can now add new leagues from profile.</p>
+                <p>Added invite links for league managers.</p>
+                <p>Improved login experience for single-league users.</p>
+                <p>Updated login process for multi-league users.</p>
+                <p>Updated sign in page.</p>
+                <p>Bug fixes.</p>
+            </div>
+            <div>
+                <h3>v5.6.0</h3>
+                <h4>May 2 2025</h4>
+            </div>
+        </div>
     </section>
     <section>
         <div class="split">

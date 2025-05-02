@@ -5,9 +5,6 @@ main {
 }
 .title {
     font-size: 4em;
-    color: transparent;
-    background: linear-gradient(90deg, var(--primary), var(--secondary));
-    background-clip: text;
 }
 .split {
     display: flex;
