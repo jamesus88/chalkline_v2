@@ -30,8 +30,10 @@ def signup():
         except (ValueError, AssertionError) as e:
             print(e)
             res['msg'] = e
+
+    all_leagues = League.get_all()
     
-    return render_template("main/create-account.html", res=res)
+    return render_template("main/create-account.html", res=res, all_leagues=all_leagues)
             
 @main.route("/profile", methods=['GET', 'POST'])
 def profile():
@@ -85,7 +87,6 @@ def profile():
 
         elif request.form.get('location'):
             leagueId = request.form.get('location')
-            print(leagueId)
             svr.login(res['user'], leagueId=leagueId)
 
         res = svr.obj()

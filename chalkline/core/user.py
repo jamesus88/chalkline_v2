@@ -227,6 +227,9 @@ class User:
     
     @staticmethod
     def add_league(user, league, form):
+        if league['leagueId'] in user['leagues']:
+            return User.safe(user)
+        
         groups = User.authorize_groups(user, league, form)
         user = User.col.find_one_and_update(
             {'userId': user['userId']}, 

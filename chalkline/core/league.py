@@ -15,6 +15,7 @@ class League:
     @staticmethod
     def get(leagueId):
         league = League.col.find_one({'leagueId': leagueId})
+        if not league: raise ValueError("Error: League does not exist")
         return League.safe(league)
     
     @staticmethod

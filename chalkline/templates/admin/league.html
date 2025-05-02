@@ -7,6 +7,8 @@
 {% block title %}Admin{% endblock title %}
 
 {% block content %}
+<script src="{{url_for('static', filename='share.js')}}" defer></script>
+
 <main>
     <center>
         <h1>Manage League</h1>
@@ -16,6 +18,7 @@
         <center>
             <h2>{{res.league.name}} ({{res.league.abbr}})</h2>
             <h3 class="subtle"><i class="fa-solid fa-id-card"></i> {{res.league.leagueId}}</h3>
+            <button class="action" onclick="copy('{{res.protocol}}://{{res.domain}}{{url_for('invite.add_league', leagueId = res.league.leagueId)}}')">Share League</button>
         </center>
     </section>
 

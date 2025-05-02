@@ -1,0 +1,76 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='view_game/view.css')}}">
+</head>
+
+{% extends "design.html" %}
+
+{% block title %}Add League{% endblock title %}
+
+{% block content %}
+<main>
+<center>
+    <h1>Add League</h1>
+    <h3 class="error">{{res.msg}}</h3>
+
+    <section>
+        <h2>{{league.name}}</h2>
+        <p class="subtle">{{league.leagueId}}</p>
+        <p>Select your groups, enter permission codes if necessary, then click <b>Add League</b></p>
+        <form method="post">
+            <table class="center">
+                <tr>
+                    <td><label for="role-parent">Parent</label></td>
+                    <td><input type="checkbox" name="role-parent" id="parent"></td>
+                </tr>
+                <tr>
+                    <td><label for="role-coach">Coach</label></td>
+                    <td><input type="checkbox" name="role-coach" id="coach" onchange="updateCodes()"></td>
+                </tr>
+                <tr id="coachDisplay">
+                    <td><input type="text" name="coach_code" id="coach_code" placeholder="League Coach Code"></td>
+                </tr>
+                <tr>
+                    <td><label for="role-umpire">Umpire</label></td>
+                    <td><input type="checkbox" name="role-umpire" id="umpire" onchange="updateCodes()"></td>
+                </tr>
+                <tr id="umpireDisplay">
+                    <td><input type="text" name="umpire_code" id="umpire_code" placeholder="League Umpire Code"></td>
+                </tr>
+                <tr>
+                    <td><label for="role-director">Director</label></td>
+                    <td><input type="checkbox" name="role-director" id="director" onchange="updateCodes()"></td>
+                </tr>
+                <tr id="directorDisplay">
+                    <td><input type="text" name="director_code" id="director_code" placeholder="League Director Code"></td>
+                </tr>
+            </table>
+            <script>
+                const coachCode = document.getElementById('coachDisplay');
+                const coachRole = document.getElementById('coach');
+                const umpireCode = document.getElementById('umpire_code');
+                const umpireRole = document.getElementById('umpire');
+                const directorCode = document.getElementById('director_code');
+                const directorRole = document.getElementById('director');
+
+                function updateCodes() {
+                    coachCode.style.display = 'none';
+                    if (coachRole.checked) {coachCode.style.display = 'table-row'}
+
+                    umpireCode.style.display = 'none';
+                    if (umpireRole.checked) {umpireCode.style.display = 'table-row'}
+
+                    directorCode.style.display = 'none';
+                    if (directorRole.checked) {directorCode.style.display = 'table-row'}
+                }
+
+                updateCodes()
+
+            </script>
+            <button class="action" name="addLeague" value="1">Add League</button>
+        </form>
+    </section>
+    
+</center>
+</main>
+
+{% endblock content %}

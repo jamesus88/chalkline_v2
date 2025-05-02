@@ -19,7 +19,10 @@
                     <tr>
                         <td><label for="league">League <b class="error">*</b></label></td>
                         <td><select name="league" id="league" required>
-                            <option value="Sarasota" selected>Sarasota</option>
+                            <option value="" disabled selected>Select</option>
+                            {% for l in all_leagues %}
+                                <option value="{{l.leagueId}}">{{l.name}}</option>
+                            {% endfor %}
                         </select></td>
                     </tr>
                     <tr>

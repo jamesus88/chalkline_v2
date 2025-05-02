@@ -64,8 +64,6 @@ def substitute(eventId, auth):
             User.remove_sub_req(req_user, event)
             return redirect(url_for('main.home'))
 
-
-
     return render_template("umpire/substitute.html", res=res, req_user=req_user, event=event, pos=pos)
 
 @invite.post("/daily-reminders")
@@ -95,3 +93,19 @@ def daily_reminders(chalkline_auth=None):
     print("Password reset links marked invalid.")
     
     return jsonify("Success!")
+
+@invite.route("/add-league/<leagueId>", methods=['GET', 'POST'])
+def add_league(leagueId):
+    mid = svr.authorized_only(set_next_url=request.url)
+    if mid: return mid
+    res = svr.obj()
+
+    league = League.get(leagueId)
+
+    if request.method == 'POST':
+        user = User.add_league(res['user'], league, request.form)
+        svr.login(user, league['leagueId'])
+        return redirect(url_for('main.home'))
+
+
+    return render_template("main/add-league.html", res=res, league=league)
