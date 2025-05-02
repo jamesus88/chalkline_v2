@@ -80,8 +80,7 @@ class User:
             return None
     
     @staticmethod
-    def authenticate(email_or_userId, pword, leagueId):
-        user = User.get_user(email=email_or_userId) or User.get_user(userId=email_or_userId)
+    def authenticate(user, pword, leagueId):
         if user:
             if leagueId not in user['leagues']:
                 raise PermissionError("You do not belong to this league!")

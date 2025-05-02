@@ -105,14 +105,27 @@ def login(next=None):
     if mid: return mid
 
     res = svr.obj()
+    ask_league = False
 
     if request.method == 'POST':
         email = request.form['email'].lower()
         pword = request.form['pword']
-        leagueId = request.form['league']
+        leagueId = request.form.get('league')
         
         try:
-            user = User.authenticate(email, pword, leagueId)
+            user = User.get_user(email=email) or User.get_user(userId=email)
+
+            if len(user['leagues']) > 1 and not leagueId:
+                res['pword_attempt'] = pword
+                res['email_attempt'] = email
+                ask_league = True
+                return render_template("main/login.html", res=res, all_leagues=user['leagues'], ask_league=ask_league)
+            elif len(user['leagues']) == 1:
+                leagueId = user['leagues'][0]
+            elif len(user['leagues']) == 0:
+                raise PermissionError("You are not a part of any league. Join a league to login!")
+
+            user = User.authenticate(user, pword, leagueId)
             try:
                 svr.login(user, leagueId, 'admin' in user['groups'][leagueId])
                 User.set_last_login(user)
@@ -128,8 +141,7 @@ def login(next=None):
         except (ValueError, PermissionError) as e:
             res['msg'] = e
     
-    all_leagues = League.get_all()
-    return render_template("main/login.html", res=res, all_leagues=all_leagues)
+    return render_template("main/login.html", res=res, ask_league=ask_league)
 
 @main.route("/send-reset", methods=['GET', 'POST'])
 def send_reset():

@@ -11,20 +11,28 @@
         <section>
             <center>
                 <h1>Sign In</h1>
-                <label for="league">League</label>
-                <select name="league" id="league" required>
-                    <option value="" selected disabled>Select</option>
-                    {% for l in all_leagues %}
-                        <option value="{{l.leagueId}}" selected>{{l.name}}</option>
-                    {% endfor %}
-                </select>
+
+                
                 <label class="sign-in" for="email">Email or Username</label>
-                <input type="text" name="email" id="email" required>
+                <input type="text" name="email" id="email" {% if ask_league %} value="{{res.email_attempt}}"{% endif %} required>
                 <label class="sign-in" for="userId">Password</label>
-                <input type="password" name="pword" id="pword" required>
+                <input type="password" name="pword" id="pword" {% if ask_league %} value="{{res.pword_attempt}}"{% endif %} required>
+                
+                {% if ask_league %}
+                <p class="error">Please choose a league to login with:</p>
+                    <label for="league">League</label>
+                    <select name="league" id="league" required>
+                        <option value="" selected disabled>Select</option>
+                        {% for l in all_leagues %}
+                            <option value="{{l}}">{{l}}</option>
+                        {% endfor %}
+                    </select>
+                {% endif %}
+                <p class="subtle">In multiple leagues? Sign in first to choose a league.</p>
                 <button class="button-sign-in" type="submit">Sign In</button>
                 <h3 class='error'>{{res.msg}}</h3>
                 <a href="{{url_for('main.signup')}}">Create Account</a>
+                <br>
             </center>
         </section>
         <section class="split">

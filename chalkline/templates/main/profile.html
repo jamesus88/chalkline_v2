@@ -252,7 +252,7 @@
                     </script>
                 {% endif %}
             </form>
-            <form method="post">
+            <form method="post" id="session">
                 <label for="location">Location: </label>
                 <select name="location" id="location" onchange="this.form.submit()">
                     {% for loc in res.user.leagues %}

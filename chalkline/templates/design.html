@@ -87,6 +87,7 @@
             <a href="{{url_for('main.signup')}}">Create Account</a>
             <a class="sign-in" href="{{url_for('main.login')}}">Sign In</a>
             {% else %}
+            <a href="{{url_for('main.profile', _anchor="session")}}">{{res.league.name}}</a>
             <a class="sign-in" href="{{url_for('main.profile')}}">Account</a>
             {% endif %}
             <a href="#" class="menu-bars" onclick="showMobileNav()"><i class="fa-solid fa-bars"></i></a>
