@@ -210,6 +210,7 @@ class User:
     
     @staticmethod
     def authorize_groups(user, league, form):
+        user['groups'][league['leagueId']] = []
         if 'role-coach' in form:
             assert league['auth']['coach_code'] == form.get('coach_code'), "Error: League Coach Code is invalid."
             user['groups'][league['leagueId']].append('coach')
@@ -227,12 +228,17 @@ class User:
     @staticmethod
     def add_league(user, league, form):
         groups = User.authorize_groups(user, league, form)
-        user = User.col.find_one_and_update({'userId': user['userId']}, {'$push': {'leagues': league['leagueId']}, '$set': {'groups': groups}}, return_document=True)
+        user = User.col.find_one_and_update(
+            {'userId': user['userId']}, 
+            {'$push': {'leagues': league['leagueId']}, '$set': {'groups': groups, f'permissions.{league['leagueId']}': {}}}, return_document=True)
         return User.safe(user)
     
     @staticmethod
     def remove_league(userId, leagueId):
-        user = User.col.find_one_and_update({'userId': userId}, {'$pull': {'leagues': leagueId}}, return_document=True)
+        user = User.col.find_one_and_update(
+            {'userId': userId}, 
+            {'$pull': {'leagues': leagueId}, "$unset": {f'groups.{leagueId}': 0, f"permissions.{leagueId}": 0}}, 
+            return_document=True)
         return User.safe(user)
 
     @staticmethod

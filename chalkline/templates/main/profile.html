@@ -158,7 +158,7 @@
                         <tr>
                             <td>{{loc}}</td>
                             <td><button id="removeLoc" name="removeLoc" value="{{loc}}" 
-                                {% if res.user.leagues|length == 1 %}
+                                {% if loc == res.league.leagueId %}
                                 class="action disabled"
                                 disabled
                                 {% else %}
@@ -230,7 +230,7 @@
                     updateCodes()
 
                 </script>
-                <button class="action disabled" name="addLeague" value="1" disabled>Add League</button>
+                <button class="action" name="addLeague" value="1">Add League</button>
             </form>
 
         </section>
