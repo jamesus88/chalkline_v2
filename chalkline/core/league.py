@@ -2,14 +2,13 @@ from chalkline.collections import leagueData, teamData, venueData, directorData
 from chalkline.core import now, _safe
 from chalkline.core.user import User
 from chalkline.core.team import Team
-from chalkline import SEASON
 
 class League:
     col = leagueData
 
     @staticmethod
     def safe(league):
-        league['teams'] = Team.get_league_teams(league['leagueId'])
+        league['teams'] = Team.get_league_teams(league)
         return _safe(league)
 
     @staticmethod
@@ -27,7 +26,7 @@ class League:
         league = {
             'leagueId': form['leagueId'],
             'name': form['name'],
-            'current_season': SEASON,
+            'current_season': form['current_season'],
             'abbr': form['abbr'],
             'venues': [],
             'age_groups': [],

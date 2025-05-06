@@ -5,7 +5,6 @@ from chalkline.core.user import User
 from chalkline.core.team import Team
 import chalkline.core.mailer as mailer
 from flask import session, render_template
-from chalkline import SEASON
 
 class Filter:
     @staticmethod
@@ -16,7 +15,7 @@ class Filter:
             'end': now() + timedelta(days=200),
             'umpires_only': False,
             'team': None,
-            'season': SEASON,
+            'season': None,
             'umpire': None
         }
 
@@ -140,6 +139,9 @@ class Event:
     def get(league, user=None, team=None, check_user_teams=True, filters=Filter.default(), add_criteria = {}, safe=True):
         criteria = [{'leagueId': league['leagueId']}, add_criteria]
         umpire = None
+
+        # set default season to current league season
+        if not filters['season']: filters['season'] = league['current_season']
 
         if filters.get('season'):
             criteria.append({'season': filters['season']})

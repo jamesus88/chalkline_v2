@@ -4,8 +4,6 @@ import os, datetime
 
 mail = Mail()
 
-DEFAULT_SEASON = "Fall 2024"
-
 PROTOCOL = os.environ.get('PROTOCOL')
 DOMAIN = os.environ.get('DOMAIN')
 APP_NAME = os.environ.get('APP_NAME')
@@ -13,7 +11,6 @@ VERSION = os.environ.get('VERSION')
 COPYRIGHT = os.environ.get('COPYRIGHT')
 CHALKLINE_AUTH = os.environ.get('')
 
-SEASON = os.environ.get('SEASON', DEFAULT_SEASON)
 
 def create_app():
     app = Flask(__name__)

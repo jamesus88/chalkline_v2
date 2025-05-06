@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from chalkline.core.user import User
 from chalkline.core.league import Venue
 from chalkline.core import ObjectId, _safe, now
-from chalkline import SEASON
 
 class Filter:
     @staticmethod
@@ -11,7 +10,7 @@ class Filter:
         return {
             'start': now() - timedelta(hours=2),
             'end': now() + timedelta(days=200),
-            'season': SEASON
+            'season': None
         }
 
     @staticmethod
@@ -46,7 +45,7 @@ class Shift:
             'venueId': form['venueId'],
             'start_date': datetime.strptime(form.get('start-date'), '%Y-%m-%dT%H:%M'),
             'end_date': datetime.strptime(form.get('start-date'), '%Y-%m-%dT%H:%M'),
-            'season': SEASON,
+            'season': league['current_season'],
             'director': None,
         }
         return shift
@@ -69,6 +68,8 @@ class Shift:
     @staticmethod
     def get(league, user=None, filters=Filter.default(), add_criteria={}):
         criteria = [{'leagueId': league['leagueId']}, add_criteria]
+
+        if not filters['season']: filters['season'] = league['current_season']
 
         if filters.get('start'):
             criteria.append({'start_date': {'$gte': filters['start']}})

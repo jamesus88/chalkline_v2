@@ -1,6 +1,6 @@
 from chalkline.collections import teamData
 from chalkline.core import _safe
-from chalkline import PROTOCOL, DOMAIN, SEASON
+from chalkline import PROTOCOL, DOMAIN
 from chalkline.core.user import User
 
 class Team:
@@ -11,7 +11,7 @@ class Team:
         def default():
             return {
                 'age': None,
-                'season': SEASON
+                'season': None
             }
 
         @staticmethod
@@ -59,9 +59,10 @@ class Team:
         return user
     
     @staticmethod
-    def get_league_teams(leagueId, filters=Filter.default()):
+    def get_league_teams(league, filters=Filter.default()):
+        if not filters['season']: filters['season'] = league['current_season']
 
-        criteria = [{'leagueId': leagueId}, {f'seasons.{filters['season']}': {'$exists': True}}]
+        criteria = [{'leagueId': league['leagueId']}, {f'seasons.{filters['season']}': {'$exists': True}}]
         
         if filters.get('age') is not None:
             criteria.append({'age': filters['age']})

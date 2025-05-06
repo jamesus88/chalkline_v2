@@ -18,7 +18,7 @@ def event_data():
 
     res = svr.obj()
     filters = Filter.default()
-    res['league']['teams'] = Team.get_league_teams(res['league']['leagueId'])
+    res['league']['teams'] = Team.get_league_teams(res['league'])
 
     events = Event.get(res['league'], filters=filters)
 
@@ -67,7 +67,7 @@ def add_event():
 
     res = svr.obj()
     res['league']['ump_positions'] = Event.get_all_ump_positions()
-    res['league']['teams'] = Team.get_league_teams(res['league']['leagueId'])
+    res['league']['teams'] = Team.get_league_teams(res['league'])
 
     if request.method == 'POST':
         try:
@@ -139,7 +139,7 @@ def team_data():
             res['msg'] = "Teams updated."
 
 
-    teams = Team.get_league_teams(res['league']['leagueId'], filters=filters)
+    teams = Team.get_league_teams(res['league'], filters=filters)
     return render_template("admin/team-data.html", res=res, teams=teams, filters=filters)
     
 @admin.route("/add-team", methods=['GET', 'POST'])
@@ -189,7 +189,7 @@ def announcement():
     if mw: return mw
 
     res = svr.obj()
-    all_teams = Team.get_league_teams(res['league']['leagueId'])
+    all_teams = Team.get_league_teams(res['league'])
 
     if request.method == 'POST':
         content = request.form.get("msg")
