@@ -107,5 +107,9 @@ def add_league(leagueId):
         svr.login(user, league['leagueId'])
         return redirect(url_for('main.home'))
 
+    res['loaded_codes'] = {}
+    res['loaded_codes']['umpire'] = request.args.get('umpire-code', '')
+    res['loaded_codes']['coach'] = request.args.get('coach-code', '')
+    res['loaded_codes']['director'] = request.args.get('director-code', '')
 
     return render_template("main/add-league.html", res=res, league=league)

@@ -21,7 +21,7 @@
                         <td><select name="league" id="league" required>
                             <option value="" disabled selected>Select</option>
                             {% for l in all_leagues %}
-                                <option value="{{l.leagueId}}">{{l.name}}</option>
+                                <option value="{{l.leagueId}}" {% if res.loaded_codes.league == l.leagueId %}selected{% endif %}>{{l.name}}</option>
                             {% endfor %}
                         </select></td>
                     </tr>
@@ -64,21 +64,21 @@
                         <td><input type="checkbox" name="role-coach" id="coach" onchange="updateCodes()"></td>
                     </tr>
                     <tr id="coachDisplay">
-                        <td><input type="text" name="coach_code" id="coach_code" placeholder="League Coach Code"></td>
+                        <td><input type="text" name="coach_code" id="coach_code" value="{{res.loaded_codes.coach}}" placeholder="League Coach Code"></td>
                     </tr>
                     <tr>
                         <td><label for="role-umpire">Umpire</label></td>
                         <td><input type="checkbox" name="role-umpire" id="umpire" onchange="updateCodes()"></td>
                     </tr>
                     <tr id="umpireDisplay">
-                        <td><input type="text" name="umpire_code" id="umpire_code" placeholder="League Umpire Code"></td>
+                        <td><input type="text" name="umpire_code" id="umpire_code" value="{{res.loaded_codes.umpire}}" placeholder="League Umpire Code"></td>
                     </tr>
                     <tr>
                         <td><label for="role-director">Director</label></td>
                         <td><input type="checkbox" name="role-director" id="director" onchange="updateCodes()"></td>
                     </tr>
                     <tr id="directorDisplay">
-                        <td><input type="text" name="director_code" id="director_code" placeholder="League Director Code"></td>
+                        <td><input type="text" name="director_code" id="director_code" value="{{res.loaded_codes.director}}" placeholder="League Director Code"></td>
                     </tr>
                 </table>
                 <script>
@@ -88,6 +88,10 @@
                     const umpireRole = document.getElementById('umpire');
                     const directorCode = document.getElementById('director_code');
                     const directorRole = document.getElementById('director');
+
+                    if ('{{res.loaded_codes.coach}}' != '') {coachRole.checked = true}
+                    if ('{{res.loaded_codes.umpire}}' != '') {umpireRole.checked = true}
+                    if ('{{res.loaded_codes.director}}' != '') {directorRole.checked = true}
 
                     function updateCodes() {
                         coachCode.style.display = 'none';

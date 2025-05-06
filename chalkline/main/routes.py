@@ -32,6 +32,12 @@ def signup():
             res['msg'] = e
 
     all_leagues = League.get_all()
+
+    res['loaded_codes'] = {}
+    res['loaded_codes']['league'] = request.args.get('league', '')
+    res['loaded_codes']['umpire'] = request.args.get('umpire-code', '')
+    res['loaded_codes']['coach'] = request.args.get('coach-code', '')
+    res['loaded_codes']['director'] = request.args.get('director-code', '')
     
     return render_template("main/create-account.html", res=res, all_leagues=all_leagues)
             

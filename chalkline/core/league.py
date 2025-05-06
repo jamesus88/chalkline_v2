@@ -1,4 +1,4 @@
-from chalkline.collections import leagueData, teamData, venueData, directorData
+from chalkline.collections import leagueData, venueData, directorData
 from chalkline.core import now, _safe
 from chalkline.core.user import User
 from chalkline.core.team import Team
