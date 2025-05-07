@@ -51,7 +51,7 @@
                 <section>
                     {% if ump.user %}
                     <center>
-                        <h3>{{pos}}: {{ump.user.firstLast}}</h3>
+                        <h3>{{pos}}: {{ump.user.fullName}}</h3>
                         <p>Email: {{ump.user.email}}</p>
                         <p>Phone: {{ump.user.phone}}</p>
                         {% if ump.user.userId == res.user.userId %}
@@ -65,8 +65,8 @@
                             {% else %}
                             <select name="sub_user" id="sub" required>
                                 <option value="" selected disabled>Select Umpire</option>
-                                {% for u in all_users %}
-                                    <option value="{{u.userId}}">{{u.firstLast}}</option>
+                                {% for u in all_users if 'umpire' in u.groups.get(res.league.leagueId) %}
+                                    <option value="{{u.userId}}">{{u.fullName}}</option>
                                 {% endfor %}
                             </select>
                             <button name="substitute" value="{{pos}}" class="action">Substitute</button>
@@ -86,7 +86,7 @@
 
                     {% if ump.coach_req %}
                     <center>
-                        <h3>Coach Request: {{ump.coach_req.firstLast}}</h3>
+                        <h3>Coach Request: {{ump.coach_req.fullName}}</h3>
                         <p>Email: {{ump.coach_req.email}}</p>
                         <p>Phone: {{ump.coach_req.phone}}</p>
                     </center>
