@@ -18,7 +18,7 @@ def schedule():
         if request.form.get('add_game'):
             eventId, pos = request.form['add_game'].split('_')
             try:
-                res['msg'] = Event.add_umpire(eventId, res['user'], pos)
+                res['msg'] = Event.add_umpire(res['league'], eventId, res['user'], pos)
             except (ValueError, PermissionError) as e:
                 res['msg'] = e
 

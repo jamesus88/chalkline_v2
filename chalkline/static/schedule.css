@@ -60,7 +60,7 @@ button.schedule-action:hover {
 input.admin, select.admin {
     width: fit-content;
 }
-input.admin[type=number] {
+input.admin.number {
     width: 50px;
 }
 h1, h2, h3 {

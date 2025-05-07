@@ -46,6 +46,27 @@ class Filter:
 class Event:
     col = eventData
 
+    # default keys for updating
+    def default():
+        return {
+            'date': None,
+            'duration': 0,
+            'season': "",
+            'leagueId': "",
+            'venueId': "",
+            'field': 0,
+            'type': 'Game',
+            'age': "",
+            'away': None,
+            'home': None,
+            'score': [0,0],
+            'status': "",
+            'visible': False,
+            'locked': True,
+            'umpires': {},
+            'created': None
+        }
+
     @staticmethod
     def create(league, form):
         form = dict(form)
@@ -54,6 +75,7 @@ class Event:
 
         event = {
             'date': datetime.strptime(form.get('date'), '%Y-%m-%dT%H:%M'),
+            'duration': float(form.get('duration')),
             'season': league['current_season'],
             'leagueId': league['leagueId'],
             'venueId': form.get('venueId'),
@@ -252,10 +274,9 @@ class Event:
     
     
     @staticmethod
-    def add_umpire(eventId, user, pos):
+    def add_umpire(league, eventId, user, pos):
         # check league is open
-        umpire_add = leagueData.find_one({'leagueId': session['league']['leagueId']})['umpire_add']
-        if not umpire_add:
+        if not league['umpire_add']:
             raise ValueError("Sorry, signups are closed right now. Check again later.")
 
         event = Event.col.find_one({'_id': ObjectId(eventId)})
@@ -273,7 +294,13 @@ class Event:
         if not User.check_permissions_to_add(umpire, user):
             raise PermissionError("You are not authorized to add this game!")
         
-        if umpire.get("coach_req") is not None:
+        # check availability
+        all_events = Event.get(league, user)
+        for e in all_events:
+            if e['date'] <= event['date'] < e['date'] + timedelta(hours=event['duration']):
+                raise PermissionError(f"Error: conflict found, you are already scheduled during this time!")
+        
+        if umpire.get("coach_req"):
             coach = User.get_user(userId=umpire["coach_req"])
             msg = mailer.ChalklineEmail(
                 "Umpire Request Fulfilled!",
@@ -343,10 +370,17 @@ class Event:
     @staticmethod
     def update(event, form):
         form = dict(form)
+        _id = event['_id']
+
+        # remove any unnecessary loaded info
+        keys = set(Event.default().keys())
+        event = {k: event[k] for k in keys}
+
         if form.get('away') == 'None': form['away'] = None
         if form.get('home') == 'None': form['home'] = None
 
         event['date'] = datetime.strptime(form['date'], "%Y-%m-%dT%H:%M")
+        event['duration'] = float(form['duration'])
         event['venueId'] = form['venueId']
         event['field'] = int(form['field'])
         event['age'] = form['age']
@@ -354,6 +388,7 @@ class Event:
         event['home'] = form['home']
         event['status'] = form['status']
         event['visible'] = form.get('visible') == 'on'
+        event['locked'] = form.get('locked') == 'on'
         for pos in event['umpires']:
             if form[f"{pos}_user"] == '':
                 event['umpires'][pos]['user'] = None
@@ -368,16 +403,6 @@ class Event:
             else:
                 event['umpires'][pos]['coach_req'] = form[f'{pos}_coach']
             
-
-        _id = event['_id']
-        del event['_id']
-        event.pop('league_info')
-        event.pop('team_umps')
-        event.pop('umpire_full')
-
-
-
-        print(event['umpires'])
 
         Event.col.replace_one({'_id': ObjectId(_id)}, event)
     

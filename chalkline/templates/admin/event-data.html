@@ -68,13 +68,13 @@
                             <button name="lock" value="{{e._id}}" class="schedule-action"><i class="fa-solid fa-unlock"></i></button>
                         {% endif %}
                     </td>
-                    <td><input class="admin" type="datetime-local" name="{{e._id}}_date" id="date" value="{{e.date.isoformat()[0:16]}}"></td>
+                    <td><input class="admin" type="datetime-local" name="{{e._id}}_date" id="date" value="{{e.date.isoformat()[0:16]}}"> : <input class="admin number" type="text" pattern="([0-9]*[.])?[0-9]+" name="{{e._id}}_duration" id="field" value="{{e.duration}}"> hrs</td>
                     <td><select class="admin" name="{{e._id}}_venueId" id="{{e._id}}_venueId">
                         {% for v in res.league.venues %}
                             <option value="{{v}}">{{v}}</option>
                         {% endfor %}
                     </select></td>
-                    <td><input class="admin" type="number" name="{{e._id}}_field" id="field" value="{{e.field}}"></td>
+                    <td><input class="admin number" type="number" name="{{e._id}}_field" id="field" value="{{e.field}}"></td>
                     <td><select class="admin" name="{{e._id}}_age" id="{{e._id}}_age">
                         {% for a in res.league.age_groups %}
                             <option value="{{a}}">{{a}}</option>

@@ -26,13 +26,18 @@ class Admin:
             # formatting
             date_attrs = ['date', 'start_date', 'end_date']
             int_attrs = ['field']
+            float_attrs = ['duration']
             multi_attrs = ['groups', 'permissions']
             league_specific = ['groups', 'permissions']
+
+            if value == "None": value = None
 
             if attr in date_attrs:
                 value = datetime.strptime(value, "%Y-%m-%dT%H:%M")
             elif attr in int_attrs:
                 value = int(value)
+            elif attr in float_attrs:
+                value = float(value)
             elif attr in multi_attrs:
                 value = form.getlist(key)
 
