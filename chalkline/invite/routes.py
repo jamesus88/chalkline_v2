@@ -55,7 +55,7 @@ def substitute(eventId, auth):
                     recipients=[req_user['email']]
                 )
                 mailer.sendMail(msg)
-            except PermissionError as e:
+            except (PermissionError, ValueError) as e:
                 res['msg'] = e
             else:
                 return redirect(url_for('main.home'))
