@@ -436,16 +436,13 @@ class Event:
                 users.append(ump['user'])
 
         return users
-
+    
     @staticmethod
-    def create_reminder(league, user):
+    def get_roles(league, user):
         filters = Filter.default()
         filters['start'] = now()
         filters['end'] = filters['start'] + timedelta(days=7)
         events = Event.get(league, user, filters=filters)
-
-        if len(events) < 1:
-            return None
         
         for e in events:
             e['user_role'] = ""
@@ -458,6 +455,15 @@ class Event:
                 e['user_role'] = "Home team"
             elif e['away'] in user['teams']:
                 e['user_role'] = "Away team"
+
+        return events
+
+    @staticmethod
+    def create_reminder(league, user):
+        events = Event.get_roles(league, user)
+
+        if len(events) < 1:
+            return None
             
         msg = mailer.ChalklineEmail(
             subject="Weekly Reminder from Chalkline", 

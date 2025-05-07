@@ -1,6 +1,7 @@
 from flask import render_template, redirect, url_for, session, request, Blueprint
 from chalkline.core import server as svr
 from chalkline.core.user import User
+from chalkline.core.events import Event
 from chalkline.core.team import Team
 from chalkline.core.league import League
 from chalkline.core import mailer
@@ -11,7 +12,11 @@ main = Blueprint('main', __name__)
 @main.route("/home")
 def home():
     res = svr.obj()
-    return render_template("main/home.html", res=res)
+    upcoming_events = []
+    if res['user']:
+        upcoming_events = Event.get_roles(res['league'], res['user'])
+
+    return render_template("main/home.html", res=res, upcoming_events=upcoming_events)
 
 @main.route("/signup", methods=["GET", "POST"])
 def signup():
