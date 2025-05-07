@@ -290,29 +290,6 @@ class User:
                     if perm not in user['permissions'][leagueId]:
                         return False
         return True
-
-    @staticmethod
-    def request_sub(user, event, pos, subId):
-        substitute = User.get_user(userId=subId)
-
-        if not User.check_permissions_to_add(event['umpires'][pos], substitute):
-            raise ValueError("This user does not have permission to take this position.")
-        
-        h = str(uuid4())
-        user = User.col.find_one_and_update({'userId': user['userId'], f"auth.sub_{event['_id']}": {'$exists': False}}, {"$set": {f"auth.sub_{event['_id']}": h}}, return_document=True)
-        if user:
-            user = User.safe(user)
-        else:
-            raise ValueError("A request has already been sent by you for this game.")
-
-        msg = mailer.ChalklineEmail(
-            subject=f"Substitute Request from {user['firstLast']}",
-            recipients=[substitute['email']],
-            html=render_template("emails/substitute-req.html", user=user, event=event, pos=pos, auth=h)
-        )
-        mailer.sendMail(msg)
-
-        return user, substitute
     
     @staticmethod
     def remove_sub_req(user, event):

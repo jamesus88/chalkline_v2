@@ -5,6 +5,7 @@ from chalkline.core.user import User
 from chalkline.core.team import Team
 import chalkline.core.mailer as mailer
 from flask import session, render_template
+from uuid import uuid4
 
 class Filter:
     @staticmethod
@@ -272,6 +273,14 @@ class Event:
 
         return event
     
+    @staticmethod
+    def check_availability(league, event, user):
+        all_events = Event.get(league, user)
+        for e in all_events:
+            if e['date'] <= event['date'] < e['date'] + timedelta(hours=event['duration']):
+                return False
+                
+        return True
     
     @staticmethod
     def add_umpire(league, eventId, user, pos):
@@ -292,13 +301,12 @@ class Event:
         
         # check permissions
         if not User.check_permissions_to_add(umpire, user):
-            raise PermissionError("You are not authorized to add this game!")
+            raise PermissionError("Error: you are not authorized to add this game!")
         
         # check availability
-        all_events = Event.get(league, user)
-        for e in all_events:
-            if e['date'] <= event['date'] < e['date'] + timedelta(hours=event['duration']):
-                raise PermissionError(f"Error: conflict found, you are already scheduled during this time!")
+        if not Event.check_availability(league, event, user):
+            raise PermissionError("Error: you are already scheduled during this time! (conflict found)")
+        
         
         if umpire.get("coach_req"):
             coach = User.get_user(userId=umpire["coach_req"])
@@ -315,6 +323,35 @@ class Event:
         Event.col.update_one({'_id': ObjectId(eventId)}, {'$set': {f'umpires.{pos}.user': user['userId']}})
         print(f"{user['userId']} added {pos} duty ({eventId}).")
         return "Game added!"
+    
+    @staticmethod
+    def request_sub(league, user, event, pos, subId):
+        substitute = User.get_user(userId=subId)
+
+        # check permissions
+        if not User.check_permissions_to_add(event['umpires'][pos], substitute):
+            raise ValueError("This user does not have permission to take this position.")
+        
+        # check availability
+        if not Event.check_availability(league, event, substitute):
+            raise ValueError("This user is already scheduled at this time (conflict found).")
+
+        
+        h = str(uuid4())
+        user = User.col.find_one_and_update({'userId': user['userId'], f"auth.sub_{event['_id']}": {'$exists': False}}, {"$set": {f"auth.sub_{event['_id']}": h}}, return_document=True)
+        if user:
+            user = User.safe(user)
+        else:
+            raise ValueError("A request has already been sent by you for this game.")
+
+        msg = mailer.ChalklineEmail(
+            subject=f"Substitute Request from {user['firstLast']}",
+            recipients=[substitute['email']],
+            html=render_template("emails/substitute-req.html", user=user, event=event, pos=pos, auth=h)
+        )
+        mailer.sendMail(msg)
+
+        return user, substitute
     
     @staticmethod
     def remove_umpire(eventId, pos, user):

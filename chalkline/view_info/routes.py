@@ -41,7 +41,7 @@ def event(eventId):
             sub = request.form['sub_user']
             pos = request.form['substitute']
             try:
-                user, req_user = User.request_sub(res['user'], e, pos, sub)
+                user, req_user = Event.request_sub(res['league'], res['user'], e, pos, sub)
             except ValueError as e:
                 res['msg'] = e
             else:
