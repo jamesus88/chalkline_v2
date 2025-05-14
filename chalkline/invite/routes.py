@@ -47,7 +47,7 @@ def substitute(eventId, auth):
     if request.method == "POST":
         if request.form.get('accept'):
             try:
-                Event.substitute(event, pos, res['user'])
+                Event.substitute(res['league'], event, pos, res['user'])
                 User.remove_sub_req(req_user, event)
                 msg = mailer.ChalklineEmail(
                     subject="Substitute Request Fulfilled!",

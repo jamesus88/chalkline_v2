@@ -456,12 +456,15 @@ class Event:
         ]
     
     @staticmethod
-    def substitute(event, pos, user):
+    def substitute(league, event, pos, user):
         ump = event['umpires'][pos]
-        if User.check_permissions_to_add(ump, user):
-            Event.col.update_one({'_id': ObjectId(event['_id'])}, {'$set': {f'umpires.{pos}.user': user['userId']}})
+        if not User.check_permissions_to_add(ump, user):
+            raise PermissionError("Error: you do not have permission to add this game!")
+        elif not Event.check_availability(league, event, user):
+            raise PermissionError("Error: you are already scheduled during this time (conflict found).")
         else:
-            raise PermissionError("You do not have permission to add this game!")
+            Event.col.update_one({'_id': ObjectId(event['_id'])}, {'$set': {f'umpires.{pos}.user': user['userId']}})
+            
 
     @staticmethod
     def get_users_in_event(e):
