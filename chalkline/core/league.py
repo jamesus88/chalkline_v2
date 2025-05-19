@@ -37,6 +37,7 @@ class League:
             },
             'active': True,
             'umpire_add': False,
+            'require_perm': True,
             'coach_add': True,
             'created': now()
         }

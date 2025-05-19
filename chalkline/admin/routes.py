@@ -177,6 +177,8 @@ def manage_league():
             League.update_codes(res['league'], request.form)
         elif request.form.get('toggleUmpireAdd'):
             Admin.toggle_perm(res['league'], 'umpire_add')
+        elif request.form.get('toggleReqPerm'):
+            Admin.toggle_perm(res['league'], 'require_perm')
 
         svr.login(res['user'], res['league']['leagueId'])
         res = svr.obj()

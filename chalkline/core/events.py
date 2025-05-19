@@ -300,7 +300,7 @@ class Event:
             raise ValueError('Position is not empty!')
         
         # check permissions
-        if not User.check_permissions_to_add(umpire, user):
+        if league['require_perm'] and not User.check_permissions_to_add(umpire, user):
             raise PermissionError("Error: you are not authorized to add this game!")
         
         # check availability
@@ -329,7 +329,7 @@ class Event:
         substitute = User.get_user(userId=subId)
 
         # check permissions
-        if not User.check_permissions_to_add(event['umpires'][pos], substitute):
+        if league['require_perm'] and not User.check_permissions_to_add(event['umpires'][pos], substitute):
             raise ValueError("This user does not have permission to take this position.")
         
         # check availability
@@ -458,7 +458,7 @@ class Event:
     @staticmethod
     def substitute(league, event, pos, user):
         ump = event['umpires'][pos]
-        if not User.check_permissions_to_add(ump, user):
+        if league['require_perm'] and not User.check_permissions_to_add(ump, user):
             raise PermissionError("Error: you do not have permission to add this game!")
         elif not Event.check_availability(league, event, user):
             raise PermissionError("Error: you are already scheduled during this time (conflict found).")
