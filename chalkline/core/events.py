@@ -1,6 +1,6 @@
 from chalkline.collections import eventData, leagueData
 from datetime import datetime, timedelta
-from chalkline.core import now, _safe, ObjectId, localize
+from chalkline.core import now, _safe, ObjectId
 from chalkline.core.user import User
 from chalkline.core.team import Team
 import chalkline.core.mailer as mailer
@@ -277,7 +277,7 @@ class Event:
     def check_availability(league, event, user):
         all_events = Event.get(league, user)
         for e in all_events:
-            if localize(e['date']) <= localize(event['date']) < localize(e['date']) + timedelta(hours=event['duration']):
+            if e['date'] <= event['date'] < e['date'] + timedelta(hours=event['duration']):
                 return False
                 
         return True

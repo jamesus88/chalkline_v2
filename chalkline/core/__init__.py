@@ -8,9 +8,6 @@ def now():
     dt = datetime.now(TIMEZONE).replace(tzinfo=None)
     return dt
 
-def localize(dt: datetime):
-    return dt.astimezone(TIMEZONE)
-
 def check_unique(cls, field: str, value):
     if cls.col.count_documents({field: value}) > 0:
         raise ValueError(f"{field.title()} is already taken! Try another one.")

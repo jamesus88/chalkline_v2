@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, session, request, Blueprint
 from chalkline.core import server as svr
 from chalkline.core.events import Event, Filter
-from chalkline.core.league import League
+from chalkline.core import now
 
 umpire = Blueprint('umpire', __name__)
 
