@@ -18,7 +18,7 @@ class Calendar:
         cal_event.add('dtend', event['date'] + game_length)
 
 
-        cal_event.add('summary', f"{event['away']} @ {event['home']} ({role}) - Chalkline")
+        cal_event.add('summary', f"{event['age']} Game - {role} ({event['away']} @ {event['home']})")
         cal_event.add('location', f"{event['venueId']} Field {event['field']}")
         cal_event.add('description', f"{role} for {event['age']} game at {event['venueId']} Field {event['field']}.\n\nCreated by Chalkline Baseball")
         cal_event.add('created', now())
