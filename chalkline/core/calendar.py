@@ -46,12 +46,12 @@ class Calendar:
         
         eventList = []
 
-        eventFilter = Filter.default()
-        eventFilter['start'] = 0
-
         for location in user['leagues']:
             league = League.get(location)
-            eventList.extend(Event.get(league, user, safe=False))
+            filters = Filter.default()
+            e = Event.get(league, user, filters=filters, safe=False)
+            eventList.extend(e)
+
 
         for event in eventList:
             # umpires
