@@ -10,13 +10,7 @@ class Calendar:
         cal_event.add('uid', str(event['_id']))
 
         cal_event.add('dtstart', event['date'])
-
-        if event['age'] in ['Majors', '50/70', 'Juniors']:
-            game_length = datetime.timedelta(hours=2)
-        else:
-            game_length = datetime.timedelta(hours=1.5)
-        cal_event.add('dtend', event['date'] + game_length)
-
+        cal_event.add('dtend', event['date'] + datetime.timedelta(hours=event['duration']))
 
         cal_event.add('summary', f"{event['age']} Game - {role} ({event['away']} @ {event['home']})")
         cal_event.add('location', f"{event['venueId']} Field {event['field']}")
