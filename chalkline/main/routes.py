@@ -125,6 +125,7 @@ def login(next=None):
         
         try:
             user = User.get_user(email=email) or User.get_user(userId=email)
+            if not user: raise PermissionError("Incorrect Username/Email or Password. Please try again.")
 
             if len(user['leagues']) > 1 and not leagueId:
                 res['pword_attempt'] = pword
