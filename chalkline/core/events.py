@@ -39,8 +39,8 @@ class Filter:
             filters['team'] = form['filter_team']
         if form.get('filter_umpire', 'None') != 'None':
             filters['umpire'] = form['filter_umpire']
-
-        filters['season'] = form.get('filter_season')
+        if form.get('filter_season', 'None') != 'None':
+            filters['season'] = form['filter_season']
         
         return filters
 
@@ -162,9 +162,6 @@ class Event:
     def get(league, user=None, team=None, check_user_teams=True, filters=Filter.default(), add_criteria = {}, safe=True):
         criteria = [{'leagueId': league['leagueId']}, add_criteria]
         umpire = None
-
-        # set default season to current league season
-        if not filters['season']: filters['season'] = league['current_season']
 
         if filters.get('season'):
             criteria.append({'season': filters['season']})
