@@ -24,7 +24,7 @@ def schedule():
 
     filters['umpires_only'] = True
     events = Event.get(res['league'], filters=filters)
-
+    res['show_umps'] = request.args.get("show_umps")
     return render_template("umpire/schedule.html", res=res, events=events, filters=filters)
 
 @umpire.route('/assignments', methods=['GET', 'POST'])
@@ -51,6 +51,6 @@ def assignments():
             else:
                 res['msg'] = "Game successfully removed!"
 
-
+    res['show_umps'] = request.args.get("show_umps")
     events = Event.get(res['league'], res['user'], check_user_teams=False, filters=filters)
     return render_template("umpire/assignments.html", res=res, events=events, filters=filters)

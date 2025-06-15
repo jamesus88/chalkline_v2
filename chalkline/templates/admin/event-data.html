@@ -55,6 +55,11 @@
                     <th>Status</th>
                     <th>Away</th>
                     <th>Home</th>
+                    {% if not res.show_umps %}
+                    <th>Umpires <a href="{{url_for('admin.event_data', show_umps=True)}}"><i title="Show Umpires" class="fa-solid fa-up-right-and-down-left-from-center"></i></a></th>
+                    {% else %}
+                    <th colspan="{{res.max_ump_count or 2}}">Umpires <a href="{{url_for('admin.event_data')}}"><i title="Hide Umpires" class="fa-solid fa-minimize"></i></a></th>
+                    {% endif %}
                     <th>Delete</th>
                 </tr>
                 {% for e in events %}
@@ -93,6 +98,27 @@
                             <option value="{{t.teamId}}">{{t.teamId}}</option>
                         {% endfor %}
                     </select></td>
+
+                    {% if not res.show_umps %}
+                        <td>{{e.full_umps}}/{{e.total_umps}}</td>
+                    {% else %}
+                        {% for pos, u in e.umpires.items() %}
+                        <td>
+                            <select class="admin" name="{{e._id}}_{{pos}}" id="{{e._id}}_{{pos}}">
+                                <option value="">None</option>
+                                {% for u in all_umps %} 
+                                <option value="{{u.userId}}">{{u.firstLast}}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <script>
+                            document.getElementById("{{e._id}}"+"_{{pos}}").value = "{{e.umpires.get(pos).user.userId}}";
+                            console.log("{{e.umpires.get(pos).user.userId}}");
+                        </script>
+                        {% endfor %}
+                    {% endif %}
+
+
                     <td><button class="schedule-action danger" type="submit" name="delete" value="{{e._id}}" onclick="return confirm('Delete event?')">Delete</button></td>
                 </tr>
                 <script>

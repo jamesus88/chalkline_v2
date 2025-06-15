@@ -39,7 +39,11 @@
                     <th>Field</th>
                     <th>Age Group</th>
                     <th>Status</th>
-                    <th>Umpires</th>
+                    {% if not res.show_umps %}
+                    <th>Umpires <a href="{{url_for('umpire.schedule', show_umps=True)}}"><i title="Show Umpires" class="fa-solid fa-up-right-and-down-left-from-center"></i></a></th>
+                    {% else %}
+                    <th>Umpires <a href="{{url_for('umpire.schedule')}}"><i title="Hide Umpires" class="fa-solid fa-minimize"></i></a></th>
+                    {% endif %}
                 </tr>
                 {% for e in events %}
                     <tr>
@@ -49,16 +53,34 @@
                         <td>{{e.field}}</td>
                         <td>{{e.age}}</td>
                         <td>{{e.status}}</td>
-                        {% if e.locked %}
-                            <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action"><i class="fa-solid fa-lock"></i> locked</button></td>
-                        {% else %}
-                            {% if e.umpire_full or 'umpire_add' not in res.user.permissions.get(res.league.leagueId) %}
-                            <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action"><i class="fa-solid fa-magnifying-glass"></i> view
+                        {% if not res.show_umps %}
+                            {% if e.locked %}
+                                <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action"><i class="fa-solid fa-lock"></i> locked</button></td>
                             {% else %}
-                            <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action blue-text">+ add
+                                {% if e.umpire_full or 'umpire_add' not in res.user.permissions.get(res.league.leagueId) %}
+                                <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action"><i class="fa-solid fa-magnifying-glass"></i> view
+                                {% else %}
+                                <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action blue-text">+ add
+                                {% endif %}
+                                
+                                ({{e.full_umps}}/{{e.total_umps}})</button></td>
                             {% endif %}
-                            
-                            ({{e.full_umps}}/{{e.total_umps}})</button></td>
+                        {% else %}
+                            {% for pos, u in e.umpires.items() %}
+                            <td>
+                                {% if u.user %}
+                                    <a href="{{url_for('view_info.user', userId=u.user.userId)}}">{{u.user.firstLast}}</a>
+                                {% elif u.team_duty and not u.coach_req %}
+                                    Team Duty ({{u.team_duty}})
+                                {% elif e.locked or not res.league.umpire_add %}
+                                    Locked
+                                {% elif 'umpire_add' in res.user.permissions.get(res.league.leagueId) and e.date > res.date %}
+                                    <button class="schedule-action" name="add_game" value="{{e._id}}_{{pos}}">+ {{pos}}</button>
+                                {% else %}
+                                    Closed
+                                {% endif %}
+                            </td>
+                            {% endfor %}
                         {% endif %}
                     </tr>
 

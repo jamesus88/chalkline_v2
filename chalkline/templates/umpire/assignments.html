@@ -34,7 +34,11 @@
                     <th>Field</th>
                     <th>Age Group</th>
                     <th>Status</th>
-                    <th>Umpires</th>
+                    {% if not res.show_umps %}
+                    <th>Umpires <a href="{{url_for('umpire.assignments', show_umps=True)}}"><i title="Show Umpires" class="fa-solid fa-up-right-and-down-left-from-center"></i></a></th>
+                    {% else %}
+                    <th>Umpires <a href="{{url_for('umpire.assignments')}}"><i title="Hide Umpires" class="fa-solid fa-minimize"></i></a></th>
+                    {% endif %}
                 </tr>
                 {% for e in events %}
                 <tr class="event-row">
@@ -44,7 +48,32 @@
                     <td>{{e.field}}</td>
                     <td>{{e.age}}</td>
                     <td>{{e.status}}</td>
+                    
+                    {% if not res.show_umps %}
                     <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action"><i class="fa-solid fa-magnifying-glass"></i> view</button></td>
+                    {% else %}
+                    {% for pos, u in e.umpires.items() %}
+                        <td>
+                            {% if u.coach_req or not u.team_duty %}
+                                {% if u.user %}
+                                    {% if u.user.userId == res.user.userId %}
+                                    <a href="{{url_for('view_info.user', userId=u.user.userId)}}">{{u.user.firstLast}}</a>
+                                    <button title="Substitute" type="submit" name="substitute" value="{{e._id}}" class="schedule-action"><i class="fa-solid fa-shuffle"></i></button>
+                                        {% if 'umpire_remove' in res.user.permissions.get(res.league.leagueId) %}
+                                            <button title="Remove game" type="submit" name="remove" value="{{pos}}_{{e._id}}" class="schedule-action danger"><i class="fa-solid fa-circle-minus"></i></button>
+                                        {% endif %}
+                                    {% else %}
+                                    <a href="{{url_for('view_info.user', userId=u.user.userId)}}">{{u.user.firstLast}}</a>
+                                    {% endif %}
+                                {% else %}
+                                Open
+                                {% endif %}
+                            {% else %}
+                                {{u.team_duty}}
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    {% endif %}
 
 
                     <dialog class="popup" id="popup_{{e._id}}">
@@ -62,7 +91,7 @@
                                             <button type="submit" name="remove" value="{{pos}}_{{e._id}}" class="schedule-action danger">Remove</button>
                                         {% endif %}
                                     {% else %}
-                                    <a>{{u.user.firstLast}}</a>
+                                    <a href="{{url_for('view_info.user', userId=u.user.userId)}}">{{u.user.firstLast}}</a>
                                     {% endif %}
                                 {% else %}
                                 Open

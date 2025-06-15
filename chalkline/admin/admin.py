@@ -29,6 +29,8 @@ class Admin:
             float_attrs = ['duration']
             multi_attrs = ['groups', 'permissions']
             league_specific = ['groups', 'permissions']
+            ump_attrs = Event.get_all_ump_positions()
+
 
             if value == "None": value = None
 
@@ -43,6 +45,10 @@ class Admin:
 
             if attr in league_specific:
                 attr = f"{attr}.{league['leagueId']}"
+
+            if attr in ump_attrs:
+                attr = f"umpires.{attr}.user"
+                value = value if not "" else None
 
             # append to updates
 

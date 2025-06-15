@@ -33,7 +33,11 @@
                     <th>Status</th>
                     <th>Away</th>
                     <th>Home</th>
-                    <th>Umpires</th>
+                    {% if not res.show_umps %}
+                    <th>Umpires <a href="{{url_for('league.master_schedule', show_umps=True)}}"><i title="Show Umpires" class="fa-solid fa-up-right-and-down-left-from-center"></i></a></th>
+                    {% else %}
+                    <th>Umpires <a href="{{url_for('league.master_schedule')}}"><i title="Hide Umpires" class="fa-solid fa-minimize"></i></a></th>
+                    {% endif %}
                     
                 </tr>
                 {% for e in events %}
@@ -46,7 +50,22 @@
                     <td>{{e.status}}</td>
                     <td>{{e.away}}</td>
                     <td>{{e.home}}</td>
-                    <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action"><i class="fa-solid fa-magnifying-glass"></i> view</button></td>
+                    {% if not res.show_umps %}
+                        <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action"><i class="fa-solid fa-magnifying-glass"></i> view
+                        ({{e.full_umps}}/{{e.total_umps}})</button></td>
+                    {% else %}
+                        {% for pos, u in e.umpires.items() %}
+                        <td>
+                            {% if u.user %}
+                                <a>{{u.user.firstLast}}</a>
+                            {% elif u.team_duty and not u.coach_req %}
+                                Team Duty ({{u.team_duty}})
+                            {% else %}
+                                Open
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    {% endif %}
                 </tr>
 
                 <dialog class="popup" id="popup_{{e._id}}">
