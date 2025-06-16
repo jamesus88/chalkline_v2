@@ -1,5 +1,6 @@
 <head>
     <link rel="stylesheet" href="{{url_for('static', filename='view_game/view.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='schedule.css')}}">
 </head>
 
 {% extends "design.html" %}
@@ -45,7 +46,7 @@
                     <h3>Permissions</h3>
                     <p>
                         <button class="action" name="toggleUmpireAdd" value="toggleUmpireAdd"><i class="fa-solid fa-power-off"></i></button>
-                        Umpire Add: 
+                        Allow umpire signup: 
                         {% if res.league.umpire_add %}
                         <i class="fa-solid fa-square-check success"></i>
                         {% else %}
@@ -55,7 +56,7 @@
 
                     <p>
                         <button class="action" name="toggleReqPerm" value="toggleReqPerm"><i class="fa-solid fa-power-off"></i></button>
-                        Require Permissions: 
+                        Require permissions to signup: 
                         {% if res.league.require_perm %}
                         <i class="fa-solid fa-square-check success"></i>
                         {% else %}
@@ -93,6 +94,93 @@
                 </h3>
             </form>
             </center>
+            
+        </section>
+
+        <section>
+            <form method="post">
+                <center class="center">
+                    <h3>Venues</h3>
+                    <table>
+                        <tr>
+                            <th>Name</th>
+                            <th>Address</th>
+                            <th>Edit</th>
+                            <th>Remove</th>
+                        </tr>
+                        {% for v in res.league.venue_info %}
+                        <tr>
+                            <td>{{v.name}}</td>
+                            <td>{{v.street}} {{v.city}}, {{v.state}} {{v.zipcode}}</td>
+                            <td><button type="button" onclick="openPopup('{{v.venueId}}')" class="schedule-action"><i class="fa-solid fa-pen"></i></button></td>
+                            <td><button onclick="return confirm('Remove {{v.venueId}} venue?')" class="danger action" name="deleteVenue" value="{{v.venueId}}"><i class="fa-solid fa-xmark"></i></button></td>
+                        </tr>
+
+                        <dialog class="popup" id="popup_{{v.venueId}}">
+                            <a onclick="closePopup('{{v.venueId}}')" class="error"><i class="fa-solid fa-xmark"></i> Cancel</a>
+                            <h3>{{v.venueId}}</h3>
+                            <form method="post">
+                                <p><label for="name">Name: </label>
+                                <input type="text" name="name" id="name" value="{{v.name}}" required></p>
+                                <p><label for="street">Street: </label>
+                                <input type="text" name="street" id="street" value="{{v.street}}" required></p>
+                                <p><label for="city">City: </label>
+                                <input type="text" name="city" id="city" value="{{v.city}}" required></p>
+                                <p><label for="state">State: </label>
+                                <select name="state" id="{{v.venueId}}_state">
+                                    {% for state in us_states.values() %}
+                                        <option value="{{state}}">{{state}}</option>
+                                    {% endfor %}
+                                </select></p>
+                                <script>
+                                    document.getElementById('{{v.venueId}}_state').value = "{{v.state}}";
+                                </script>
+
+                                <p><label for="zipcode">Zipcode: </label>
+                                <input type="number" name="zipcode" id="zipcode" value="{{v.zipcode}}" required></p>
+
+                                <p><label for="field_count">Fields: </label>
+                                <input type="number" name="field_count" id="field_count" value="{{v.field_count}}" required></p>
+                                
+                                <button type="submit" class="action" name="updateVenue" value="{{v.venueId}}">Save</button>
+
+                                <br><br>
+                                Venue status can be changed <a href="{{url_for('league.status')}}">here</a>.
+                            </form>
+                        </dialog>
+                        {% endfor %}
+                    </table>
+                <button class="action" type="button" onclick="openPopup('add_venue')" class="schedule-action">Create</button>
+
+                <dialog class="popup" id="popup_add_venue">
+                            <a onclick="closePopup('add_venue')" class="error"><i class="fa-solid fa-xmark"></i> Cancel</a>
+                            <form method="post">
+                                <p><label for="venueId">Unique Id: </label>
+                                <input type="text" name="venueId" id="venueId" required></p>
+                                <p><label for="name">Name: </label>
+                                <input type="text" name="name" id="name" required></p>
+                                <p><label for="street">Street: </label>
+                                <input type="text" name="street" id="street" required></p>
+                                <p><label for="city">City: </label>
+                                <input type="text" name="city" id="city" required></p>
+                                <p><label for="state">state: </label>
+                                <select name="state" id="state">
+                                    {% for state in us_states.values() %}
+                                        <option value="{{state}}">{{state}}</option>
+                                    {% endfor %}
+                                </select></p>
+
+                                <p><label for="zipcode">Zipcode: </label>
+                                <input type="number" name="zipcode" id="zipcode" required></p>
+
+                                <p><label for="field_count">Field Count: </label>
+                                <input type="number" name="field_count" id="field_count" required></p>
+                                
+                                <button type="submit" class="action" name="addVenue" value="1">Add</button>
+                            </form>
+                        </dialog>
+                </center>
+            </form>
             
         </section>
 

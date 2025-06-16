@@ -1,5 +1,5 @@
 from chalkline.collections import leagueData, venueData, directorData
-from chalkline.core import now, _safe
+from chalkline.core import now, _safe, check_unique
 from chalkline.core.user import User
 from chalkline.core.team import Team
 
@@ -71,6 +71,14 @@ class League:
         venues = Venue.col.find({'venueId': {'$in': league['venues']}})
         league['venue_info'] = [Venue.safe(v) for v in venues]
         return league
+    
+    @staticmethod
+    def add_venue(league, venueId):
+        League.col.update_one({'leagueId': league['leagueId']}, {'$push': {'venues': venueId}})
+
+    @staticmethod
+    def remove_venue(league, venueId):
+        League.col.update_one({'leagueId': league['leagueId']}, {'$pull': {'venues': venueId}})
 
 class Venue:
     col = venueData
@@ -82,7 +90,22 @@ class Venue:
     @staticmethod
     def create(form):
         venue = {
-            'venueId': form['venueId'],
+            'venueId': check_unique(Venue, "venueId", form['venueId']),
+            'name': form['name'],
+            'street': form['street'],
+            'city': form['city'],
+            'zipcode': form['zipcode'],
+            'state': form['state'],
+            'field_count': int(form['field_count']),
+            'status': 'Open'
+        }
+        _id = Venue.col.insert_one(venue).inserted_id
+        venue['_id'] = _id
+        return Venue.safe(venue)
+    
+    @staticmethod
+    def update(form):
+        venue = {
             'name': form['name'],
             'street': form['street'],
             'city': form['city'],
@@ -90,9 +113,8 @@ class Venue:
             'state': form['state'],
             'field_count': int(form['field_count'])
         }
-        _id = Venue.col.insert_one(venue).inserted_id
-        venue['_id'] = _id
-        return Venue.safe(venue)
+        Venue.col.update_one({'venueId': form['updateVenue']}, {"$set": venue})
+
     
     @staticmethod
     def get(venueId):

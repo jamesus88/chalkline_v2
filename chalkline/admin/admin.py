@@ -48,7 +48,7 @@ class Admin:
 
             if attr in ump_attrs:
                 attr = f"umpires.{attr}.user"
-                value = value if not "" else None
+                if value in ['', "None"]: value = None
 
             # append to updates
 

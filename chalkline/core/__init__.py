@@ -10,7 +10,7 @@ def now():
 
 def check_unique(cls, field: str, value):
     if cls.col.count_documents({field: value}) > 0:
-        raise ValueError(f"{field.title()} is already taken! Try another one.")
+        raise ValueError(f"{field} is already taken! Try another one.")
     else:
         return value
 

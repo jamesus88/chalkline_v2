@@ -293,7 +293,7 @@ class Event:
 
         umpire = event['umpires'][pos]
         # check empty (safety catch)
-        if umpire['user'] is not None:
+        if umpire['user'] not in [None, '', 'None']:
             raise ValueError('Position is not empty!')
         
         # check permissions

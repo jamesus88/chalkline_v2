@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, session, request, Blueprint, abort
-from chalkline.core import server as svr
+from chalkline.core import server as svr, get_us_states, check_unique
 from chalkline.core.events import Event, Filter
-from chalkline.core.league import League
+from chalkline.core.league import League, Venue
 from chalkline.core.team import Team
 from chalkline.core.user import User
 import chalkline.core.mailer as mailer
@@ -167,6 +167,7 @@ def manage_league():
     if mw: return mw
 
     res = svr.obj()
+    msg = ""
 
     if request.method == 'POST':
         if request.form.get('deleteAge'):
@@ -181,11 +182,27 @@ def manage_league():
             Admin.toggle_perm(res['league'], 'umpire_add')
         elif request.form.get('toggleReqPerm'):
             Admin.toggle_perm(res['league'], 'require_perm')
+        elif request.form.get('updateVenue'):
+            Venue.update(request.form)
+            msg = "Venue updated!"
+        elif request.form.get('addVenue'):
+            try:
+                venue = Venue.create(request.form)
+                League.add_venue(res['league'], venue['venueId'])
+                msg = "Venue added!"
+            except ValueError as e:
+                msg = e
+        elif request.form.get('deleteVenue'):
+            League.remove_venue(res['league'], request.form['deleteVenue'])
+            msg = "Venue Removed!"
 
         svr.login(res['user'], res['league']['leagueId'])
         res = svr.obj()
+        res['msg'] = msg
 
-    return render_template("admin/league.html", res=res)
+    res['league'] = League.load_venues(res['league'])
+    us_states = get_us_states()
+    return render_template("admin/league.html", res=res, us_states=us_states)
 
 @admin.route("/announcement", methods=['GET', 'POST'])
 def announcement():
