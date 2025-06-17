@@ -1,0 +1,4 @@
+type,season,date,time,length(hrs),venueId,field,age,away,home,status,locked,plate,plate_duty,1b,1b_duty,2b,2b_duty,3b,3b_duty,lf,lf_duty,rf,rf_duty,misc,misc_duty
+Game,Fall 2025,yyyy-mm-dd,18:30,2,Twin Lakes,1,Majors,MAJ1,MAJ2,On Time,,1,,1,MAJ3,,,,,,,,,,
+Game,Fall 2025,yyyy-mm-dd,18:30,2,Twin Lakes,1,Majors,MAJ1,MAJ2,On Time,,1,,1,MAJ3,,,,,,,,,,
+Game,Fall 2025,yyyy-mm-dd,18:30,2,Twin Lakes,1,Majors,MAJ1,MAJ2,On Time,,1,,1,MAJ3,,,,,,,,,,

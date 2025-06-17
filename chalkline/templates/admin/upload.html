@@ -1,0 +1,54 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='docs/docs.css')}}">
+</head>
+
+{% extends "design.html" %}
+{% block title %}Upload Schedule{% endblock title %}
+
+{% block content %}
+<main>
+    <center>
+        <h1>Upload Schedule</h1>
+        <a href="{{url_for('docs.download', filename="sample.csv")}}">Download Template .csv</a>
+    </center>
+    <section class="text">
+        <h3>Step 1: Important Notes.</h3>
+        <ul>
+            <li>Download the template above and edit with your league's schedule.</li>
+            <li>Uploaded schedules <b>must</b> follow the template .csv format.</li>
+            <li>Failure to match format may result in inaccurate uploads and more cleanup.</li>
+            <li>Do <b>not</b> edit the header (first) row. Do <b>not</b> add additional columns.</li>
+            <i>Column Guide:</i>
+            <ol>
+                <br>
+                <p class="error">The below columns cannot be left empty!</p>
+                <li><b>type</b>: "Game" or "Practice". In almost all cases, use "Game"</li>
+                <li><b>season</b>: Choose from "Fall", "Spring", or "Summer" followed by a space and the year. e.g. "Fall 2025"</li>
+                <li><b>date</b>: yyyy-mm-dd format. e.g. "2025-01-20"</li>
+                <li><b>time</b>: Use Military/24-hr time. e.g. "19:30"</li>
+                <li><b>length(hrs)</b>: duration of the game in hours.</li>
+                <li><b>venueId</b>: Unique id of venue game is to be played at. For full list of venues, see <a href="{{url_for('admin.manage_league', _anchor='venues')}}">Admin - Manage League</a> - Venues</li>
+                <li><b>field</b>: field number. e.g. "1"</li>
+                <li><b>age</b>: full age group name. e.g. "Majors". Must be exactly one of the age groups listed under <a href="{{url_for('admin.manage_league', _anchor='ages')}}">Admin - Manage League</a> - Age Groups</li>
+                <br>
+                <p class="error">The below columns may be left empty!</p>
+                <li><b>away</b>: away team code, if any. e.g. "SLL-MAJ1". Must be exactly a team's <b>id</b> from <a href="{{url_for('admin.team_data')}}">Admin - Teams</a></li>
+                <li><b>home</b>: home team code, if any. e.g. "SLL-MAJ2". Must be exactly a team's <b>id</b> from <a href="{{url_for('admin.team_data')}}">Admin - Teams</a></li>
+                <li><b>status</b>: status of game, if any. If left blank, default will be "On Time"</li>
+                <li><b>locked</b>: mark with "1" to lock game (prevent signups), otherwise leave blank. In almost all cases, leave blank.</li>
+                <br>
+                <p class="error">Umpire columns:</p>
+                <li><b>Position</b>: mark with "1" to create position opening or "0"/"None"/leave empty otherwise</li>
+                <li><b>Position_duty</b>: team, if any, responsible for filling such umpire position. e.g. "SLL_MAJ3". Must be exactly a team's <b>id</b> from <a href="{{url_for('admin.team_data')}}">Admin - Teams</a></li>
+            
+            </ol>
+        </ul>
+    </section>
+    <p>For additional help, email <a href="mailto:chalklinebaseball@gmail.com">chalklinebaseball@gmail.com</a></p>
+    <section class="text">
+        <h3>Step 2: Upload</h3>
+
+    </section>
+</main>
+
+{% endblock content %}

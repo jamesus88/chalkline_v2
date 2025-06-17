@@ -21,7 +21,7 @@
             <p class="error">{{res.msg}}</p>
         </div>
         <div class="align-right">
-            <h3><a href="{{url_for('admin.add_event')}}">Add Event</a></h3>
+            <h3><a href="{{url_for('admin.add_event')}}">Add Event</a> | <a href="{{url_for('admin.upload_schedule')}}">Upload Schedule</a></h3>
             <form method="post">
                 <button class="action secondary" onclick="return confirm('Generate director shifts? This will replace any existing shifts for this season!')" name="genShifts" value="1">Generate DOD Shifts</button>
                 <button class="action secondary" onclick="return confirm('Unlock all games?')" name="unlockAll" value="1">Unlock all Games</button>

@@ -1,6 +1,10 @@
-from flask import render_template, redirect, url_for, session, request, Blueprint
+from flask import render_template, current_app, Blueprint, send_file, request, abort
 from chalkline.core import server as svr
+import os
 docs = Blueprint('docs', __name__)
+
+def get_file(name):
+    return os.path.join(current_app.root_path, "static/var", name)
 
 @docs.route("/")
 def home():
@@ -62,3 +66,14 @@ def lost_id():
 def security():
     res = svr.obj()
     return render_template("docs/security.html", res=res)
+
+@docs.route("/download/<filename>")
+def download(filename):
+    mw = svr.authorized_only("admin", request.url)
+    if mw: return mw
+
+    try:
+        filepath = get_file(filename)
+        return send_file(filepath, as_attachment=True)
+    except:
+        abort(404)

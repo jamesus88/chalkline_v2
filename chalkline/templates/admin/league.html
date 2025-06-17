@@ -67,7 +67,7 @@
             </center>
         </section>
 
-        <section>
+        <section id="ages">
             <form method="post">
             <center>
                 <h3>Age Groups</h3>
@@ -97,12 +97,13 @@
             
         </section>
 
-        <section>
+        <section id="venues">
             <form method="post">
                 <center class="center">
                     <h3>Venues</h3>
                     <table>
                         <tr>
+                            <th>venueId</th>
                             <th>Name</th>
                             <th>Address</th>
                             <th>Edit</th>
@@ -110,6 +111,7 @@
                         </tr>
                         {% for v in res.league.venue_info %}
                         <tr>
+                            <td>{{v.venueId}}</td>
                             <td>{{v.name}}</td>
                             <td>{{v.street}} {{v.city}}, {{v.state}} {{v.zipcode}}</td>
                             <td><button type="button" onclick="openPopup('{{v.venueId}}')" class="schedule-action"><i class="fa-solid fa-pen"></i></button></td>

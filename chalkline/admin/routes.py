@@ -250,3 +250,8 @@ def announcement():
             res['msg'] = "Error: Select email or text."
 
     return render_template("admin/announcement.html", res=res, all_teams=all_teams)
+
+@admin.route("/upload", methods=['GET', 'POST'])
+def upload_schedule():
+    res = svr.obj()
+    return render_template("admin/upload.html", res=res)
