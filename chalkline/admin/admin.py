@@ -4,7 +4,7 @@ from pymongo import UpdateOne
 from datetime import datetime, timedelta
 from chalkline.core.user import User
 from chalkline.core.team import Team
-
+from pandas import read_csv
 import chalkline.core.mailer as mailer
 from chalkline.core.director import Shift
 from chalkline.core.events import Event, Filter
@@ -176,5 +176,66 @@ class Admin:
 
         return count
 
+    @staticmethod
+    def read_schedule(res, file):
+        events = []
+        errors = set()
+        team_codes = {t['teamId'] for t in res['league']['teams']}
+        team_codes.add(None)
+
+        df = read_csv(file)
+        df = df.replace({float('nan'): None}) # replace NaN with None
+
+        # strip all string cols
+        str_col = df.select_dtypes('object')
+        df[str_col.columns] = str_col.apply(lambda x: x.str.strip())
+
+        # check for errors
+        if len(set(df['type'].unique()).difference({'Game', 'Practice'})) > 0:
+            raise ValueError('One or more event types are invalid. Choose from "Game" or "Practice"')
         
-            
+        if len(set(df['venueId'].unique()).difference(set(res['league']['venues']))) > 0:
+            raise ValueError(f'One or more venues are invalid. Choose from {", ".join(res['league']['venues'])} or create new ones.')
+        
+        if len(set(df['age'].unique()).difference(set(res['league']['age_groups']))) > 0:
+            raise ValueError(f'One or more ages are invalid. Choose from {", ".join(res['league']['age_groups'])} or create new ones.')
+        
+        if len(set(df['away'].unique()).difference(team_codes)) > 0:
+            errors.add('One or more away teams are invalid. Choose a team code from your league or create a new one.')
+
+        if len(set(df['home'].unique()).difference(team_codes)) > 0:
+            errors.add('One or more home teams are invalid. Choose a team code from your league or create a new one.')
+
+        for i, r in df.iterrows():
+            e = Event.default()
+            e['leagueId'] = res['league']['leagueId']
+            e['type'] = r.type
+            e['season'] = r.season
+            if r.season != res['league']['current_season']:
+                errors.add(f"One or more games are not listed for your league's current season ({res['league']['current_season']})")
+            e['date'] = datetime.strptime(r.date + ' ' + r.time, '%Y-%m-%d %H:%M')
+            e['duration'] = float(r.length_hrs)
+            e['venueId'] = r.venueId
+            e['field'] = int(r.field)
+            e['age'] = r.age
+            e['away'] = r.away
+            e['home'] = r.home
+            e['status'] = r.status.title() if r.status else "On Time"
+            e['locked'] = True if r.locked else False
+            if e['locked']:
+                errors.add("One or more games are locked.")
+            e['created'] = now()
+
+            for pos in Event.get_all_ump_positions():
+                if getattr(r, pos.lower()):
+                    blank = Event.generate_blank_ump_pos(e, pos)
+                    if getattr(r, pos.lower()+"_duty"):
+                        blank['team_duty'] = getattr(r, pos.lower()+"_duty")
+                        if blank['team_duty'] not in team_codes:
+                            errors.add("One or more umpire duties include invalid teams. Choose a team code from your league or create a new one.")
+
+                    e['umpires'][pos] = blank
+
+            events.append(e)
+
+        return events, errors

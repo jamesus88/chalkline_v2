@@ -1,0 +1,88 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='docs/docs.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='schedule.css')}}">
+    <script src="{{url_for('static', filename='schedule.js')}}" defer></script>
+</head>
+
+{% extends "design.html" %}
+{% block title %}Confirm Schedule{% endblock title %}
+
+{% block content %}
+<main>
+    <center>
+        <h1>Confirm Schedule</h1>
+        <form method="post">
+            <button class="action danger" type="submit" name="cancel" value="{{fn}}" onclick="return confirm('Cancel? Changes will be lost.')">Cancel</button>
+        </form>
+        <p class="subtle">Scroll to bottom to submit schedule.</p>
+    </center>
+
+    {% if errors|length > 0 %}
+    <section class="text">
+            <h3 class="error">Warnings:</h3>
+            <ul>
+                {% for x in errors %}
+                    <li class="error">{{x}}</li>
+                {% endfor %}
+            </ul>
+    </section>
+    {% endif %}
+
+    <section class="schedule-section scrollwrapper">
+        <h3>Preview ({{events|length}} events)</h3>
+        <table id="schedule-table" class="event-display">
+            <tr>
+                <th></th>
+                <th>Event</th>
+                <th>Season</th>
+                <th>Date</th>
+                <th>Venue</th>
+                <th>Field</th>
+                <th>Age</th>
+                <th>Status</th>
+                <th>Away</th>
+                <th>Home</th>
+                <th>Umpires</th>
+                
+            </tr>
+            {% for e in events %}
+            <tr class="event-row">
+                <th>{{loop.index}}{% if e.locked %} <i class="fa-solid fa-lock"></i>{% endif %}</th>
+                <td class="event-type">{{e.type}}</td>
+                <td>{{e.season}}</td>
+                <td>{{e.date.strftime('%a %m/%d @ %H:%M')}} ({{e.duration}} hrs)</td>
+                <td>{{e.venueId}}</td>
+                <td>{{e.field}}</td>
+                <td>{{e.age}}</td>
+                <td>{{e.status}}</td>
+                <td>{{e.away}}</td>
+                <td>{{e.home}}</td>
+
+                {% for pos, u in e.umpires.items() %}
+                <td>
+                    <b>{{pos}}</b>: 
+                    {% if u.team_duty %}
+                        Team Duty ({{u.team_duty}})
+                    {% else %}
+                        Open
+                    {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+            
+        </table>
+    </section>
+
+    <center>
+        <form method="post">
+            {% if errors|length > 0 %}
+            <label for="ignore-warnings"><b>Ignore warnings: </b></label>
+            <input type="checkbox" name="ignore-warnings" id="ignore-warnings" required>
+            {% endif %}
+            <button class="action" type="submit" name="_confirm" value="{{fn}}" onclick="return confirm('Submit schedule? {{events|length}} events will be added.')">Confirm and Upload</button>
+        </form>
+    </center>
+</main>
+
+{% endblock content %}

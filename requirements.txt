@@ -7,3 +7,4 @@ certifi
 icalendar
 x-wr-timezone
 pytz
+pandas

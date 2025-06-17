@@ -62,8 +62,8 @@ class Event:
             'home': None,
             'score': [0,0],
             'status': "",
-            'visible': False,
-            'locked': True,
+            'visible': True,
+            'locked': False,
             'umpires': {},
             'created': None
         }

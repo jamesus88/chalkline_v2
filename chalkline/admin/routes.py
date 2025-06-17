@@ -1,12 +1,12 @@
-from flask import render_template, redirect, url_for, session, request, Blueprint, abort
-from chalkline.core import server as svr, get_us_states, check_unique
+from flask import render_template, request, Blueprint, current_app, abort
+from chalkline.core import server as svr, get_us_states
 from chalkline.core.events import Event, Filter
 from chalkline.core.league import League, Venue
 from chalkline.core.team import Team
 from chalkline.core.user import User
 import chalkline.core.mailer as mailer
-
-
+from werkzeug.utils import secure_filename
+import os
 from .admin import Admin
 
 admin = Blueprint('admin', __name__)
@@ -253,5 +253,43 @@ def announcement():
 
 @admin.route("/upload", methods=['GET', 'POST'])
 def upload_schedule():
+    mw = svr.authorized_only("admin")
+    if mw: return mw
+
     res = svr.obj()
+    res['league']['teams'] = Team.get_league_teams(res['league'])
+    if request.method == 'POST':
+        if request.form.get('upload'):
+            f = request.files['schedule']
+            if f.filename.split('.')[-1] != 'csv': raise PermissionError("This filetype is not allowed!")
+            try:
+                fn = secure_filename(res['user']['userId'] + '_' + f.filename)
+                events, errors = Admin.read_schedule(res, f)
+                f.stream.seek(0) # prevents empty file when saving
+                f.save(os.path.join(current_app.config['UPLOAD_FOLDER'], fn))
+                print(fn, 'uploaded.')
+                return render_template("admin/upload_confirm.html", res=res, events=events, errors=errors, fn=fn)
+            except ValueError as e:
+                res['msg'] = e
+        elif request.form.get('_confirm'):
+            fn = os.path.join(current_app.config['UPLOAD_FOLDER'], request.form['_confirm'])
+            try:
+                with open(fn, 'r') as f:
+                    events, errors = Admin.read_schedule(res, f)
+                    print(events)
+                print("Schedule uploaded for", res['league']['leagueId'], 'by', res['user']['userId'], f"({fn})")
+                os.remove(os.path.join(current_app.config['UPLOAD_FOLDER'], fn))
+            except FileNotFoundError as e:
+                pass
+            else:
+                Event.col.insert_many(events)
+                res['msg'] = "Success! Schedule uploaded!"
+
+        elif request.form.get('cancel'):
+            try:
+                os.remove(os.path.join(current_app.config['UPLOAD_FOLDER'], request.form['cancel']))
+            except FileNotFoundError:
+                pass
+            res['msg'] = "Schedule upload canceled."
+
     return render_template("admin/upload.html", res=res)
