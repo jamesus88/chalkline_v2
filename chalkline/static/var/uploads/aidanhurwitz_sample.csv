@@ -1,5 +1,0 @@
-type,season,date,time,length_hrs,venueId,field,age,away,home,status,locked,plate,plate_duty,1b,1b_duty,2b,2b_duty,3b,3b_duty,lf,lf_duty,rf,rf_duty,misc,misc_duty
-Game,Summer 2025,2025-06-30,18:30,2,Twin Lakes,1,Majors,SLL-MAJ1,SLL-MAJ2,Sample,,x,,x,SLL-MAJ3,,,,,,,,,,
-Game,Summer 2025,2025-06-30,18:30,2,Twin Lakes,1,Majors,SLL-MAJ1,SLL-MAJ2,Sample,x,x,,x,SLL-MAJ3,,,,,,,,,,
-Game,Summer 2025,2025-07-01,18:30,2,Twin Lakes,1,Majors,SLL-MAJ1,SLL-MAJ2,Sample,,x,,x,SLL-MAJ3,,,,,,,,,,
-Game,Summer 2025,2025-07-01,18:30,2,Twin Lakes,1,Majors,,,,,x,,x,,,,,,,,,,,
