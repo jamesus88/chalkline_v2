@@ -59,7 +59,7 @@
                                     {% if u.user.userId == res.user.userId %}
                                     <a href="{{url_for('view_info.user', userId=u.user.userId)}}">{{u.user.firstLast}}</a>
                                     <button title="Substitute" type="submit" name="substitute" value="{{e._id}}" class="schedule-action"><i class="fa-solid fa-shuffle"></i></button>
-                                        {% if 'umpire_remove' in res.user.permissions.get(res.league.leagueId) %}
+                                        {% if 'umpire_remove' in res.user_perms %}
                                             <button title="Remove game" type="submit" name="remove" value="{{pos}}_{{e._id}}" class="schedule-action danger" onclick="return confirm('Remove game?')"><i class="fa-solid fa-circle-minus"></i></button>
                                         {% endif %}
                                     {% else %}
@@ -87,7 +87,7 @@
                                     {% if u.user.userId == res.user.userId %}
                                     <a href="{{url_for('view_info.user', userId=u.user.userId)}}">{{u.user.firstLast}}</a>
                                     <button type="submit" name="substitute" value="{{e._id}}" class="schedule-action">Substitute</button>
-                                        {% if 'umpire_remove' in res.user.permissions.get(res.league.leagueId) %}
+                                        {% if 'umpire_remove' in res.user_perms %}
                                             <button onclick="return confirm('Remove game?')" type="submit" name="remove" value="{{pos}}_{{e._id}}" class="schedule-action danger">Remove</button>
                                         {% endif %}
                                     {% else %}

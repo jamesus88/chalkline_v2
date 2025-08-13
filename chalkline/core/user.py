@@ -145,7 +145,7 @@ class User:
                 form['league']: []
             },
             'permissions': {
-                form['league']: []
+                form['league']: "Default"
             },
             'teams': [],
             'auth': {},
@@ -285,10 +285,11 @@ class User:
     
     @staticmethod
     def check_permissions_to_add(position, user):
-        leagueId = session['league']['leagueId']
+        league = session['league']
+        perm_group = user['permissions'][league['leagueId']]
         for perm in position['permissions']:
-                    if perm not in user['permissions'][leagueId]:
-                        return False
+            if perm not in league['perm_groups'][perm_group]['perms']:
+                return False
         return True
     
     @staticmethod

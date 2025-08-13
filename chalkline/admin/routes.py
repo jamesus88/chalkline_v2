@@ -1,10 +1,12 @@
 from flask import render_template, request, Blueprint, current_app, abort
-from chalkline.core import server as svr, get_us_states
+from chalkline.core import server as svr, get_us_states, now
 from chalkline.core.events import Event, Filter
 from chalkline.core.league import League, Venue
 from chalkline.core.team import Team
+from chalkline.core.requests import Request
 from chalkline.core.user import User
 import chalkline.core.mailer as mailer
+from datetime import datetime
 from werkzeug.utils import secure_filename
 import os
 from .admin import Admin
@@ -97,27 +99,8 @@ def user_data():
         elif request.form.get('remove'):
             u = User.remove_league(request.form['remove'], res['league']['leagueId'])
             res['msg'] = f"{u['firstLast']} removed from your league."
-        elif request.form.get('umpire_add_all'):
-            Admin.umpire_add_all(res['league'])
-            res['msg'] = "Umpire add opened."
-        elif request.form.get('umpire_add_none'):
-            Admin.umpire_add_none(res['league'])
-            res['msg'] = "Umpire add closed."
-        elif request.form.get('umpire_remove_all'):
-            Admin.umpire_remove_all(res['league'])
-            res['msg'] = "Umpire drop opened."
-        elif request.form.get('umpire_remove_none'):
-            Admin.umpire_remove_none(res['league'])
-            res['msg'] = "Umpire drop closed."
-        elif request.form.get('coach_add_all'):
-            Admin.coach_add_all(res['league'])
-            res['msg'] = "Coach add opened."
-        elif request.form.get('coach_add_none'):
-            Admin.coach_add_none(res['league'])
-            res['msg'] = "Coach add closed."
 
     users = User.get(res, add_criteria={'leagues': {'$in': [res['league']['leagueId']]}}, filters=filters)
-    res['league']['permissions'] = User.generate_permissions(res['league'])
     groups = User.get_all_groups()
 
     return render_template("admin/user-data.html", res=res, users=users, groups=groups, filters=filters)
@@ -160,6 +143,62 @@ def add_team():
             res['msg'] = e
 
     return render_template("admin/add-team.html", res=res, coaches=coaches)
+
+@admin.route("/groups", methods=['GET', 'POST'])
+def group_data():
+    mw = svr.authorized_only('admin')
+    if mw: return mw
+
+    res = svr.obj()
+
+    if request.method == 'POST':
+        if request.form.get('add'):
+            group = {
+                'name': request.form['name'],
+                'perms': request.form.getlist('perms'),
+                'pending_update': None,
+                'last_updated': now()
+            }
+            League.add_group(res['league'], group)
+
+        elif request.form.get('delete'):
+            League.delete_group(res['league'], request.form['delete'])
+
+        elif request.form.get('update_now'):
+            name = request.form['update_now']
+            perms = request.form.getlist(f'{name}_perms')
+            League.update_group(res['league'], name, perms)
+
+        elif request.form.get('update_later'):
+            name = request.form['update_later']
+            perms = request.form.getlist(f'{name}_perms')
+            date = request.form[f'{name}_next_update']
+            req = Request.create(res, "update_permissions", date, group=name, perms=perms)
+            League.update_group_later(res['league'], name, req)
+
+        elif request.form.get('cancel_update'):
+            req_id = request.form['cancel_update']
+            Request.cancel(req_id)
+
+        elif request.form.get('umpire_add_all'):
+            Admin.umpire_add_all(res['league'])
+        elif request.form.get('umpire_add_none'):
+            Admin.umpire_add_none(res['league'])
+        elif request.form.get('umpire_remove_all'):
+            Admin.umpire_remove_all(res['league'])
+        elif request.form.get('umpire_remove_none'):
+            Admin.umpire_remove_none(res['league'])
+        elif request.form.get('coach_add_all'):
+            Admin.coach_add_all(res['league'])
+        elif request.form.get('coach_add_none'):
+            Admin.coach_add_none(res['league'])
+
+        svr.login(res['user'], res['league']['leagueId'])
+        res = svr.obj()
+        res['msg'] = "Groups updated!"
+        
+    all_perms = User.generate_permissions(res['league'])
+    return render_template("admin/group-data.html", res=res, all_perms=all_perms)
 
 @admin.route("/manage-league", methods=['GET', 'POST'])
 def manage_league():

@@ -81,6 +81,7 @@
                 <div class="hide" id="admin-menu">
                     <a href="{{url_for('admin.event_data')}}" class="menu">Events</a>
                     <a href="{{url_for('admin.user_data')}}" class="menu">Users</a>
+                    <a href="{{url_for('admin.group_data')}}" class="menu">Groups</a>
                     <a href="{{url_for('admin.team_data')}}" class="menu">Teams</a>
                     <a href="{{url_for('admin.manage_league')}}" class="menu">League</a>
                     <a href="{{url_for('admin.announcement')}}" class="menu">Announcements</a>
@@ -206,6 +207,23 @@
     </center>
     <section id="developers-log">
         <h2>Developer's Log</h2>
+    </section>
+    <section>
+        <div class="split">
+            <div>
+                <p>Overhauled permissions and groups:</p>
+                <p>Admins can now assign users to permission groups.</p>
+                <p>Permission groups now contain user permissions for all members.</p>
+                <p>Added ability to schedule permission updates.</p>
+                <p>Implemented new request system.</p>
+                <p>Changed permission storage in database.</p>
+                <p>Added API call to check updates every 15min.</p>
+            </div>
+            <div>
+                <h3>v5.11.0</h3>
+                <h4>Aug. 13 2025</h4>
+            </div>
+        </div>
     </section>
     <section>
         <div class="split">

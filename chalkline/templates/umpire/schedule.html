@@ -57,7 +57,7 @@
                             {% if e.locked %}
                                 <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action"><i class="fa-solid fa-lock"></i> locked</button></td>
                             {% else %}
-                                {% if e.umpire_full or 'umpire_add' not in res.user.permissions.get(res.league.leagueId) %}
+                                {% if e.umpire_full or 'umpire_add' not in res.user_perms %}
                                 <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action"><i class="fa-solid fa-magnifying-glass"></i> view
                                 {% else %}
                                 <td><button type="button" onclick="openPopup('{{e._id}}')" class="schedule-action blue-text">+ add
@@ -74,7 +74,7 @@
                                     Team Duty ({{u.team_duty}})
                                 {% elif e.locked or not res.league.umpire_add %}
                                     Locked
-                                {% elif 'umpire_add' in res.user.permissions.get(res.league.leagueId) and e.date > res.date %}
+                                {% elif 'umpire_add' in res.user_perms and e.date > res.date %}
                                     <button class="schedule-action" name="add_game" value="{{e._id}}_{{pos}}">+ {{pos}}</button>
                                 {% else %}
                                     Closed
@@ -97,7 +97,7 @@
                                 Team Duty ({{u.team_duty}})
                             {% elif e.locked or not res.league.umpire_add %}
                                 Locked
-                            {% elif 'umpire_add' in res.user.permissions.get(res.league.leagueId) and e.date > res.date %}
+                            {% elif 'umpire_add' in res.user_perms and e.date > res.date %}
                                 <button class="schedule-action" name="add_game" value="{{e._id}}_{{pos}}">+ {{pos}}</button>
                             {% else %}
                                 Closed

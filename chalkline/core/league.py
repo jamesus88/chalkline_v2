@@ -35,6 +35,11 @@ class League:
                 'coach_code': form['coach_code'],
                 'director_code': form['director_code']
             },
+            'perm_groups': [{
+                'name': 'Default',
+                'users': None,
+                'perms': []
+            }],
             'active': True,
             'umpire_add': False,
             'require_perm': True,
@@ -79,6 +84,47 @@ class League:
     @staticmethod
     def remove_venue(league, venueId):
         League.col.update_one({'leagueId': league['leagueId']}, {'$pull': {'venues': venueId}})
+
+    @staticmethod
+    def add_group(league, group: dict):
+        grp_names = [g['name'] for g in league['perm_groups']]
+        if group['name'] in grp_names:
+            raise ValueError("Group name must be unique!")
+        
+        League.col.update_one({'leagueId': league['leagueId']}, {"$push": {"perm_groups": group}})
+
+    @staticmethod
+    def delete_group(league, group_name):
+        if group_name == "Default":
+            raise ValueError("Cannot delete Default group!")
+        League.col.update_one(
+            {'leagueId': league['leagueId']}, 
+            {"$pull": {"perm_groups": {"name": group_name}}}
+        )
+
+    @staticmethod
+    def update_group(league, group_name, perms):
+        League.col.update_one(
+            {'leagueId': league['leagueId']}, 
+            {"$set": {"perm_groups.$[elem].perms": perms, "perm_groups.$[elem].last_updated": now(), "perm_groups.$[elem].pending_update": None}},
+            array_filters=[{'elem.name': group_name}]
+        )
+
+    @staticmethod
+    def update_group_later(league, group_name, req):
+        League.col.update_one(
+            {'leagueId': league['leagueId']}, 
+            {"$set": {"perm_groups.$[elem].pending_update": req['_id']}},
+            array_filters=[{'elem.name': group_name}]
+        )
+
+    @staticmethod
+    def cancel_group_update(league, group_name):
+        League.col.update_one(
+            {'leagueId': league['leagueId']}, 
+            {"$set": {"perm_groups.$[elem].pending_update": None}},
+            array_filters=[{'elem.name': group_name}]
+        )
 
 class Venue:
     col = venueData

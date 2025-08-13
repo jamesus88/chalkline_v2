@@ -19,21 +19,10 @@
     <section class="split">
         <div>
             <h1 class="fancy">Users</h1>
-            <p class="subtle">Hold ctrl on PC or cmd on Mac to select multiple groups/permissions</p>
+            <p class="subtle">Hold ctrl on PC or cmd on Mac to select multiple groups</p>
             <p class="error">{{res.msg}}</p>
         </div>
         <div>
-            <br>
-            <h3>Quick Actions</h3>
-            <form method="post">
-                <button class="action secondary" name="umpire_add_all" value="1" onclick="return confirm('Allow all active umpires in your league to add games?')">Open Umpire Add</button> 
-                <button class="action secondary" name="umpire_add_none" value="1" onclick="return confirm('Close umpire game adding?')">Close Umpire Add</button>
-                <button class="action secondary" name="umpire_remove_all" value="1" onclick="return confirm('Allow all umpires in your league to drop games?')">Open Umpire Drop</button> 
-                <button class="action secondary" name="umpire_remove_none" value="1" onclick="return confirm('Close umpire drop?')">Close Umpire Drop</button>
-                <br><br>
-                <button class="action secondary" name="coach_add_all" value="1" onclick="return confirm('Allow all active coaches in your league to request youth umps?')">Open Coach Add</button>
-                <button class="action secondary" name="coach_add_none" value="1" onclick="return confirm('Lock all youth umpire requests?')">Close Coach Add</button>
-            </form>
         </div>
     </section>
     <form method="post">
@@ -75,28 +64,21 @@
                         <option value="{{g}}">{{g}}</option>
                         {% endfor %}
                     </select></td>
-                    <td><select name="{{u._id}}_permissions" id="{{u._id}}_permissions" multiple>
-                        <option value="blank">None</option>
-                        {% for p in res.league.permissions %}
-                        <option value="{{p}}">{{p}}</option>
+                    <td><select name="{{u._id}}_permissions" id="{{u._id}}_permissions">
+                        {% for g in res.league.perm_groups %}
+                        <option value="{{g.name}}">{{g.name}}</option>
                         {% endfor %}
+                        <script>
+                            document.getElementById("{{u._id}}_permissions").value = "{{u.permissions.get(res.league.leagueId)}}";
+                        </script>
                     </select></td>
 
                     <script>
                         groups = JSON.parse('{{u.groups.get(res.league.leagueId)|tojson}}')
-                        permissions = JSON.parse('{{u.permissions.get(res.league.leagueId)|tojson}}')
                         groups_select = document.getElementById('{{u._id}}_groups')
-                        permissions_select = document.getElementById('{{u._id}}_permissions')
                         for (g of groups) {
                             for (o of groups_select.options) {
                                 if (o.value == g) {
-                                    o.selected = true
-                                }
-                            }
-                        }
-                        for (p of permissions) {
-                            for (o of permissions_select.options) {
-                                if (o.value == p) {
                                     o.selected = true
                                 }
                             }

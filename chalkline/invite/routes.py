@@ -4,6 +4,7 @@ from chalkline.core.user import User
 from chalkline.core.calendar import Calendar
 from chalkline.core.events import Event
 from chalkline.core.league import League
+from chalkline.core.requests import Request
 from chalkline.core import now
 from chalkline.core import server as svr
 from chalkline.core import mailer
@@ -93,6 +94,18 @@ def daily_reminders(chalkline_auth=None):
     print("Password reset links marked invalid.")
     
     return jsonify("Success!")
+
+@invite.post("/update-15")
+def update_15(chalkline_auth=None):
+    if chalkline_auth != CHALKLINE_AUTH:
+        raise PermissionError("Credentials failed")
+    
+    all_reqs = Request.get(now())
+    for r in all_reqs:
+        Request.perform(r)
+
+    print("15 min update complete,", len(all_reqs), "requests performed.")
+    return jsonify(f"Success! {len(all_reqs)} requests performed.")
 
 @invite.route("/add-league/<leagueId>", methods=['GET', 'POST'])
 def add_league(leagueId):

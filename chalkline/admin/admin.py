@@ -27,7 +27,7 @@ class Admin:
             date_attrs = ['date', 'start_date', 'end_date']
             int_attrs = ['field']
             float_attrs = ['duration']
-            multi_attrs = ['groups', 'permissions']
+            multi_attrs = ['groups']
             league_specific = ['groups', 'permissions']
             ump_attrs = Event.get_all_ump_positions()
 
@@ -101,45 +101,27 @@ class Admin:
 
     @staticmethod
     def umpire_add_all(league):
-        User.col.update_many(
-            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'groups.{league['leagueId']}': {'$in': ["umpire"]}}, 
-            {'$push': {f'permissions.{league['leagueId']}': "umpire_add"}}
-        )
+        League.col.update_one({'leagueId': league['leagueId']}, {"$push": {"perm_groups.$[].perms": "umpire_add"}})
 
     @staticmethod
     def umpire_add_none(league):
-        User.col.update_many(
-            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'groups.{league['leagueId']}': {'$in': ["umpire"]}}, 
-            {'$pull': {f'permissions.{league['leagueId']}': "umpire_add"}}
-        )
+        League.col.update_one({'leagueId': league['leagueId']}, {"$pull": {"perm_groups.$[].perms": "umpire_add"}})
 
     @staticmethod
     def umpire_remove_all(league):
-        User.col.update_many(
-            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'groups.{league['leagueId']}': {'$in': ["umpire"]}}, 
-            {'$push': {f'permissions.{league['leagueId']}': "umpire_remove"}}
-        )
+        League.col.update_one({'leagueId': league['leagueId']}, {"$push": {"perm_groups.$[].perms": "umpire_remove"}})
 
     @staticmethod
     def umpire_remove_none(league):
-        User.col.update_many(
-            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'groups.{league['leagueId']}': {'$in': ["umpire"]}}, 
-            {'$pull': {f'permissions.{league['leagueId']}': "umpire_remove"}}
-        )
+        League.col.update_one({'leagueId': league['leagueId']}, {"$pull": {"perm_groups.$[].perms": "umpire_remove"}})
     
     @staticmethod
     def coach_add_all(league):
-        User.col.update_many(
-            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'groups.{league['leagueId']}': {'$in': ["coach"]}}, 
-            {'$push': {f'permissions.{league['leagueId']}': {"$each": ["coach_add", "coach_remove"]}}}
-        )
+        League.col.update_one({'leagueId': league['leagueId']}, {"$pull": {"perm_groups.$[].perms": "coach_add"}})
 
     @staticmethod
     def coach_add_none(league):
-        User.col.update_many(
-            {'active': True, 'leagues': {'$in': [league['leagueId']]}, f'groups.{league['leagueId']}': {'$in': ["coach"]}}, 
-            {'$pull': {f'permissions.{league['leagueId']}': "coach_add"}}
-        )
+        League.col.update_one({'leagueId': league['leagueId']}, {"$pull": {"perm_groups.$[].perms": "coach_add"}})
 
     @staticmethod
     def generate_dod_shifts(league):

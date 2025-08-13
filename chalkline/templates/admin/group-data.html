@@ -1,0 +1,117 @@
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='schedule.css')}}">
+    <script src="{{url_for('static', filename='share.js')}}" defer></script>
+    <style>
+        @media screen and (max-width: 2000px) {
+            main {
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+
+{% extends "design.html" %}
+{% block title %}Admin{% endblock title %}
+
+{% block content %}
+<main>
+    <section class="split">
+        <div>
+            <h1 class="fancy">Groups</h1>
+            <p class="subtle">Hold ctrl on PC or cmd on Mac to select multiple permissions</p>
+            <p class="error">{{res.msg}}</p>
+        </div>
+        <div>
+            <br>
+            <h3>Quick Actions (all groups)</h3>
+            <form method="post">
+                <button class="action secondary" name="umpire_add_all" value="1" onclick="return confirm('Allow all active umpires in your league to add games?')">Open Umpire Add</button> 
+                <button class="action secondary" name="umpire_add_none" value="1" onclick="return confirm('Close umpire game adding?')">Close Umpire Add</button>
+                <button class="action secondary" name="umpire_remove_all" value="1" onclick="return confirm('Allow all umpires in your league to drop games?')">Open Umpire Drop</button> 
+                <button class="action secondary" name="umpire_remove_none" value="1" onclick="return confirm('Close umpire drop?')">Close Umpire Drop</button>
+                <br><br>
+                <button class="action secondary" name="coach_add_all" value="1" onclick="return confirm('Allow all active coaches in your league to request youth umps?')">Open Coach Add</button>
+                <button class="action secondary" name="coach_add_none" value="1" onclick="return confirm('Lock all youth umpire requests?')">Close Coach Add</button>
+            </form>
+        </div>
+    </section>
+
+    <form method="post">
+        <section class="schedule-section scrollwrapper">
+            {% if res.league.perm_groups|length < 1 %}
+            <h3 class="error">No groups found.</h3>
+            {% endif %}
+
+            <table id="schedule-table" class="event-display admin">
+                <tr>
+                    <th>Name</th>
+                    <th>Permissions</th>
+                    <th>Update Now</th>
+                    <th>Update Later</th>
+                    <th>Remove</th>
+                </tr>
+                {% for g in res.league.perm_groups %}
+                <tr class="event-row">
+                    <td class="event-type">{{g.name}}</td>
+                    <td><select name="{{g.name}}_perms" id="{{g.name}}_perms" multiple>
+                        <option value="None">None</option>
+                        {% for p in all_perms %}
+                        <option value="{{p}}">{{p}}</option>
+                        {% endfor %}
+                    </select></td>
+
+                    <script>
+                        perms = JSON.parse('{{g.perms|tojson}}')
+                        perms_select = document.getElementById('{{g.name}}_perms')
+                        for (p of perms) {
+                            for (o of perms_select.options) {
+                                if (o.value == p) {
+                                    o.selected = true
+                                }
+                            }
+                        }
+                    </script>
+                    
+                    <td><button type="submit" onclick="return confirm('Update group now?')" class="schedule-action" name="update_now" value="{{g.name}}">Update Now</button></td>
+                    
+                    {% if g.pending_update %}
+                    <td>
+                        Scheduled (<a href="">view</a>)
+                        <button type="submit" class="schedule-action danger" onclick="return confirm('Cancel update?')" name="cancel_update" value="{{g.pending_update}}">X</button>
+                    </td>
+                    {% else %}
+                    <td>
+                        <input class="admin" type="datetime-local" name="{{g.name}}_next_update" id="{{g.name}}_next_update">
+                        <button type="submit" onclick="return confirm('Update group later?')" class="schedule-action" name="update_later" value="{{g.name}}">Schedule Update</button>
+                    </td>
+                    {% endif %}
+
+                    
+                    {% if g.name == 'Default' %}
+                    <td><button disabled="true" class="schedule-action disabled">Delete</button></td>
+                    {% else %}
+                    <td><button type="submit" onclick="return confirm('Delete group? All users will be placed in Default group.')" class="schedule-action danger" name="delete" value="{{g.name}}">Delete</button></td>
+                    {% endif %}
+                    
+                </tr>
+
+                {% endfor %}
+            </table>
+        </section>
+    </form>
+    <hr>
+    <form method="post">
+        <center>
+        <h2>Add Group</h2>
+        Name: <input type="text" name="name" id="name" required> <br> <br>
+        Permissions: <select name="perms" id="perms" multiple>
+            {% for p in all_perms %}
+            <option value="{{p}}">{{p}}</option>
+            {% endfor %}
+        </select> <br><br>
+        <button class="action" type="submit" name="add" value="1" onclick="return confirm('Add group?')">Add</button>
+        <p class="subtle">Add users to this group on the User page after creation</p>
+        </center>
+    </form>
+</main>
+{% endblock content %}

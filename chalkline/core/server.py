@@ -22,7 +22,18 @@ def login(user, leagueId=None, admin=None):
 def logout():
     session.clear()
 
+def get_perm_group(league, user):
+    if user is None or league is None:
+        return {'name': None, 'perms': []}
+    else:
+        for g in league['perm_groups']:
+            if user['permissions'][league['leagueId']] == g['name']:
+                return g
+
 def obj(context={}):
+    user = session.get('user')
+    league = session.get('league')
+    perm_group = get_perm_group(league, user)
     res = {
         'protocol': PROTOCOL,
         'domain': DOMAIN,
@@ -30,8 +41,10 @@ def obj(context={}):
         'version': VERSION,
         'copyright': COPYRIGHT,
         'date': now(),
-        'user': session.get('user'),
-        'league': session.get('league'),
+        'user': user,
+        'league': league,
+        'user_perm_group': perm_group['name'],
+        'user_perms': perm_group['perms'],
         'admin': session.get('admin'),
         'flash': session.get('flash')
     }
