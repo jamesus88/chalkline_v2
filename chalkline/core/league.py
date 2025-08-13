@@ -102,6 +102,12 @@ class League:
             {"$pull": {"perm_groups": {"name": group_name}}}
         )
 
+        # reset any users with this group
+        User.col.update_many(
+            {f'permissions.{league['leagueId']}': group_name},
+            {"$set": {f'permissions.{league['leagueId']}': "Default"}}
+        )
+
     @staticmethod
     def update_group(league, group_name, perms):
         League.col.update_one(

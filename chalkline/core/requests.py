@@ -2,6 +2,7 @@ from chalkline.collections import requestData
 from chalkline.core import _safe, now, ObjectId
 from datetime import datetime
 from chalkline.core.league import League
+import chalkline.core.server as svr
 
 class Request:
     col = requestData
@@ -30,11 +31,19 @@ class Request:
 
         
         return _safe(req)
+    
+    @staticmethod
+    def find(req_id):
+        r = Request.col.find_one({"_id": ObjectId(req_id)})
+        if r:
+            return _safe(r)
+        else:
+            return None
 
     @staticmethod
     def get(date=None):
         if date:
-            reqs = Request.col.find({'next_update': {'$gte': now()}})
+            reqs = Request.col.find({'next_update': {'$lte': now()}})
         else:
             reqs = Request.col.find({})
 

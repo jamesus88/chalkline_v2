@@ -3,6 +3,8 @@ from chalkline.core import server as svr
 from chalkline.core.events import Event
 from chalkline.core.user import User
 from chalkline.core.league import League
+from chalkline.core.requests import Request
+from chalkline.admin.admin import Admin
 from chalkline.core.team import Team
 
 view_info = Blueprint('view_info', __name__)
@@ -72,6 +74,28 @@ def user(userId=None):
         return redirect(url_for('main.home'))
 
     return render_template("view_info/user.html", res=res, user=u)
+
+@view_info.route("/request/<req_id>", methods=['GET', 'POST'])
+@view_info.route("/request")
+def req(req_id=None):
+    mw = svr.authorized_only("admin", set_next_url=request.url)
+    if mw: return mw
+    res = svr.obj()
+
+    if req_id:
+        r = Request.find(req_id)
+        if not r:
+            abort(404)
+    else:
+        return redirect(url_for('main.home'))
+    
+    if request.method == 'POST':
+        if request.form.get('cancel'):
+            Request.cancel(req_id)
+            return redirect(url_for('admin.group_data'))
+    
+    return render_template("view_info/request.html", res=res, r=r)
+
 
 @view_info.route("/team/<teamId>", methods=['GET', 'POST'])
 @view_info.route("/team")

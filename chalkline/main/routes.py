@@ -59,33 +59,26 @@ def profile():
             return redirect(url_for('main.home'))
         
         elif request.form.get('getCalendar'):
-            user = User.get_calendar(res['user'])
-            svr.login(user)
+            User.get_calendar(res['user'])
 
         elif request.form.get('removeTeam'):
-            user = User.remove_team(res['user'], request.form['removeTeam'])
-            svr.login(user)
+            User.remove_team(res['user'], request.form['removeTeam'])
 
         elif request.form.get('addTeam'):
             teamId = request.form['newTeam']
-            try: user = User.add_team(res['user'], teamId)
+            try: User.add_team(res['user'], teamId)
             except ValueError as e: msg = e
-            else:
-                svr.login(user)
 
         elif request.form.get('updateProfile'):
-            user = User.update_profile(res['user'], request.form)
-            svr.login(user)
+            User.update_profile(res['user'], request.form)
 
         elif request.form.get('removeLoc'):
             leagueId = request.form['removeLoc']
-            user = User.remove_league(res['user']['userId'], leagueId)
-            svr.login(user)
+            User.remove_league(res['user']['userId'], leagueId)
 
         elif request.form.get('addLeague'):
             league = League.get(request.form['new_league'])
-            user = User.add_league(res['user'], league, request.form)
-            svr.login(user)
+            User.add_league(res['user'], league, request.form)
 
         elif request.form.get('admin-features'):
             assert 'admin' in res['user']['groups'][res['league']['leagueId']], "You do not have permission to access these features."
@@ -100,8 +93,11 @@ def profile():
             leagueId = request.form.get('location')
             svr.login(res['user'], leagueId=leagueId)
 
-        res = svr.obj()
+        res = svr.refresh()
         res['msg'] = msg
+
+        if request.form.get('refresh'):
+            return redirect(url_for('main.home'))
 
     res['user'] = Team.load_teams(res['user'], res['league'])
     all_teams = Team.get_league_teams(res['league'])

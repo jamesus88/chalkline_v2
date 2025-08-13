@@ -2,6 +2,7 @@ from flask import session, redirect, url_for, request
 from chalkline import PROTOCOL, DOMAIN, APP_NAME, VERSION, COPYRIGHT
 from chalkline.core import now
 from chalkline.core.league import League
+from chalkline.core.user import User
 
 def login(user, leagueId=None, admin=None):
     if leagueId:
@@ -21,6 +22,21 @@ def login(user, leagueId=None, admin=None):
 
 def logout():
     session.clear()
+
+def refresh(context={}):
+    assert session['user'], "Login Error: no user"
+    assert session['league'], "Login Error: no league"
+    assert session['admin'] is not None, "Login Error: no admin"
+
+    userId = session['user']['userId']
+    leagueId = session['league']['leagueId']
+    session['user'] = User.get_user(userId=userId)
+    session['league'] = League.get(leagueId)
+
+    res = obj()
+    res.update(context)
+    return res
+
 
 def get_perm_group(league, user):
     if user is None or league is None:

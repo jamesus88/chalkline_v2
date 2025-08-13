@@ -12,6 +12,10 @@
         <h3>Need Help? Check the <a href="{{url_for('docs.profile')}}">Docs</a>. Or <a href="{{url_for('main.home')}}">Return Home</a>.</h3>
         <h3 class='error'>{{res.msg}}</h3>
 
+        <form method="post">
+            <button class="action" type="submit" name="refresh" value="0">Refresh Chalkline</button>
+        </form>
+        <p class="subtle">This may help reload your account's permissions or groups</p>
         {% if res.user.auth.calendar %}
         <section>
             <h3>Chalkline iCalendar Feed</h3>

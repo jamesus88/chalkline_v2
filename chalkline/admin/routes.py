@@ -193,9 +193,7 @@ def group_data():
         elif request.form.get('coach_add_none'):
             Admin.coach_add_none(res['league'])
 
-        svr.login(res['user'], res['league']['leagueId'])
-        res = svr.obj()
-        res['msg'] = "Groups updated!"
+        res = svr.refresh({'msg': "Groups updated!"})
         
     all_perms = User.generate_permissions(res['league'])
     return render_template("admin/group-data.html", res=res, all_perms=all_perms)

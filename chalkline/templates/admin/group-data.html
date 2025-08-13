@@ -17,7 +17,7 @@
 <main>
     <section class="split">
         <div>
-            <h1 class="fancy">Groups</h1>
+            <h1 class="fancy">Permissions</h1>
             <p class="subtle">Hold ctrl on PC or cmd on Mac to select multiple permissions</p>
             <p class="error">{{res.msg}}</p>
         </div>
@@ -76,7 +76,7 @@
                     
                     {% if g.pending_update %}
                     <td>
-                        Scheduled (<a href="">view</a>)
+                        Scheduled (<a href="{{url_for('view_info.req', req_id=g.pending_update)}}">view</a>)
                         <button type="submit" class="schedule-action danger" onclick="return confirm('Cancel update?')" name="cancel_update" value="{{g.pending_update}}">X</button>
                     </td>
                     {% else %}
@@ -102,7 +102,7 @@
     <hr>
     <form method="post">
         <center>
-        <h2>Add Group</h2>
+        <h2>Add Permission Group</h2>
         Name: <input type="text" name="name" id="name" required> <br> <br>
         Permissions: <select name="perms" id="perms" multiple>
             {% for p in all_perms %}
