@@ -14,6 +14,18 @@
     --warning: orange;
     --bg-secondary: rgb(236, 236, 236);
 }
+* {
+    overflow-x: scroll;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+    scrollbar-width: none;
+    /*IE10+*/
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+*::--webkit-scrollbar {
+    display: none;
+}
 html {
     scroll-behavior: smooth;
 }
