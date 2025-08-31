@@ -1,6 +1,6 @@
 from chalkline.collections import userData, leagueData
 from werkzeug.security import check_password_hash, generate_password_hash
-from chalkline.core import now, check_unique, _safe
+from chalkline.core import now, check_unique, _safe, find
 from uuid import uuid4
 from flask import session, render_template
 from chalkline.core import mailer
@@ -288,7 +288,7 @@ class User:
         league = session['league']
         perm_group = user['permissions'][league['leagueId']]
         for perm in position['permissions']:
-            if perm not in league['perm_groups'][perm_group]['perms']:
+            if perm not in find(league['perm_groups'], "name", perm_group)['perms']:
                 return False
         return True
     

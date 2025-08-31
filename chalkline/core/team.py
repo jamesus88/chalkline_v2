@@ -24,7 +24,8 @@ class Team:
             if form.get('filter_age', 'None') != 'None':
                 filters['age'] = form['filter_age']
 
-            filters['season'] = form.get('filter_season')
+            if form.get('filter_season', 'None') != 'None':
+                filters['season'] = form['filter_season']
             
             return filters
 
@@ -60,12 +61,12 @@ class Team:
     
     @staticmethod
     def get_league_teams(league, filters=Filter.default()):
-        if not filters['season']: filters['season'] = league['current_season']
-
-        criteria = [{'leagueId': league['leagueId']}, {f'seasons.{filters['season']}': {'$exists': True}}]
+        criteria = [{'leagueId': league['leagueId']}]
         
-        if filters.get('age') is not None:
+        if filters.get('age'):
             criteria.append({'age': filters['age']})
+        if filters.get('season'):
+            criteria.append({f'seasons.{filters['season']}': {'$exists': True}})
 
         return [Team.safe(t) for t in Team.col.find({'$and': criteria}).sort("teamId")]
     

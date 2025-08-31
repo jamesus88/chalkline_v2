@@ -18,6 +18,12 @@ def _safe(obj):
     obj['_id'] = str(obj['_id'])
     return obj
 
+def find(list_of_dicts, key, value):
+    for d in list_of_dicts:
+        if d[key] == value:
+            return d
+    return None
+
 def remove_dups(seq):
     seen = set()
     seen_add = seen.add
