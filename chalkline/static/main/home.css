@@ -146,11 +146,13 @@ section.menu:hover div.hide {
     display: block;
 }
 .about-page {
-    box-shadow: 0px 0px 50px rgb(47, 0, 141);
+    margin: 40px;
+    box-shadow: 0px 0px 30px rgb(47, 0, 141);
+    overflow: visible;
     transition: box-shadow 0.3s;
 }
 .about-page:hover {
-    box-shadow: 0 0 50px rgb(85, 0, 255);
+    box-shadow: 0 0 34px rgb(85, 0, 255);
 }
 div.pricing {
     background-color: white;
