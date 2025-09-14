@@ -157,6 +157,11 @@ class Admin:
             count += len(shifts)
 
         return count
+    
+    @staticmethod
+    def remove_all_coaches(league):
+        User.col.update_many({'leagues': {"$in": [league['leagueId']]}}, {'$pull': {'teams': {"$regex": f"^{league['abbr']}"}}})
+        Team.col.update_many({'leagueId': league['leagueId']}, {'$set': {f'seasons.{league['current_season']}.coaches': []}})
 
     @staticmethod
     def read_schedule(res, file):

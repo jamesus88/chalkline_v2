@@ -122,6 +122,9 @@ def team_data():
         elif request.form.get('save'):
             Admin.update_all(request.form, Team, res['league'])
             res['msg'] = "Teams updated."
+        elif request.form.get('remove_coaches'):
+            Admin.remove_all_coaches(res['league'])
+            res['msg'] = "Coaches removed from all teams."
 
 
     teams = Team.get_league_teams(res['league'], filters=filters)
