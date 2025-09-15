@@ -174,8 +174,15 @@ class Admin:
         df = df.replace({float('nan'): None}) # replace NaN with None
 
         # strip all string cols
-        str_col = df.select_dtypes('object')
-        df[str_col.columns] = str_col.apply(lambda x: x.str.strip())
+        # str_col = df.select_dtypes('object')
+        # print(str_col)
+        # df[str_col.columns] = str_col.apply(lambda x: x.str.strip())
+        def strip_spaces(x):
+            if type(x) == str:
+                return x.strip()
+            else: return x
+
+        df = df.map(strip_spaces)
 
         # check for errors
         if len(set(df['type'].unique()).difference({'Game', 'Practice'})) > 0:

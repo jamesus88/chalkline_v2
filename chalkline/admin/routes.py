@@ -222,6 +222,8 @@ def manage_league():
             Admin.toggle_perm(res['league'], 'umpire_add')
         elif request.form.get('toggleReqPerm'):
             Admin.toggle_perm(res['league'], 'require_perm')
+        elif request.form.get('maxUmpireGames'):
+            League.set_max_umpire_games(res['league'], request.form['maxUmpireGames'])
         elif request.form.get('updateVenue'):
             Venue.update(request.form)
             msg = "Venue updated!"

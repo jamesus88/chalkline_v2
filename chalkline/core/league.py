@@ -132,6 +132,10 @@ class League:
             array_filters=[{'elem.name': group_name}]
         )
 
+    @staticmethod
+    def set_max_umpire_games(league, max_umpire_games):
+        League.col.update_one({'leagueId': league['leagueId']}, {'$set': {'max_umpire_games': int(max_umpire_games)}})
+
 class Venue:
     col = venueData
 

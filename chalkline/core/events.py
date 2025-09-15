@@ -280,6 +280,11 @@ class Event:
         return True
     
     @staticmethod
+    def count_umpire_duties(league, user):
+        events = Event.get(league, user = user, check_user_teams=False)
+        return len(events)
+    
+    @staticmethod
     def add_umpire(league, eventId, user, pos):
         # check league is open
         if not league['umpire_add']:
@@ -303,6 +308,12 @@ class Event:
         # check availability
         if not Event.check_availability(league, event, user):
             raise PermissionError("Error: you are already scheduled during this time! (conflict found)")
+        
+        # check max games
+        max_games = league.get('max_umpire_games', -1)
+        if max_games > -1:
+            if Event.count_umpire_duties(league, user) >= max_games:
+                raise PermissionError(f"Error: you've already signed up for {max_games} games (current league limit).")
         
         
         if umpire.get("coach_req"):

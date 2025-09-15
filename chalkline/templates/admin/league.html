@@ -64,6 +64,13 @@
                         {% endif %}
                     </p>
                 </form>
+                <form method="post">
+                    <p>
+                        <label for="maxUmpireGames">Max umpire signup:</label>
+                        <input type="number" name="maxUmpireGames" id="maxUmpireGames" value="{{res.league.max_umpire_games}}" required onchange="this.form.submit()">
+                        <p class="subtle">The maximum allowed games umpire can sign up for. Set to -1 for unlimited.</p>
+                    </p>
+                </form>
             </center>
         </section>
 

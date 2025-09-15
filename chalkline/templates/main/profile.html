@@ -107,9 +107,10 @@
         </section>
         {% endif %}
         
-        <section>
+        <section id="personal-info">
             <form method="post" id="profile">
                 <h3>Personal Information</h3>
+                <p>Your account is {% if res.user.active %}<b style="color:blue">active!</b>{% else %}<b style="color:red">inactive.</b>{% endif %}</p>
                 <table class="center">
                     <tr>
                         <td><label for="firstName">First Name</label></td>
