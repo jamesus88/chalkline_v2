@@ -258,6 +258,7 @@ def announcement():
         content = request.form.get("msg")
 
         groups = request.form.getlist("group")
+        perm_groups = request.form.getlist("perm_group")
         teams = request.form.getlist("teams")
 
         if content is None or content == "":
@@ -265,6 +266,8 @@ def announcement():
         elif request.form.get('email'):                
 
             users = User.find_groups(res['league'], groups)
+            users.extend(User.find_perm_groups(res['league'], perm_groups))
+
             for t in teams:
                 users.extend(Team.load_contacts(t, team_is_loaded=False))
 
@@ -285,7 +288,7 @@ def announcement():
 
             print(f"{res['user']['fullName']} ({res['user']['userId']}) sent an announcement to:")
             print(len(emails), "recipients.")
-
+            
             mailer.sendBulkMail(msgs)
             res['msg'] = "Sent!"
         else:

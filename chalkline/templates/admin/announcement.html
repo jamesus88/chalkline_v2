@@ -52,6 +52,13 @@
                             <label for="board">All Directors</label>
                             <input type="checkbox" name="group" value="director" id="director">
                         </div>
+                        <p><b>Permission Groups</b></p>
+                        {% for g in res.league.perm_groups %}
+                            <div>
+                                <label for="{{g.name}}">{{g.name}}</label>
+                                <input type="checkbox" name="perm_group" id="{{g.name}}" value="{{g.name}}">
+                            </div>
+                        {% endfor %}
                         <p><b>Teams</b> - Send to coaches and parents of each team</p>
                         {% for t in all_teams %}
                         <div>

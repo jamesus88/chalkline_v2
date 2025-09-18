@@ -257,6 +257,16 @@ class User:
             return [User.view(u) for u in users]
         else:
             return [User.safe(u) for u in users]
+        
+    @staticmethod
+    def find_perm_groups(league, perm_groups: list, view=False):
+        print(perm_groups)
+        users = User.col.find({'leagues': {'$in': [league['leagueId']]}, f'permissions.{league['leagueId']}': {'$in': perm_groups}, 'active': True}).sort("lastName")
+        if view:
+            return [User.view(u) for u in users]
+        else:
+            return [User.safe(u) for u in users]
+
     
     @staticmethod
     def generate_permissions(league):
