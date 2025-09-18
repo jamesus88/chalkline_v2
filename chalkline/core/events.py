@@ -274,7 +274,7 @@ class Event:
     def check_availability(league, event, user):
         all_events = Event.get(league, user)
         for e in all_events:
-            if e['date'] <= event['date'] < e['date'] + timedelta(hours=event['duration']):
+            if e['date'] <= event['date'] < e['date'] + timedelta(hours=e['duration']):
                 return False
                 
         return True
