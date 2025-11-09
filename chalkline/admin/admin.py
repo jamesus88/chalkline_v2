@@ -184,6 +184,8 @@ class Admin:
 
         df = df.map(strip_spaces)
 
+        df['age'] = df['age'].astype(str)
+
         # check for errors
         if len(set(df['type'].unique()).difference({'Game', 'Practice'})) > 0:
             raise ValueError('One or more event types are invalid. Choose from "Game" or "Practice"')
@@ -192,6 +194,7 @@ class Admin:
             raise ValueError(f'One or more venues are invalid. Choose from {", ".join(res['league']['venues'])} or create new ones.')
         
         if len(set(df['age'].unique()).difference(set(res['league']['age_groups']))) > 0:
+            print(set(df['age'].unique()).difference(set(res['league']['age_groups'])))
             raise ValueError(f'One or more ages are invalid. Choose from {", ".join(res['league']['age_groups'])} or create new ones.')
         
         if len(set(df['away'].unique()).difference(team_codes)) > 0:

@@ -68,8 +68,8 @@ def substitute(eventId, auth):
     return render_template("umpire/substitute.html", res=res, req_user=req_user, event=event, pos=pos)
 
 @invite.post("/daily-reminders")
-def daily_reminders(chalkline_auth=None):
-    if chalkline_auth != CHALKLINE_AUTH:
+def daily_reminders():
+    if request.headers.get("Authorization") != CHALKLINE_AUTH:
         raise PermissionError("Credentials failed")
     
     all_leagues = League.get_all()
@@ -96,8 +96,8 @@ def daily_reminders(chalkline_auth=None):
     return jsonify("Success!")
 
 @invite.post("/update-15")
-def update_15(chalkline_auth=None):
-    if chalkline_auth != CHALKLINE_AUTH:
+def update_15():
+    if request.headers.get("Authorization") != CHALKLINE_AUTH:
         raise PermissionError("Credentials failed")
     
     all_reqs = Request.get(now())

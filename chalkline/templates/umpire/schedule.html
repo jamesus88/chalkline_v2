@@ -75,7 +75,7 @@
                                 {% elif e.locked or not res.league.umpire_add %}
                                     Locked
                                 {% elif 'umpire_add' in res.user_perms and e.date > res.date %}
-                                    <button class="schedule-action" name="add_game" value="{{e._id}}_{{pos}}">+ {{pos}}</button>
+                                    <button class="schedule-action" name="add_game" value="{{e._id}}_{{pos}}">+ {{pos}}{% if u.coach_req %}*{% endif %}</button>
                                 {% else %}
                                     Closed
                                 {% endif %}
@@ -98,7 +98,7 @@
                             {% elif e.locked or not res.league.umpire_add %}
                                 Locked
                             {% elif 'umpire_add' in res.user_perms and e.date > res.date %}
-                                <button class="schedule-action" name="add_game" value="{{e._id}}_{{pos}}">+ {{pos}}</button>
+                                <button class="schedule-action" name="add_game" value="{{e._id}}_{{pos}}">+ {{pos}}{% if u.coach_req %}*{% endif %}</button>
                             {% else %}
                                 Closed
                             {% endif %}
@@ -111,5 +111,6 @@
         </section>
         <button id="load-more" type="button" class="action" onclick="load()">Load More</button>
     </form>
+    {% if res.show_umps %}<p class="subtle">* positions requested by coaches</p>{% endif %}
 </main>
 {% endblock content %}
