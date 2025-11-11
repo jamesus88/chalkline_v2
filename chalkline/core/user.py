@@ -127,7 +127,7 @@ class User:
     def check_safe(s: str):
         if any(((not c.isalnum()) or c == ' ') for c in s):
             raise ValueError("Username cannot contain special characters or spaces.")
-        return s
+        return s.strip()
     
     @staticmethod
     def create(form, league):
@@ -135,7 +135,7 @@ class User:
 
         user = {
             'userId': check_unique(User, 'userId', userId),
-            'email': check_unique(User, 'email', form['email']),
+            'email': check_unique(User, 'email', form['email'].lower().strip()),
             'phone': check_unique(User, 'phone', User.clean_phone(form['phone'])),
             'pword': User.create_pword(form['pword']),
             'firstName': form['firstName'],
