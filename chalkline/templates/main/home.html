@@ -18,6 +18,12 @@
             {% endif %}
         {% endif %}
     <br>
+        <section>
+            <center>
+                <h2>Want to use Chalkline for your league?</h2>
+                <h3>Contact Aidan Hurwitz at <a href="mailto:chalklinebaseball@gmail.com">chalklinebaseball@gmail.com</a> for more info!</h3>
+            </center>
+        </section>
         {% if res.user %}
         {% if upcoming_events|length > 0 %}
             <section id="schedule">
@@ -27,13 +33,6 @@
                 {% endfor %}
             </section>
         {% endif %}
-
-        <section>
-            <center>
-                <h2>Want to use Chalkline for your league?</h2>
-                <h3>Contact Aidan Hurwitz at <a href="mailto:chalklinebaseball@gmail.com">chalklinebaseball@gmail.com</a> for more info!</h3>
-            </center>
-        </section>
         
         <div class="divide">
             {% if 'coach' in res.user.groups.get(res.league.leagueId) or 'parent' in res.user.groups.get(res.league.leagueId) %}
@@ -98,13 +97,12 @@
             }
         </script>
         {% endif %}
-        <section id="supporters">
-            <h3>Enjoying Chalkline? You can support me and Chalkline <a target='_blank' href="https://buymeacoffee.com/aidanhurwitz">here!</a></h3>
-            <h3 class="urgent">Thank you to supporters of Chalkline&trade;!</h3>
-            <p>Dave Miller</p>
-            <p>Chris Riley</p>
-            <p>Scott Elsberry</p>
-            <p>Luke Radcliffe</p>
+        <section>
+            <center>
+                <h2>Support the Developer!</h2>
+                <p>Donate just $2 to help fund updates and show your support!</p>
+                <h3>You can <a target="_blank" href="https://www.buymeacoffee.com/aidanhurwitz">buy me a coffee here</a> to show support.</h3>
+            </center>
         </section>
         <section>
             <h3>Find a bug?</h3>
@@ -191,14 +189,16 @@
                 <h3>View Chalkline <a href="{{url_for('docs.home')}}">Documentation</a></h3>
             </center>
         </section>
-        <section>
+        <section id="supporters">
             <center>
-                <h2>Support the Developer!</h2>
-                <p>Donate just $2 to help fund updates and show your support!</p>
-                <h3>You can <a target="_blank" href="https://www.buymeacoffee.com/aidanhurwitz">buy me a coffee here</a> to show support.</h3>
+                <h3>Enjoying Chalkline? You can support me and Chalkline <a target='_blank' href="https://buymeacoffee.com/aidanhurwitz">here!</a></h3>
+                <h3 class="urgent">Thank you to supporters of Chalkline&trade;!</h3>
+                <p>Dave Miller</p>
+                <p>Chris Riley</p>
+                <p>Scott Elsberry</p>
+                <p>Luke Radcliffe</p>
             </center>
         </section>
-        
     <center>
     <br>
     <center>
