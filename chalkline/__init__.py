@@ -9,7 +9,7 @@ DOMAIN = os.environ.get('DOMAIN')
 APP_NAME = os.environ.get('APP_NAME')
 VERSION = os.environ.get('VERSION')
 COPYRIGHT = os.environ.get('COPYRIGHT')
-CHALKLINE_AUTH = os.environ.get('')
+CHALKLINE_AUTH = os.environ.get('CHALKLINE_AUTH')
 
 
 def create_app():
