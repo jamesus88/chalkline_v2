@@ -18,13 +18,7 @@
             {% endif %}
         {% endif %}
     <br>
-        <section>
-            <center>
-                <h2>Want to use Chalkline for your league?</h2>
-                <h3>Contact Aidan Hurwitz at <a href="mailto:chalklinebaseball@gmail.com">chalklinebaseball@gmail.com</a> for more info!</h3>
-            </center>
-        </section>
-        {% if res.user %}
+    {% if res.user %}
         {% if upcoming_events|length > 0 %}
             <section id="schedule">
                 <h3>Your upcoming events for <em>{{res.league.name}}</em></h3>
@@ -33,6 +27,16 @@
                 {% endfor %}
             </section>
         {% endif %}
+
+        <section>
+            <center>
+                <h2>2026 Chalkline Merit Scholarship</h2>
+                <p>Applications for the <a target="_blank" href="https://forms.gle/paAMMZmErq2Kg1TQA">2026 Chalkline Merit Scholarship</a> are now open!</p>
+                <p>If selected, earn up to <b>$250</b> in textbooks or materials.</p>
+                <p>Youth umpires and coaches are encouraged to apply!</p>
+                <span class="subtle">You will need a Google account to apply via the Google Form above.</span>
+            </center>
+        </section>
         
         <div class="divide">
             {% if 'coach' in res.user.groups.get(res.league.leagueId) or 'parent' in res.user.groups.get(res.league.leagueId) %}
@@ -107,6 +111,12 @@
         <section>
             <h3>Find a bug?</h3>
             <h4>Report it immediately to Aidan Hurwitz at <a href="mailto:chalklinebaseball@gmail.com">chalklinebaseball@gmail.com</a></h4>
+        </section>
+        <section>
+            <center>
+                <h2>Want to use Chalkline for your league?</h2>
+                <h3>Contact Aidan Hurwitz at <a href="mailto:chalklinebaseball@gmail.com">chalklinebaseball@gmail.com</a> for more info!</h3>
+            </center>
         </section>
 
         <h1>About Chalkline Baseball&trade;</h1>
