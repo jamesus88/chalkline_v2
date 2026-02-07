@@ -147,8 +147,10 @@
 
                 <button class="action" type="submit" name="updateProfile" value="updateProfile">Save</button>
                 <br><br>
+                <h4>Your group:</h4>
+                <p><b style="color:blue">{{res.user.permissions.get(res.league.leagueId)}}</b></p>
                 <h4>Your permissions: </h4>
-                <p>{{res.user_perms}}</p>
+                <p>{{res.user_perms|join(', ')}}</p>
             </form>
         </section>
         <section>

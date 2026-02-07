@@ -170,7 +170,7 @@ class Admin:
         team_codes = {t['teamId'] for t in res['league']['teams']}
         team_codes.add(None)
 
-        df = read_csv(file)
+        df = read_csv(file, encoding="latin-1")
         df = df.replace({float('nan'): None}) # replace NaN with None
 
         # strip all string cols

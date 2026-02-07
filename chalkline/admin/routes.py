@@ -319,7 +319,7 @@ def upload_schedule():
         elif request.form.get('_confirm'):
             fn = os.path.join(current_app.config['UPLOAD_FOLDER'], request.form['_confirm'])
             try:
-                with open(fn, 'r') as f:
+                with open(fn, 'r', encoding="latin-1") as f:
                     events, errors = Admin.read_schedule(res, f)
                     print(events)
                 print("Schedule uploaded for", res['league']['leagueId'], 'by', res['user']['userId'], f"({fn})")
