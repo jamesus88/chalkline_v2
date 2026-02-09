@@ -1,5 +1,5 @@
 from flask import session, redirect, url_for, request
-from chalkline import PROTOCOL, DOMAIN, APP_NAME, VERSION, COPYRIGHT
+from chalkline import PROTOCOL, DOMAIN, APP_NAME, VERSION, COPYRIGHT, CHALKLINE_AUTH
 from chalkline.core import now
 from chalkline.core.league import League
 from chalkline.core.user import User
@@ -86,3 +86,13 @@ def authorized_only(group: str | list = None, set_next_url=None):
 def unauthorized_only():
     if session.get('user'):
         return redirect(url_for('main.home'))
+    
+def verify_auth(raise_error=True):
+    j = request.get_json(silent=True)
+    if j:
+        if j.get("chalkline_auth") == CHALKLINE_AUTH:
+            return True
+    
+    if raise_error:
+        raise PermissionError("Authentication failed.")
+    return False

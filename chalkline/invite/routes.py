@@ -69,9 +69,8 @@ def substitute(eventId, auth):
 
 @invite.post("/daily-reminders")
 def daily_reminders():
-    if request.headers.get("chalkline_auth") != CHALKLINE_AUTH:
-        raise PermissionError("Credentials failed")
-    
+    svr.verify_auth()
+
     all_leagues = League.get_all()
     day_of_week = now().weekday()
     msgs = []
@@ -97,8 +96,7 @@ def daily_reminders():
 
 @invite.post("/update-15")
 def update_15():
-    if request.headers.get("chalkline_auth") != CHALKLINE_AUTH:
-        raise PermissionError("Credentials failed")
+    svr.verify_auth()
     
     all_reqs = Request.get(now())
     for r in all_reqs:
