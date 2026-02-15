@@ -274,7 +274,11 @@ class Event:
     def check_availability(league, event, user):
         all_events = Event.get(league, user)
         for e in all_events:
+            # new event starts during some old event
             if e['date'] <= event['date'] < e['date'] + timedelta(hours=e['duration']):
+                return False
+            # some old event starts during new event
+            if event['date'] <= e['date'] < event['date'] + timedelta(hours=event['duration']):
                 return False
                 
         return True
