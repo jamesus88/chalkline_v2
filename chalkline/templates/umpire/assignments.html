@@ -18,7 +18,7 @@
             <p>To view all games for umpires.</p>
         </div>
     </section>
-    <form method="post">
+    <form method="post" name="form">
         {% include "filters.html" %}
         
         <p class="error">{{res.msg}}</p>
@@ -35,9 +35,9 @@
                     <th>Age Group</th>
                     <th>Status</th>
                     {% if not res.show_umps %}
-                    <th>Umpires <a href="{{url_for('umpire.assignments', show_umps=True)}}"><i title="Show Umpires" class="fa-solid fa-up-right-and-down-left-from-center"></i></a></th>
+                    <th>Umpires <a onclick="expand(true)"><i title="Show Umpires" class="fa-solid fa-up-right-and-down-left-from-center"></i></a></th>
                     {% else %}
-                    <th>Umpires <a href="{{url_for('umpire.assignments')}}"><i title="Hide Umpires" class="fa-solid fa-minimize"></i></a></th>
+                    <th>Umpires <a onclick="expand(false)"><i title="Hide Umpires" class="fa-solid fa-minimize"></i></a></th>
                     {% endif %}
                 </tr>
                 {% for e in events %}

@@ -18,7 +18,7 @@ def master_schedule():
         filters = Filter.parse(request.form)
 
     events = Event.get(res['league'], filters=filters)
-    res['show_umps'] = request.args.get('show_umps')
+    res['show_umps'] = filters['expand']
     return render_template("league/master-schedule.html", res=res, events=events, filters=filters)
 
 @league.route("/status", methods=['GET', 'POST'])

@@ -1,7 +1,15 @@
-<button type="button" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
+
+<button type="button" id="filter-button" onclick="toggleFilterSection('filter-section')" class="filter-dropdown action"><i class="fa-solid fa-filter"></i> Filters</button>
+
+{% if not filters.default %}
+<script>
+    document.getElementById('filter-button').style.backgroundColor = 'var(--success)';
+</script>
+{% endif %}
+
 <section id="filter-section" class="filter-section" style='display: none;'>
     <br>
-    {% if res.league %}
+    {% if request.blueprint not in ["director", "teams"] and res.league %}
         <select class="filter" name="filter_age" id="filter_age">
             <option value="None" selected>All Age Groups</option>
             {% for a in res.league.age_groups %}
@@ -26,7 +34,7 @@
         document.getElementById('filter_season').value = "{{filters.season}}";
     </script>
 
-    {% if request.blueprint != "umpire" and res.league %}
+    {% if request.blueprint not in ["umpire", "director", "teams"] and res.league %}
         <select class="filter" name="filter_team" id="filter_team">
             <option value="None" selected>All teams</option>
             {% for t in res.league.teams %}
@@ -37,6 +45,19 @@
         <script>
             document.getElementById('filter_team').value = "{{filters.team}}";
         </script>
+    {% endif %}
+
+    {% if request.blueprint in ['umpire', 'league', 'admin'] %}
+        <select class="filter" name="filter_open" id="filter_open">
+            <option value="False" selected>Filled or Open</option>
+            <option value="True">Open positions only</option>
+        </select>
+
+        <script>
+            document.getElementById('filter_open').value = "{{filters.open}}";
+        </script>
+        
+        <input type="hidden" name="filter_expand" id="filter_expand" value="{{filters.expand}}">
     {% endif %}
 
     {% if request.blueprint == 'admin' %}
@@ -80,6 +101,17 @@
     <button class="action secondary"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
     <button class="action secondary" name="filter_reset" value="0"><i class="fa-solid fa-arrow-rotate-left"></i> Reset</button>
 
-
+<script>
+    // expands umpires when clicking "show umpires"
+    function expand(t) {
+        if (t) {
+            document.getElementById("filter_expand").value = "True";
+            document.form.submit();
+        } else {
+            document.getElementById("filter_expand").value = "False";
+            document.form.submit();
+        }
+    }
+</script>
 
 </section>

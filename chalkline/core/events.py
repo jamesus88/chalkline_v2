@@ -12,12 +12,16 @@ class Filter:
     def default():
         return {
             'age': None,
-            'start': now() - timedelta(hours=2),
-            'end': now() + timedelta(days=200),
+            'start': now().replace(second=0, microsecond=0) - timedelta(hours=2),
+            'end': now().replace(second=0, microsecond=0) + timedelta(days=200),
             'umpires_only': False,
             'team': None,
             'season': None,
-            'umpire': None
+            'umpire': None,
+            'open': False,
+            'expand': False,
+
+            'default': True
         }
 
     @staticmethod
@@ -28,6 +32,7 @@ class Filter:
             return filters
 
         filters['umpires_only'] = form.get('filter_umpires_only') == 'True'
+        filters['open'] = form.get('filter_open') == 'True'
 
         if form.get('filter_age', 'None') != 'None':
             filters['age'] = form['filter_age']
@@ -41,6 +46,12 @@ class Filter:
             filters['umpire'] = form['filter_umpire']
         if form.get('filter_season', 'None') != 'None':
             filters['season'] = form['filter_season']
+
+        if filters != Filter.default():
+            print(filters, Filter.default())
+            filters['default'] = False
+
+        filters['expand'] = form.get('filter_expand') == 'True'
         
         return filters
 
@@ -176,7 +187,7 @@ class Event:
         if filters.get('umpire'):
             umpire = User.get_user(userId=filters.get('umpire'))
 
-        all_events = list(Event.col.find({'$and': criteria}).sort(['date', 'field']))
+        all_events = Event.col.find({'$and': criteria}).sort(['date', 'field'])
 
         if safe:
             umps_coaches = User.find_groups(league, ["umpire", "coach"], view=True)
@@ -184,20 +195,22 @@ class Event:
 
         events = []
 
-        # filter
+        # filter (events have been made safe)
         for e in all_events:
             if user:
                 if not Event.user_in_event(e, user, check_user_teams):
                     continue
+            elif umpire:
+                if not Event.user_in_event(e, umpire, check_user_teams=False):
+                    continue
+                
             if team:
                 if not Event.team_in_event(e, team):
                     continue
             elif filters.get('team'):
                 if not Event.team_in_event(e, filters['team']):
                     continue
-            elif umpire:
-                if not Event.user_in_event(e, umpire, check_user_teams=False):
-                    continue
+            
 
             if filters['umpires_only']:
                 found = False
@@ -211,6 +224,9 @@ class Event:
                             found = True
                 
                 if not found: continue
+
+            if filters['open']:
+                if e['umpire_full']: continue
 
             events.append(e)
 

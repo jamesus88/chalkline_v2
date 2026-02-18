@@ -59,7 +59,7 @@ def event_data():
         events = Event.get(res['league'], filters=filters)
         
     all_umps = User.find_groups(res['league'], ['umpire'])
-    res['show_umps'] = request.args.get("show_umps")
+    res['show_umps'] = filters['expand']
     res['max_ump_count'] = max([len(e['umpires'].keys()) for e in events] + [0])
 
     return render_template("admin/event-data.html", res=res, events=events, filters=filters, all_umps=all_umps)

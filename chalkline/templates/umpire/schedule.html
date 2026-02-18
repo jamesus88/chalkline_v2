@@ -18,7 +18,7 @@
             <p>To view games you are working.</p>
         </div>
     </section>
-    <form method="post">        
+    <form method="post" name="form">        
         {% include "filters.html" %}
         <br><br>
 
@@ -40,9 +40,9 @@
                     <th>Age Group</th>
                     <th>Status</th>
                     {% if not res.show_umps %}
-                    <th>Umpires <a href="{{url_for('umpire.schedule', show_umps=True)}}"><i title="Show Umpires" class="fa-solid fa-up-right-and-down-left-from-center"></i></a></th>
+                    <th>Umpires <a onclick="expand(true)"><i title="Show Umpires" class="fa-solid fa-up-right-and-down-left-from-center"></i></a></th>
                     {% else %}
-                    <th>Umpires <a href="{{url_for('umpire.schedule')}}"><i title="Hide Umpires" class="fa-solid fa-minimize"></i></a></th>
+                    <th>Umpires <a onclick="expand(false)"><i title="Hide Umpires" class="fa-solid fa-minimize"></i></a></th>
                     {% endif %}
                 </tr>
                 {% for e in events %}
@@ -109,8 +109,10 @@
                 {% endfor %}
             </table>
         </section>
-        <button id="load-more" type="button" class="action" onclick="load()">Load More</button>
+        <button id="load-more" type="button" class="action" onclick="load()">View More</button>
+        <p class="subtle">{{events|length}} games loaded.</p>
     </form>
     {% if res.show_umps %}<p class="subtle">* positions requested by coaches</p>{% endif %}
+
 </main>
 {% endblock content %}
