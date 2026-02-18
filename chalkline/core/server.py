@@ -3,6 +3,7 @@ from chalkline import PROTOCOL, DOMAIN, APP_NAME, VERSION, COPYRIGHT, CHALKLINE_
 from chalkline.core import now
 from chalkline.core.league import League
 from chalkline.core.user import User
+from chalkline.collections import messageData
 
 def login(user, leagueId=None, admin=None):
     if leagueId:
@@ -64,6 +65,11 @@ def obj(context={}):
         'admin': session.get('admin'),
         'flash': session.get('flash')
     }
+
+    msg = messageData.find_one({"name": "chalkline"})
+    if msg['msg']:
+        res['flash'] = msg['msg'] + f" ({msg['date']})"
+
     res.update(context)
 
     return res
