@@ -27,16 +27,6 @@
                 {% endfor %}
             </section>
         {% endif %}
-
-        <section>
-            <center>
-                <h2>2026 Chalkline Merit Scholarship</h2>
-                <p>Applications for the <a target="_blank" href="https://forms.gle/paAMMZmErq2Kg1TQA">2026 Chalkline Merit Scholarship</a> are now open!</p>
-                <p>If selected, earn up to <b>$250</b> in textbooks or materials.</p>
-                <p>Youth umpires and coaches are encouraged to apply!</p>
-                <span class="subtle">You will need a Google account to apply via the Google Form above.</span>
-            </center>
-        </section>
         
         <div class="divide">
             {% if 'coach' in res.user.groups.get(res.league.leagueId) or 'parent' in res.user.groups.get(res.league.leagueId) %}
