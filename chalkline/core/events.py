@@ -383,10 +383,12 @@ class Event:
     
     @staticmethod
     def remove_umpire(eventId, pos, user):
+        print(f"{user['userId']} removed {pos} duty ({eventId}).")
         Event.col.update_one({'_id': ObjectId(eventId), f'umpires.{pos}.user': user['userId']}, {'$set': {f'umpires.{pos}.user': None}})
 
     @staticmethod
     def request_umpire(eventId, pos, coach):
+        print(f"{coach['userId']} requested {pos} duty ({eventId}).")
         Event.col.update_one({'_id': ObjectId(eventId)}, {'$set': {f'umpires.{pos}.coach_req': coach['userId']}})
 
     @staticmethod
@@ -424,6 +426,9 @@ class Event:
         
         if event is None:
             raise ValueError('An umpire has already accepted this game!')
+        else:
+            print(f"{pos} request removed ({eventId}).")
+
         
     @staticmethod
     def label_umpire_duties(events, team):
@@ -492,6 +497,8 @@ class Event:
             raise PermissionError("Error: you are already scheduled during this time (conflict found).")
         else:
             Event.col.update_one({'_id': ObjectId(event['_id'])}, {'$set': {f'umpires.{pos}.user': user['userId']}})
+            print(f"{user['userId']} filled {pos} duty ({event['eventId']}).")
+
             
 
     @staticmethod

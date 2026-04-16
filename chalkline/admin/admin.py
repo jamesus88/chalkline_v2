@@ -4,7 +4,7 @@ from pymongo import UpdateOne
 from datetime import datetime, timedelta
 from chalkline.core.user import User
 from chalkline.core.team import Team
-from pandas import read_csv
+from pandas import read_csv, notna
 import chalkline.core.mailer as mailer
 from chalkline.core.director import Shift
 from chalkline.core.events import Event, Filter
@@ -226,7 +226,7 @@ class Admin:
             for pos in Event.get_all_ump_positions():
                 if getattr(r, pos.lower()):
                     blank = Event.generate_blank_ump_pos(e, pos)
-                    if getattr(r, pos.lower()+"_duty"):
+                    if notna(getattr(r, pos.lower()+"_duty")):
                         blank['team_duty'] = getattr(r, pos.lower()+"_duty")
                         if blank['team_duty'] not in team_codes:
                             errors.add("One or more umpire duties include invalid teams. Choose a team code from your league or create a new one.")

@@ -43,7 +43,7 @@
                 {% for e in events %}
                 <tr class="event-row">
                     <td><a class="icon-link" href="{{url_for('view_info.event', eventId=e._id)}}"><i class="fa-solid fa-info"></i></a></td>
-                    <td class="event-type">{{e.type}}</td>
+                    <td class="event-type">{{e.age}}</td>
                     <td>{{e.date.strftime('%a %m/%d @ %H:%M')}}</td>
                     <td>{{e.venueId}}</td>
                     <td>{{e.field}}</td>

@@ -1,6 +1,13 @@
 function colorifySchedule(tbl) {
-    for (let i = 0, row; row = tbl.rows[i]; i++) {
+    // color first row, skip header
+    for (let i = 1, row; row = tbl.rows[i]; i++) {
         let text = row.cells[1].innerHTML;
+
+        if (row.cells[1].classList.contains('event-type')) {
+            row.cells[1].classList.add('blue-text');
+            continue;
+        }
+
         if (text == 'Game') {
             row.cells[1].classList.add('red-text');
         }
@@ -9,7 +16,7 @@ function colorifySchedule(tbl) {
         }
         else if (text == 'Umpire Duty') {
             row.cells[1].classList.add('blue-text');
-        }
+        }   
     }
 }
 
