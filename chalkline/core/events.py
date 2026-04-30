@@ -497,7 +497,7 @@ class Event:
             raise PermissionError("Error: you are already scheduled during this time (conflict found).")
         else:
             Event.col.update_one({'_id': ObjectId(event['_id'])}, {'$set': {f'umpires.{pos}.user': user['userId']}})
-            print(f"{user['userId']} filled {pos} duty ({event['eventId']}).")
+            print(f"{user['userId']} filled {pos} duty ({event['_id']}).")
 
             
 
